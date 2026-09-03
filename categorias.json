@@ -1,0 +1,64 @@
+{
+  "categories": [
+    {
+      "key": "carnes",
+      "name": "Carnes",
+      "url": "https://www.tudogostoso.com.br/categorias/1004-carnes",
+      "enabled": true
+    },
+    {
+      "key": "aves",
+      "name": "Aves",
+      "url": "https://www.tudogostoso.com.br/categorias/1009-aves",
+      "enabled": true
+    },
+    {
+      "key": "peixes-e-frutos-do-mar",
+      "name": "Peixes e frutos do mar",
+      "url": "https://www.tudogostoso.com.br/categorias/1014-peixes-e-frutos-do-mar",
+      "enabled": true
+    },
+    {
+      "key": "saladas-molhos-e-acompanhamentos",
+      "name": "Saladas, molhos e acompanhamentos",
+      "url": "https://www.tudogostoso.com.br/categorias/1023-saladas-molhos-e-acompanhamentos",
+      "enabled": true
+    },
+    {
+      "key": "sopas",
+      "name": "Sopas",
+      "url": "https://www.tudogostoso.com.br/categorias/1027-sopas",
+      "enabled": true
+    },
+    {
+      "key": "massas",
+      "name": "Massas",
+      "url": "https://www.tudogostoso.com.br/categorias/1028-massas",
+      "enabled": true
+    },
+    {
+      "key": "doces-e-sobremesas",
+      "name": "Doces e sobremesas",
+      "url": "https://www.tudogostoso.com.br/categorias/1037-doces-e-sobremesas",
+      "enabled": true
+    },
+    {
+      "key": "lanches",
+      "name": "Lanches",
+      "url": "https://www.tudogostoso.com.br/categorias/1044-lanches",
+      "enabled": true
+    },
+    {
+      "key": "alimentacao-saudavel",
+      "name": "Alimentação saudável",
+      "url": "https://www.tudogostoso.com.br/categorias/1334-alimentacao-saudavel",
+      "enabled": true
+    },
+    {
+      "key": "todas-receitas",
+      "name": "Todas as receitas",
+      "url": "https://www.tudogostoso.com.br/receitas",
+      "enabled": true
+    }
+  ]
+}

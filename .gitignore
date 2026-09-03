@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.tmp-test*/
+*.index
+.venv/
+.deps/
+data/*.sqlite
+data/*.db
+logs/*.jsonl
+.streamlit/secrets.toml

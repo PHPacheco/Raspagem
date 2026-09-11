@@ -16,6 +16,7 @@ from .database import (
     initialize_database,
     listing_count,
     recipe_count,
+    rebuild_text_preparations,
     save_listing,
     save_recipe,
 )
@@ -222,6 +223,14 @@ def init_database(args: argparse.Namespace) -> int:
     return 0
 
 
+def prepare_database(args: argparse.Namespace) -> int:
+    connection = _open_database(args.database)
+    prepared_count = rebuild_text_preparations(connection)
+    connection.close()
+    print(f"Preparação de textos atualizada: {prepared_count} unidade(s) em {args.database}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Coletor acadêmico de receitas")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -229,6 +238,10 @@ def build_parser() -> argparse.ArgumentParser:
     init_parser = subparsers.add_parser("init-db", help="inicializa o schema SQLite")
     init_parser.add_argument("--database", default=DEFAULT_DATABASE)
     init_parser.set_defaults(handler=init_database)
+
+    prepare_parser = subparsers.add_parser("prepare-db", help="reconstrói textos limpos, tokens e metadados de preparação")
+    prepare_parser.add_argument("--database", default=DEFAULT_DATABASE)
+    prepare_parser.set_defaults(handler=prepare_database)
 
     collect_parser = subparsers.add_parser("collect", help="descobre e coleta receitas")
     collect_parser.add_argument("--category-url", default=DEFAULT_CATEGORY_URL)

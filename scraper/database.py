@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
@@ -7,7 +8,7 @@ from typing import Any, Iterable
 
 from . import PARSER_VERSION, USER_AGENT
 from .models import RecipeData, RecipeLink, RelatedCategory
-from .text_utils import normalize_text
+from .text_utils import normalize_text, prepare_text, search_index_text, search_terms
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -138,7 +139,103 @@ def _search_text(recipe: RecipeData) -> str:
     values.extend(recipe.utensils)
     values.extend(recipe.preparation_steps)
     values.extend(category.name for category in recipe.related_categories)
-    return normalize_text(" ".join(values))
+    return search_index_text(values)
+
+
+def _recipe_text_units(recipe: RecipeData) -> Iterable[tuple[str, int, str]]:
+    yield "title", 0, recipe.title
+    if recipe.description:
+        yield "description", 0, recipe.description
+    for position, value in enumerate(recipe.ingredients, 1):
+        yield "ingredient", position, value
+    for position, value in enumerate(recipe.utensils, 1):
+        yield "utensil", position, value
+    for position, value in enumerate(recipe.preparation_steps, 1):
+        yield "preparation_step", position, value
+    for position, category in enumerate(recipe.related_categories, 1):
+        yield "related_category", position, category.name
+
+
+def _database_text_units(connection: sqlite3.Connection, recipe_id: str) -> Iterable[tuple[str, int, str]]:
+    recipe = connection.execute(
+        "SELECT title, description FROM recipes WHERE site_recipe_id = ?", (recipe_id,)
+    ).fetchone()
+    if recipe is None:
+        return
+    yield "title", 0, recipe["title"]
+    if recipe["description"]:
+        yield "description", 0, recipe["description"]
+    for row in connection.execute(
+        "SELECT position, raw_text FROM ingredients WHERE recipe_id = ? ORDER BY position", (recipe_id,)
+    ):
+        yield "ingredient", int(row["position"]), row["raw_text"]
+    for row in connection.execute(
+        "SELECT position, name FROM utensils WHERE recipe_id = ? ORDER BY position", (recipe_id,)
+    ):
+        yield "utensil", int(row["position"]), row["name"]
+    for row in connection.execute(
+        "SELECT position, raw_text FROM preparation_steps WHERE recipe_id = ? ORDER BY position", (recipe_id,)
+    ):
+        yield "preparation_step", int(row["position"]), row["raw_text"]
+    for position, row in enumerate(
+        connection.execute(
+            """
+            SELECT c.name
+            FROM recipe_categories rc
+            JOIN categories c ON c.site_category_id = rc.category_id
+            WHERE rc.recipe_id = ?
+            ORDER BY c.name COLLATE NOCASE
+            """,
+            (recipe_id,),
+        ),
+        1,
+    ):
+        yield "related_category", position, row["name"]
+
+
+def _save_prepared_texts(
+    connection: sqlite3.Connection,
+    recipe_id: str,
+    units: Iterable[tuple[str, int, str]],
+    *,
+    prepared_at: str | None = None,
+) -> int:
+    timestamp = prepared_at or utc_now()
+    rows = []
+    for field_name, position, raw_text in units:
+        prepared = prepare_text(raw_text)
+        rows.append(
+            (
+                recipe_id,
+                field_name,
+                position,
+                prepared.raw_text,
+                prepared.clean_text,
+                prepared.normalized_text,
+                json.dumps(prepared.tokens, ensure_ascii=False),
+                json.dumps(prepared.content_tokens, ensure_ascii=False),
+                json.dumps(prepared.stemmed_tokens, ensure_ascii=False),
+                json.dumps(prepared.lemma_tokens, ensure_ascii=False),
+                prepared.duplicate_key,
+                prepared.near_duplicate_key,
+                prepared.pipeline_version,
+                json.dumps(prepared.transformations, ensure_ascii=False),
+                timestamp,
+            )
+        )
+    connection.execute("DELETE FROM text_preparations WHERE recipe_id = ?", (recipe_id,))
+    connection.executemany(
+        """
+        INSERT INTO text_preparations
+            (recipe_id, field_name, position, raw_text, clean_text, normalized_text,
+             tokens_json, content_tokens_json, stemmed_tokens_json, lemma_tokens_json,
+             duplicate_key, near_duplicate_key, pipeline_version, transformations_json,
+             prepared_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        rows,
+    )
+    return len(rows)
 
 
 def save_recipe(connection: sqlite3.Connection, recipe: RecipeData) -> None:
@@ -212,7 +309,20 @@ def save_recipe(connection: sqlite3.Connection, recipe: RecipeData) -> None:
             """,
             (recipe.site_recipe_id, category_id),
         )
+    _save_prepared_texts(connection, recipe.site_recipe_id, _recipe_text_units(recipe), prepared_at=recipe.retrieved_at)
     connection.commit()
+
+
+def rebuild_text_preparations(connection: sqlite3.Connection) -> int:
+    total = 0
+    recipe_ids = [
+        row["site_recipe_id"]
+        for row in connection.execute("SELECT site_recipe_id FROM recipes ORDER BY site_recipe_id")
+    ]
+    for recipe_id in recipe_ids:
+        total += _save_prepared_texts(connection, recipe_id, _database_text_units(connection, recipe_id))
+    connection.commit()
+    return total
 
 
 def recipe_count(connection: sqlite3.Connection) -> int:
@@ -240,9 +350,11 @@ def query_recipes(
     clauses = ["1 = 1"]
     parameters: list[Any] = []
     if search.strip():
-        clauses.append("r.search_text LIKE ? ESCAPE '\\'")
-        escaped = normalize_text(search).replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-        parameters.append(f"%{escaped}%")
+        terms = search_terms(search)
+        for term in terms:
+            clauses.append("r.search_text LIKE ? ESCAPE '\\'")
+            escaped = term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+            parameters.append(f"%{escaped}%")
     difficulty_value = difficulty.strip()
     if difficulty_value:
         clauses.append("TRIM(r.difficulty) = TRIM(?) COLLATE NOCASE")
@@ -311,6 +423,21 @@ def recipe_details(connection: sqlite3.Connection, recipe_id: str) -> dict[str, 
             JOIN categories c ON c.site_category_id = rc.category_id
             WHERE rc.recipe_id = ?
             ORDER BY c.name COLLATE NOCASE
+            """,
+            (recipe_id,),
+        )
+    ]
+    details["prepared_texts"] = [
+        dict(row)
+        for row in connection.execute(
+            """
+            SELECT field_name, position, raw_text, clean_text, normalized_text,
+                   tokens_json, content_tokens_json, stemmed_tokens_json,
+                   lemma_tokens_json, duplicate_key, near_duplicate_key,
+                   pipeline_version, transformations_json, prepared_at
+            FROM text_preparations
+            WHERE recipe_id = ?
+            ORDER BY field_name, position
             """,
             (recipe_id,),
         )

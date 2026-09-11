@@ -67,6 +67,27 @@ Somente após a autorização adequada:
 
 As execuções geram logs JSONL em `logs/`. O banco armazena detalhes normalizados, não snapshots HTML.
 
+## Limpeza e preparação dos textos
+
+O projeto mantém o texto bruto extraído e registra versões derivadas na tabela `text_preparations`.
+O pipeline aplicado segue as etapas da aula de PLN:
+
+- remoção de HTML residual, menus e URLs;
+- normalização de espaços, caixa e acentos;
+- remoção de pontuação, símbolos e emojis para a versão tokenizada;
+- tokenização por palavras;
+- remoção seletiva de stopwords em português, preservando negação;
+- stemming leve;
+- lematização heurística para termos comuns do domínio;
+- chaves de duplicidade literal e quase duplicidade;
+- versão do pipeline e lista de transformações aplicadas.
+
+Para reconstruir essas versões em um banco já existente:
+
+```powershell
+.\.venv\bin\python.exe -m scraper prepare-db
+```
+
 ## Abrir a aplicação
 
 ```powershell
@@ -91,4 +112,4 @@ bats\coletar_receitas.bat fixture
 bats\coletar_receitas.bat --max-pages 2 --discover-only
 ```
 
-Sem argumentos, o BAT executa o modo seguro de descoberta. Consulte `Estudo\implementacao.md` para entender o fluxo completo.
+Sem argumentos, o BAT executa o modo seguro de descoberta.

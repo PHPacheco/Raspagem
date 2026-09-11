@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sqlite3
 from pathlib import Path
 
@@ -58,6 +59,26 @@ def _show_details(details: dict[str, object]) -> None:
         st.markdown("#### Categorias relacionadas")
         categories = details["related_categories"]
         st.write(", ".join(str(category["name"]) for category in categories) or "Nenhuma informada")
+
+    prepared_texts = details.get("prepared_texts") or []
+    if prepared_texts:
+        with st.expander("Preparação dos textos"):
+            first = prepared_texts[0]
+            st.caption(f"Pipeline {first['pipeline_version']} · {len(prepared_texts)} unidade(s) preparada(s)")
+            st.dataframe(
+                [
+                    {
+                        "Campo": row["field_name"],
+                        "Posição": row["position"],
+                        "Bruto": row["raw_text"],
+                        "Limpo": row["clean_text"],
+                        "Tokens": ", ".join(json.loads(row["content_tokens_json"])),
+                    }
+                    for row in prepared_texts
+                ],
+                width="stretch",
+                hide_index=True,
+            )
 
 
 def _reset_filters() -> None:

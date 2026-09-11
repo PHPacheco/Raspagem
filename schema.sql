@@ -80,9 +80,31 @@ CREATE TABLE IF NOT EXISTS category_listings (
     UNIQUE(run_id, category_id, page_number, recipe_id)
 );
 
+CREATE TABLE IF NOT EXISTS text_preparations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    recipe_id TEXT NOT NULL REFERENCES recipes(site_recipe_id) ON DELETE CASCADE,
+    field_name TEXT NOT NULL,
+    position INTEGER NOT NULL CHECK (position >= 0),
+    raw_text TEXT NOT NULL,
+    clean_text TEXT NOT NULL,
+    normalized_text TEXT NOT NULL,
+    tokens_json TEXT NOT NULL,
+    content_tokens_json TEXT NOT NULL,
+    stemmed_tokens_json TEXT NOT NULL,
+    lemma_tokens_json TEXT NOT NULL,
+    duplicate_key TEXT NOT NULL,
+    near_duplicate_key TEXT NOT NULL,
+    pipeline_version TEXT NOT NULL,
+    transformations_json TEXT NOT NULL,
+    prepared_at TEXT NOT NULL,
+    UNIQUE(recipe_id, field_name, position)
+);
+
 CREATE INDEX IF NOT EXISTS idx_recipes_rating ON recipes(rating_value);
 CREATE INDEX IF NOT EXISTS idx_recipes_difficulty ON recipes(difficulty);
 CREATE INDEX IF NOT EXISTS idx_recipes_cost ON recipes(cost_label);
 CREATE INDEX IF NOT EXISTS idx_listings_recipe ON category_listings(recipe_id);
 CREATE INDEX IF NOT EXISTS idx_recipe_categories_category ON recipe_categories(category_id);
-
+CREATE INDEX IF NOT EXISTS idx_text_preparations_recipe ON text_preparations(recipe_id);
+CREATE INDEX IF NOT EXISTS idx_text_preparations_duplicate ON text_preparations(duplicate_key);
+CREATE INDEX IF NOT EXISTS idx_text_preparations_near_duplicate ON text_preparations(near_duplicate_key);

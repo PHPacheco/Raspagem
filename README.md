@@ -88,6 +88,30 @@ Para reconstruir essas versões em um banco já existente:
 .\.venv\bin\python.exe -m scraper prepare-db
 ```
 
+## Representação e análise textual
+
+Depois da preparação, o projeto também implementa o processo da aula sobre transformar textos em dados analisáveis:
+
+```text
+Textos -> preparação -> TF-IDF -> matriz documento x termo
+```
+
+A partir da matriz, o projeto calcula:
+
+- termos principais de cada receita;
+- similaridade por cosseno entre receitas;
+- clusters com K-Means simples;
+- coordenadas 2D por projeção linear para visualização.
+
+Para gerar essa etapa no banco:
+
+```powershell
+.\.venv\bin\python.exe -m scraper analyze-texts
+```
+
+O resultado fica nas tabelas `text_analysis_runs`, `document_vectors`, `document_term_weights` e `document_similarities`.
+Na aplicação Streamlit, a seção "Análise textual" mostra a leitura didática desses dados.
+
 ## Abrir a aplicação
 
 ```powershell

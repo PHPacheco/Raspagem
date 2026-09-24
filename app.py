@@ -7,6 +7,7 @@ from pathlib import Path
 import streamlit as st
 
 from scraper.database import connect_database, distinct_filter_values, query_recipes, recipe_details
+from scraper.text_analysis import latest_text_analysis
 
 
 DATABASE_PATH = Path(__file__).resolve().parent / "data" / "recipes.sqlite"
@@ -75,6 +76,50 @@ def _show_details(details: dict[str, object]) -> None:
                         "Tokens": ", ".join(json.loads(row["content_tokens_json"])),
                     }
                     for row in prepared_texts
+                ],
+                width="stretch",
+                hide_index=True,
+            )
+
+
+def _show_text_analysis(analysis: dict[str, object] | None) -> None:
+    if not analysis:
+        st.info("Análise textual ainda não gerada. Rode `.\\.venv\\bin\\python.exe -m scraper analyze-texts`.")
+        return
+
+    run = analysis["run"]
+    documents = analysis["documents"]
+    similarities = analysis["similarities"]
+    with st.expander("Análise textual: TF-IDF, similaridade, clusters e projeção"):
+        st.caption(
+            f"Execução {run['id']} · {run['document_count']} documento(s) · "
+            f"{run['vocabulary_size']} termo(s) · modelo {run['model_version']}"
+        )
+        st.dataframe(
+            [
+                {
+                    "Receita": row["title"],
+                    "Cluster": row["cluster_label"],
+                    "X": round(float(row["x"]), 4),
+                    "Y": round(float(row["y"]), 4),
+                    "Termos principais": ", ".join(item["term"] for item in row["top_terms_data"][:6]),
+                }
+                for row in documents
+            ],
+            width="stretch",
+            hide_index=True,
+        )
+        if similarities:
+            st.markdown("#### Vizinhos por cosseno")
+            st.dataframe(
+                [
+                    {
+                        "Receita": row["recipe_title"],
+                        "Vizinha": row["neighbor_title"],
+                        "Rank": row["rank"],
+                        "Cosseno": round(float(row["cosine_similarity"]), 4),
+                    }
+                    for row in similarities
                 ],
                 width="stretch",
                 hide_index=True,
@@ -156,6 +201,7 @@ def main() -> None:
             min_rating=min_rating_value or None,
             category_id=category_id,
         )
+        _show_text_analysis(latest_text_analysis(connection))
         st.subheader(f"{len(rows)} receita(s) encontrada(s)")
         if not rows:
             st.info("Nenhuma receita corresponde aos filtros atuais.")

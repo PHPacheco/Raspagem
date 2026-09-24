@@ -22,6 +22,7 @@ from .database import (
 )
 from .http_client import AcademicHttpClient, RecipeAuthorizationRequired, RobotsBlocked
 from .recipe_parser import parse_recipe
+from .text_analysis import run_text_analysis
 from .text_utils import canonical_url, site_category_id_from_url
 
 
@@ -231,6 +232,27 @@ def prepare_database(args: argparse.Namespace) -> int:
     return 0
 
 
+def analyze_texts(args: argparse.Namespace) -> int:
+    connection = _open_database(args.database)
+    prepared_count = rebuild_text_preparations(connection)
+    run_id = run_text_analysis(
+        connection,
+        cluster_count=args.clusters,
+        neighbor_count=args.neighbors,
+    )
+    summary = connection.execute(
+        "SELECT document_count, vocabulary_size, cluster_count FROM text_analysis_runs WHERE id = ?",
+        (run_id,),
+    ).fetchone()
+    connection.close()
+    print(
+        f"Análise textual {run_id}: {summary['document_count']} documento(s), "
+        f"{summary['vocabulary_size']} termo(s), {summary['cluster_count']} cluster(s). "
+        f"Preparação atualizada: {prepared_count} unidade(s)."
+    )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Coletor acadêmico de receitas")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -242,6 +264,15 @@ def build_parser() -> argparse.ArgumentParser:
     prepare_parser = subparsers.add_parser("prepare-db", help="reconstrói textos limpos, tokens e metadados de preparação")
     prepare_parser.add_argument("--database", default=DEFAULT_DATABASE)
     prepare_parser.set_defaults(handler=prepare_database)
+
+    analyze_parser = subparsers.add_parser(
+        "analyze-texts",
+        help="gera TF-IDF, matriz documento-termo, similaridades, clusters e projeção 2D",
+    )
+    analyze_parser.add_argument("--database", default=DEFAULT_DATABASE)
+    analyze_parser.add_argument("--clusters", type=int, default=4)
+    analyze_parser.add_argument("--neighbors", type=int, default=5)
+    analyze_parser.set_defaults(handler=analyze_texts)
 
     collect_parser = subparsers.add_parser("collect", help="descobre e coleta receitas")
     collect_parser.add_argument("--category-url", default=DEFAULT_CATEGORY_URL)

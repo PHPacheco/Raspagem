@@ -1,6 +1,6 @@
 # Coleta acadêmica de receitas
 
-Projeto didático para estudar raspagem de HTML, normalização de dados, SQLite e uma interface local com Streamlit.
+Projeto didático para estudar raspagem de HTML, normalização de dados, SQLite e análise textual em um notebook Jupyter com outputs prontos.
 
 ## Aviso de conformidade
 
@@ -110,7 +110,7 @@ Para gerar essa etapa no banco:
 ```
 
 O resultado fica nas tabelas `text_analysis_runs`, `document_vectors`, `document_term_weights` e `document_similarities`.
-Na aplicação Streamlit, a seção "Análise textual" mostra um mapa 3D das receitas, além da leitura didática dos termos e vizinhos.
+No notebook, a seção de análise textual mostra um mapa 3D das receitas, além da leitura didática dos termos e vizinhos.
 
 ## Embeddings por contexto
 
@@ -137,15 +137,25 @@ Para gerar essa etapa no banco:
 ```
 
 O resultado fica nas tabelas `embedding_runs`, `word_embeddings`, `document_embeddings` e `embedding_similarities`.
-Na aplicação Streamlit, a seção "Etapa 7" mostra os embeddings, vizinhos por similaridade densa e contextos aprendidos.
+No notebook, a seção "Etapa 7" mostra os embeddings, vizinhos por similaridade densa e contextos aprendidos.
 
-## Abrir a aplicação
+## Gerar e abrir o notebook
 
 ```powershell
-streamlit run app.py
+.\.venv\bin\python.exe -m scraper export-notebook
 ```
 
-A interface permite busca por texto normalizado, dificuldade, custo, tempo, nota e categoria relacionada.
+Esse comando gera `notebooks\Trabalho PLN.ipynb` com outputs prontos. O fluxo oficial de visualização não usa mais página web/Streamlit.
+
+Para atualizar tudo antes de gerar o notebook:
+
+```powershell
+.\.venv\bin\python.exe -m scraper analyze-texts
+.\.venv\bin\python.exe -m scraper build-embeddings
+.\.venv\bin\python.exe -m scraper export-notebook
+```
+
+O notebook mantém os filtros em forma de variáveis editáveis, além das tabelas, detalhes das receitas, preparação textual, gráfico 3D, TF-IDF e embeddings.
 
 ## Testes
 
@@ -164,3 +174,11 @@ bats\coletar_receitas.bat --max-pages 2 --discover-only
 ```
 
 Sem argumentos, o BAT executa o modo seguro de descoberta.
+
+Para visualizar as implementações mais recentes sem decorar os comandos, use:
+
+```text
+bats\visualizar_novidades.bat
+```
+
+Esse atalho atualiza a limpeza/preparação dos textos, gera a análise TF-IDF com projeção 3D, gera os embeddings da etapa 7, exporta `notebooks\Trabalho PLN.ipynb` com outputs prontos e tenta abrir o notebook no VS Code ou no aplicativo padrão. Se o banco `data\recipes.sqlite` ainda não existir, ele carrega a fixture local antes de gerar o notebook.

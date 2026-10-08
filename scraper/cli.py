@@ -25,6 +25,7 @@ from .recipe_parser import parse_recipe
 from .text_embeddings import run_embedding_analysis
 from .text_analysis import run_text_analysis
 from .text_utils import canonical_url, site_category_id_from_url
+from .notebook_export import DEFAULT_NOTEBOOK, export_analysis_notebook
 
 
 DEFAULT_CATEGORY_URL = "https://www.tudogostoso.com.br/categorias/1004-carnes"
@@ -276,6 +277,12 @@ def build_embeddings(args: argparse.Namespace) -> int:
     return 0
 
 
+def export_notebook(args: argparse.Namespace) -> int:
+    notebook_path = export_analysis_notebook(args.database, args.output)
+    print(f"Notebook gerado com outputs prontos: {notebook_path}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Coletor acadêmico de receitas")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -290,7 +297,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     analyze_parser = subparsers.add_parser(
         "analyze-texts",
-        help="gera TF-IDF, matriz documento-termo, similaridades, clusters e projeção 2D",
+        help="gera TF-IDF, matriz documento-termo, similaridades, clusters e projeção 3D",
     )
     analyze_parser.add_argument("--database", default=DEFAULT_DATABASE)
     analyze_parser.add_argument("--clusters", type=int, default=4)
@@ -306,6 +313,14 @@ def build_parser() -> argparse.ArgumentParser:
     embeddings_parser.add_argument("--window", type=int, default=2)
     embeddings_parser.add_argument("--neighbors", type=int, default=5)
     embeddings_parser.set_defaults(handler=build_embeddings)
+
+    notebook_parser = subparsers.add_parser(
+        "export-notebook",
+        help="gera notebook .ipynb com outputs prontos para visualizar a análise",
+    )
+    notebook_parser.add_argument("--database", default=DEFAULT_DATABASE)
+    notebook_parser.add_argument("--output", default=str(DEFAULT_NOTEBOOK))
+    notebook_parser.set_defaults(handler=export_notebook)
 
     collect_parser = subparsers.add_parser("collect", help="descobre e coleta receitas")
     collect_parser.add_argument("--category-url", default=DEFAULT_CATEGORY_URL)

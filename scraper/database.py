@@ -28,7 +28,20 @@ def connect_database(database_path: str | Path) -> sqlite3.Connection:
 
 def initialize_database(connection: sqlite3.Connection) -> None:
     connection.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+    _apply_schema_migrations(connection)
     connection.commit()
+
+
+def _column_names(connection: sqlite3.Connection, table_name: str) -> set[str]:
+    return {
+        row["name"]
+        for row in connection.execute(f"PRAGMA table_info({table_name})")
+    }
+
+
+def _apply_schema_migrations(connection: sqlite3.Connection) -> None:
+    if "z" not in _column_names(connection, "document_vectors"):
+        connection.execute("ALTER TABLE document_vectors ADD COLUMN z REAL NOT NULL DEFAULT 0")
 
 
 def create_scrape_run(

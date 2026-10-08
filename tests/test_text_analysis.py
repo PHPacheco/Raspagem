@@ -49,6 +49,7 @@ def test_text_analysis_pipeline_persists_vectors_similarity_clusters_and_project
     assert run["document_count"] == 3
     assert run["vocabulary_size"] >= 6
     assert len(vectors) == 3
+    assert all("z" in vector.keys() for vector in vectors)
     assert len(weights) > 0
     assert len(similarities) == 6
     assert nearest_to_first["neighbor_recipe_id"] == "2"
@@ -56,6 +57,7 @@ def test_text_analysis_pipeline_persists_vectors_similarity_clusters_and_project
     assert latest is not None
     assert latest["run"]["id"] == run_id
     assert len(latest["documents"]) == 3
+    assert "z" in latest["documents"][0]
 
 
 def test_tfidf_model_gives_weight_to_terms_that_do_not_appear_in_every_document() -> None:

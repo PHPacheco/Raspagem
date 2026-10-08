@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS document_vectors (
     cluster_label INTEGER NOT NULL DEFAULT 0,
     x REAL NOT NULL DEFAULT 0,
     y REAL NOT NULL DEFAULT 0,
+    z REAL NOT NULL DEFAULT 0,
     top_terms_json TEXT NOT NULL,
     UNIQUE(run_id, recipe_id)
 );

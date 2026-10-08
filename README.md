@@ -101,7 +101,7 @@ A partir da matriz, o projeto calcula:
 - termos principais de cada receita;
 - similaridade por cosseno entre receitas;
 - clusters com K-Means simples;
-- coordenadas 2D por projeção linear para visualização.
+- coordenadas 3D por projeção linear para visualização.
 
 Para gerar essa etapa no banco:
 
@@ -110,7 +110,7 @@ Para gerar essa etapa no banco:
 ```
 
 O resultado fica nas tabelas `text_analysis_runs`, `document_vectors`, `document_term_weights` e `document_similarities`.
-Na aplicação Streamlit, a seção "Análise textual" mostra a leitura didática desses dados.
+Na aplicação Streamlit, a seção "Análise textual" mostra um mapa 3D das receitas, além da leitura didática dos termos e vizinhos.
 
 ## Abrir a aplicação
 

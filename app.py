@@ -5,6 +5,7 @@ import sqlite3
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from scraper.database import connect_database, distinct_filter_values, query_recipes, recipe_details
 from scraper.text_analysis import latest_text_analysis
@@ -82,6 +83,213 @@ def _show_details(details: dict[str, object]) -> None:
             )
 
 
+def _render_3d_recipe_map(documents: list[dict[str, object]]) -> None:
+    if not documents:
+        return
+    points = [
+        {
+            "title": str(row["title"]),
+            "cluster": int(row["cluster_label"]),
+            "x": float(row["x"]),
+            "y": float(row["y"]),
+            "z": float(row["z"]),
+            "terms": ", ".join(item["term"] for item in row["top_terms_data"][:6]),
+        }
+        for row in documents
+    ]
+    points_json = json.dumps(points, ensure_ascii=False).replace("</", "<\\/")
+    components.html(
+        f"""
+        <div class="map3d-wrap">
+          <canvas id="recipe-map-3d" width="920" height="520" aria-label="Mapa 3D das receitas"></canvas>
+          <div id="recipe-map-info">
+            <strong>Mapa 3D das receitas</strong>
+            <span>Arraste para girar. As cores indicam clusters.</span>
+          </div>
+        </div>
+        <style>
+          .map3d-wrap {{
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 260px;
+            gap: 12px;
+            align-items: stretch;
+            width: 100%;
+            min-height: 520px;
+          }}
+          #recipe-map-3d {{
+            width: 100%;
+            height: 520px;
+            border: 1px solid #d9dbe3;
+            border-radius: 8px;
+            background: #fbfcff;
+          }}
+          #recipe-map-info {{
+            border: 1px solid #d9dbe3;
+            border-radius: 8px;
+            padding: 14px;
+            color: #252936;
+            font: 14px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #ffffff;
+          }}
+          #recipe-map-info strong, #recipe-map-info span {{
+            display: block;
+          }}
+          #recipe-map-info span {{
+            margin-top: 8px;
+            color: #596174;
+          }}
+          @media (max-width: 760px) {{
+            .map3d-wrap {{ grid-template-columns: 1fr; }}
+            #recipe-map-3d {{ height: 420px; }}
+          }}
+        </style>
+        <script>
+        (() => {{
+          const points = {points_json};
+          const canvas = document.getElementById("recipe-map-3d");
+          const ctx = canvas.getContext("2d");
+          const info = document.getElementById("recipe-map-info");
+          const colors = ["#1763dc", "#00856f", "#ab571e", "#8455a1", "#b42318", "#126d89"];
+          let angleX = -0.55;
+          let angleY = 0.75;
+          let dragging = false;
+          let lastX = 0;
+          let lastY = 0;
+          let projected = [];
+
+          function resize() {{
+            const ratio = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = Math.max(600, Math.floor(rect.width * ratio));
+            canvas.height = Math.max(360, Math.floor(rect.height * ratio));
+            draw();
+          }}
+
+          function extent(axis) {{
+            const values = points.map((point) => point[axis]);
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const span = Math.max(max - min, 1e-9);
+            return points.map((point) => ((point[axis] - min) / span - 0.5) * 2);
+          }}
+
+          const nx = extent("x");
+          const ny = extent("y");
+          const nz = extent("z");
+
+          function rotate(point) {{
+            const cx = Math.cos(angleX);
+            const sx = Math.sin(angleX);
+            const cy = Math.cos(angleY);
+            const sy = Math.sin(angleY);
+            const y1 = point.y * cx - point.z * sx;
+            const z1 = point.y * sx + point.z * cx;
+            const x2 = point.x * cy + z1 * sy;
+            const z2 = -point.x * sy + z1 * cy;
+            return {{ x: x2, y: y1, z: z2 }};
+          }}
+
+          function project(point) {{
+            const rotated = rotate(point);
+            const scale = 0.84 / (1.8 - rotated.z * 0.38);
+            const size = Math.min(canvas.width, canvas.height) * 0.36;
+            return {{
+              x: canvas.width / 2 + rotated.x * size * scale,
+              y: canvas.height / 2 + rotated.y * size * scale,
+              z: rotated.z,
+              scale
+            }};
+          }}
+
+          function drawAxis(label, point, color) {{
+            const origin = project({{ x: 0, y: 0, z: 0 }});
+            const end = project(point);
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(origin.x, origin.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.stroke();
+            ctx.fillText(label, end.x + 6, end.y - 6);
+          }}
+
+          function draw() {{
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = `${{13 * (window.devicePixelRatio || 1)}}px system-ui, sans-serif`;
+            drawAxis("X", {{ x: 1.18, y: 0, z: 0 }}, "#687083");
+            drawAxis("Y", {{ x: 0, y: 1.18, z: 0 }}, "#687083");
+            drawAxis("Z", {{ x: 0, y: 0, z: 1.18 }}, "#687083");
+            projected = points.map((point, index) => {{
+              const coords = project({{ x: nx[index], y: ny[index], z: nz[index] }});
+              return {{ ...point, ...coords }};
+            }}).sort((a, b) => a.z - b.z);
+            for (const point of projected) {{
+              const radius = Math.max(6, 11 * point.scale) * (window.devicePixelRatio || 1);
+              ctx.beginPath();
+              ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+              ctx.fillStyle = colors[point.cluster % colors.length];
+              ctx.fill();
+              ctx.strokeStyle = "#ffffff";
+              ctx.lineWidth = 2;
+              ctx.stroke();
+            }}
+          }}
+
+          function nearest(clientX, clientY) {{
+            const rect = canvas.getBoundingClientRect();
+            const ratio = window.devicePixelRatio || 1;
+            const x = (clientX - rect.left) * ratio;
+            const y = (clientY - rect.top) * ratio;
+            let best = null;
+            let bestDistance = Infinity;
+            for (const point of projected) {{
+              const distance = Math.hypot(point.x - x, point.y - y);
+              if (distance < bestDistance) {{
+                best = point;
+                bestDistance = distance;
+              }}
+            }}
+            return bestDistance <= 24 * ratio ? best : null;
+          }}
+
+          canvas.addEventListener("pointerdown", (event) => {{
+            dragging = true;
+            lastX = event.clientX;
+            lastY = event.clientY;
+            canvas.setPointerCapture(event.pointerId);
+          }});
+          canvas.addEventListener("pointermove", (event) => {{
+            if (dragging) {{
+              angleY += (event.clientX - lastX) * 0.01;
+              angleX += (event.clientY - lastY) * 0.01;
+              lastX = event.clientX;
+              lastY = event.clientY;
+              draw();
+              return;
+            }}
+            const point = nearest(event.clientX, event.clientY);
+            if (point) {{
+              const title = document.createElement("strong");
+              const cluster = document.createElement("span");
+              const terms = document.createElement("span");
+              title.textContent = point.title;
+              cluster.textContent = `Cluster ${{point.cluster}}`;
+              terms.textContent = point.terms || "Sem termos principais";
+              info.replaceChildren(title, cluster, terms);
+            }}
+          }});
+          canvas.addEventListener("pointerup", () => {{ dragging = false; }});
+          canvas.addEventListener("pointerleave", () => {{ dragging = false; }});
+          window.addEventListener("resize", resize);
+          resize();
+        }})();
+        </script>
+        """,
+        height=560,
+    )
+
+
 def _show_text_analysis(analysis: dict[str, object] | None) -> None:
     if not analysis:
         st.info("Análise textual ainda não gerada. Rode `.\\.venv\\bin\\python.exe -m scraper analyze-texts`.")
@@ -90,11 +298,12 @@ def _show_text_analysis(analysis: dict[str, object] | None) -> None:
     run = analysis["run"]
     documents = analysis["documents"]
     similarities = analysis["similarities"]
-    with st.expander("Análise textual: TF-IDF, similaridade, clusters e projeção"):
+    with st.expander("Análise textual: TF-IDF, similaridade, clusters e projeção 3D"):
         st.caption(
             f"Execução {run['id']} · {run['document_count']} documento(s) · "
             f"{run['vocabulary_size']} termo(s) · modelo {run['model_version']}"
         )
+        _render_3d_recipe_map(documents)
         st.dataframe(
             [
                 {
@@ -102,6 +311,7 @@ def _show_text_analysis(analysis: dict[str, object] | None) -> None:
                     "Cluster": row["cluster_label"],
                     "X": round(float(row["x"]), 4),
                     "Y": round(float(row["y"]), 4),
+                    "Z": round(float(row["z"]), 4),
                     "Termos principais": ", ".join(item["term"] for item in row["top_terms_data"][:6]),
                 }
                 for row in documents

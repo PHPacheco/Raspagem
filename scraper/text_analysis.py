@@ -209,32 +209,41 @@ def _principal_component(centered: list[list[float]], dimension: int) -> list[fl
     return vector
 
 
-def project_vectors_2d(model: TfidfModel) -> dict[str, tuple[float, float]]:
+def _project_vectors(model: TfidfModel, *, component_count: int) -> dict[str, tuple[float, ...]]:
     if not model.documents:
         return {}
     dimension = len(model.vocabulary)
     if dimension == 0 or len(model.documents) == 1:
-        return {document.recipe_id: (0.0, 0.0) for document in model.documents}
+        return {
+            document.recipe_id: tuple(0.0 for _ in range(component_count))
+            for document in model.documents
+        }
 
     ordered_vectors = [model.vectors[document.recipe_id] for document in model.documents]
     centered = _centered_vectors(ordered_vectors)
-    first = _principal_component(centered, dimension)
-    first_scores = [
-        sum(value * first[index] for index, value in enumerate(row))
-        for row in centered
-    ]
-    residual = [
-        [value - first_scores[row_index] * first[index] for index, value in enumerate(row)]
-        for row_index, row in enumerate(centered)
-    ]
-    second = _principal_component(residual, dimension)
-    second_scores = [
-        sum(value * second[index] for index, value in enumerate(row))
-        for row in centered
-    ]
+    residual = centered
+    component_scores: list[list[float]] = []
+    for _ in range(component_count):
+        component = _principal_component(residual, dimension)
+        scores = [
+            sum(value * component[index] for index, value in enumerate(row))
+            for row in residual
+        ]
+        component_scores.append(scores)
+        residual = [
+            [value - scores[row_index] * component[index] for index, value in enumerate(row)]
+            for row_index, row in enumerate(residual)
+        ]
     return {
-        document.recipe_id: (first_scores[index], second_scores[index])
+        document.recipe_id: tuple(scores[index] for scores in component_scores)
         for index, document in enumerate(model.documents)
+    }
+
+
+def project_vectors_3d(model: TfidfModel) -> dict[str, tuple[float, float, float]]:
+    return {
+        recipe_id: (values[0], values[1], values[2])
+        for recipe_id, values in _project_vectors(model, component_count=3).items()
     }
 
 
@@ -266,7 +275,7 @@ def run_text_analysis(
     model = build_tfidf_model(documents)
     effective_cluster_count = max(1, min(cluster_count, len(model.documents))) if model.documents else 0
     clusters = cluster_vectors(model, cluster_count=effective_cluster_count)
-    projection = project_vectors_2d(model)
+    projection = project_vectors_3d(model)
     neighbors = nearest_neighbors(model, limit=neighbor_count)
     created_at = utc_now()
 
@@ -282,8 +291,8 @@ def run_text_analysis(
     connection.executemany(
         """
         INSERT INTO document_vectors
-            (run_id, recipe_id, vector_json, norm, cluster_label, x, y, top_terms_json)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (run_id, recipe_id, vector_json, norm, cluster_label, x, y, z, top_terms_json)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             (
@@ -292,8 +301,9 @@ def run_text_analysis(
                 json.dumps(model.vectors[document.recipe_id], ensure_ascii=False),
                 math.sqrt(sum(value * value for value in model.vectors[document.recipe_id])),
                 clusters.get(document.recipe_id, 0),
-                projection.get(document.recipe_id, (0.0, 0.0))[0],
-                projection.get(document.recipe_id, (0.0, 0.0))[1],
+                projection.get(document.recipe_id, (0.0, 0.0, 0.0))[0],
+                projection.get(document.recipe_id, (0.0, 0.0, 0.0))[1],
+                projection.get(document.recipe_id, (0.0, 0.0, 0.0))[2],
                 json.dumps(top_terms(model, document.recipe_id), ensure_ascii=False),
             )
             for document in model.documents

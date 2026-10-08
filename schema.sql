@@ -144,6 +144,45 @@ CREATE TABLE IF NOT EXISTS document_similarities (
     UNIQUE(run_id, recipe_id, neighbor_recipe_id)
 );
 
+CREATE TABLE IF NOT EXISTS embedding_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    model_version TEXT NOT NULL,
+    document_count INTEGER NOT NULL DEFAULT 0,
+    vocabulary_size INTEGER NOT NULL DEFAULT 0,
+    dimension INTEGER NOT NULL DEFAULT 0,
+    window_size INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS word_embeddings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES embedding_runs(id) ON DELETE CASCADE,
+    term TEXT NOT NULL,
+    vector_json TEXT NOT NULL,
+    top_contexts_json TEXT NOT NULL,
+    UNIQUE(run_id, term)
+);
+
+CREATE TABLE IF NOT EXISTS document_embeddings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES embedding_runs(id) ON DELETE CASCADE,
+    recipe_id TEXT NOT NULL REFERENCES recipes(site_recipe_id) ON DELETE CASCADE,
+    vector_json TEXT NOT NULL,
+    norm REAL NOT NULL,
+    top_tokens_json TEXT NOT NULL,
+    UNIQUE(run_id, recipe_id)
+);
+
+CREATE TABLE IF NOT EXISTS embedding_similarities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES embedding_runs(id) ON DELETE CASCADE,
+    recipe_id TEXT NOT NULL REFERENCES recipes(site_recipe_id) ON DELETE CASCADE,
+    neighbor_recipe_id TEXT NOT NULL REFERENCES recipes(site_recipe_id) ON DELETE CASCADE,
+    rank INTEGER NOT NULL CHECK (rank > 0),
+    cosine_similarity REAL NOT NULL,
+    UNIQUE(run_id, recipe_id, neighbor_recipe_id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_recipes_rating ON recipes(rating_value);
 CREATE INDEX IF NOT EXISTS idx_recipes_difficulty ON recipes(difficulty);
 CREATE INDEX IF NOT EXISTS idx_recipes_cost ON recipes(cost_label);
@@ -156,3 +195,6 @@ CREATE INDEX IF NOT EXISTS idx_document_vectors_run ON document_vectors(run_id);
 CREATE INDEX IF NOT EXISTS idx_document_vectors_cluster ON document_vectors(run_id, cluster_label);
 CREATE INDEX IF NOT EXISTS idx_document_term_weights_run ON document_term_weights(run_id, term);
 CREATE INDEX IF NOT EXISTS idx_document_similarities_run ON document_similarities(run_id, recipe_id, rank);
+CREATE INDEX IF NOT EXISTS idx_word_embeddings_run ON word_embeddings(run_id, term);
+CREATE INDEX IF NOT EXISTS idx_document_embeddings_run ON document_embeddings(run_id);
+CREATE INDEX IF NOT EXISTS idx_embedding_similarities_run ON embedding_similarities(run_id, recipe_id, rank);

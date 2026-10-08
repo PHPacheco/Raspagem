@@ -112,6 +112,33 @@ Para gerar essa etapa no banco:
 O resultado fica nas tabelas `text_analysis_runs`, `document_vectors`, `document_term_weights` e `document_similarities`.
 Na aplicação Streamlit, a seção "Análise textual" mostra um mapa 3D das receitas, além da leitura didática dos termos e vizinhos.
 
+## Embeddings por contexto
+
+A etapa seguinte implementa uma versão didática da aula sobre Word2Vec e embeddings modernos.
+O projeto aprende embeddings densos locais a partir da hipótese distribucional:
+
+```text
+palavras em contextos semelhantes -> vetores próximos
+```
+
+O fluxo usado é:
+
+- janelas de contexto sobre os tokens preparados;
+- contagens de coocorrência;
+- ponderação PPMI;
+- projeção densa determinística;
+- embedding de cada receita pela média dos vetores de seus termos;
+- similaridade por cosseno entre embeddings de receitas.
+
+Para gerar essa etapa no banco:
+
+```powershell
+.\.venv\bin\python.exe -m scraper build-embeddings
+```
+
+O resultado fica nas tabelas `embedding_runs`, `word_embeddings`, `document_embeddings` e `embedding_similarities`.
+Na aplicação Streamlit, a seção "Etapa 7" mostra os embeddings, vizinhos por similaridade densa e contextos aprendidos.
+
 ## Abrir a aplicação
 
 ```powershell

@@ -7,7 +7,8 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
-from scraper.database import connect_database, distinct_filter_values, query_recipes, recipe_details
+from scraper.database import connect_database, distinct_filter_values, initialize_database, query_recipes, recipe_details
+from scraper.text_embeddings import latest_embedding_analysis
 from scraper.text_analysis import latest_text_analysis
 
 
@@ -24,6 +25,7 @@ FILTER_STATE_DEFAULTS = {
 
 def _open_database() -> sqlite3.Connection:
     connection = connect_database(DATABASE_PATH)
+    initialize_database(connection)
     return connection
 
 
@@ -336,6 +338,63 @@ def _show_text_analysis(analysis: dict[str, object] | None) -> None:
             )
 
 
+def _show_embedding_analysis(analysis: dict[str, object] | None) -> None:
+    if not analysis:
+        st.info("Embeddings ainda não gerados. Rode `.\\.venv\\bin\\python.exe -m scraper build-embeddings`.")
+        return
+
+    run = analysis["run"]
+    documents = analysis["documents"]
+    similarities = analysis["similarities"]
+    words = analysis["words"]
+    with st.expander("Etapa 7: embeddings densos por contexto"):
+        st.caption(
+            f"Execução {run['id']} · {run['document_count']} documento(s) · "
+            f"{run['vocabulary_size']} termo(s) · dimensão {run['dimension']} · "
+            f"janela {run['window_size']} · modelo {run['model_version']}"
+        )
+        st.dataframe(
+            [
+                {
+                    "Receita": row["title"],
+                    "Norma": round(float(row["norm"]), 4),
+                    "Tokens principais": ", ".join(item["token"] for item in row["top_tokens"][:8]),
+                }
+                for row in documents
+            ],
+            width="stretch",
+            hide_index=True,
+        )
+        if similarities:
+            st.markdown("#### Vizinhos por embeddings")
+            st.dataframe(
+                [
+                    {
+                        "Receita": row["recipe_title"],
+                        "Vizinha": row["neighbor_title"],
+                        "Rank": row["rank"],
+                        "Cosseno": round(float(row["cosine_similarity"]), 4),
+                    }
+                    for row in similarities
+                ],
+                width="stretch",
+                hide_index=True,
+            )
+        if words:
+            st.markdown("#### Amostra de contextos aprendidos")
+            st.dataframe(
+                [
+                    {
+                        "Termo": row["term"],
+                        "Contextos": ", ".join(item["context"] for item in row["top_contexts"][:5]),
+                    }
+                    for row in words
+                ],
+                width="stretch",
+                hide_index=True,
+            )
+
+
 def _reset_filters() -> None:
     for key, value in FILTER_STATE_DEFAULTS.items():
         st.session_state[key] = value
@@ -412,6 +471,7 @@ def main() -> None:
             category_id=category_id,
         )
         _show_text_analysis(latest_text_analysis(connection))
+        _show_embedding_analysis(latest_embedding_analysis(connection))
         st.subheader(f"{len(rows)} receita(s) encontrada(s)")
         if not rows:
             st.info("Nenhuma receita corresponde aos filtros atuais.")

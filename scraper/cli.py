@@ -22,6 +22,7 @@ from .database import (
 )
 from .http_client import AcademicHttpClient, RecipeAuthorizationRequired, RobotsBlocked
 from .recipe_parser import parse_recipe
+from .text_embeddings import run_embedding_analysis
 from .text_analysis import run_text_analysis
 from .text_utils import canonical_url, site_category_id_from_url
 
@@ -253,6 +254,28 @@ def analyze_texts(args: argparse.Namespace) -> int:
     return 0
 
 
+def build_embeddings(args: argparse.Namespace) -> int:
+    connection = _open_database(args.database)
+    prepared_count = rebuild_text_preparations(connection)
+    run_id = run_embedding_analysis(
+        connection,
+        dimension=args.dimension,
+        window_size=args.window,
+        neighbor_count=args.neighbors,
+    )
+    summary = connection.execute(
+        "SELECT document_count, vocabulary_size, dimension, window_size FROM embedding_runs WHERE id = ?",
+        (run_id,),
+    ).fetchone()
+    connection.close()
+    print(
+        f"Embeddings {run_id}: {summary['document_count']} documento(s), "
+        f"{summary['vocabulary_size']} termo(s), dimensão {summary['dimension']}, "
+        f"janela {summary['window_size']}. Preparação atualizada: {prepared_count} unidade(s)."
+    )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Coletor acadêmico de receitas")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -273,6 +296,16 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument("--clusters", type=int, default=4)
     analyze_parser.add_argument("--neighbors", type=int, default=5)
     analyze_parser.set_defaults(handler=analyze_texts)
+
+    embeddings_parser = subparsers.add_parser(
+        "build-embeddings",
+        help="gera embeddings densos didáticos por contexto e similaridades semânticas",
+    )
+    embeddings_parser.add_argument("--database", default=DEFAULT_DATABASE)
+    embeddings_parser.add_argument("--dimension", type=int, default=32)
+    embeddings_parser.add_argument("--window", type=int, default=2)
+    embeddings_parser.add_argument("--neighbors", type=int, default=5)
+    embeddings_parser.set_defaults(handler=build_embeddings)
 
     collect_parser = subparsers.add_parser("collect", help="descobre e coleta receitas")
     collect_parser.add_argument("--category-url", default=DEFAULT_CATEGORY_URL)

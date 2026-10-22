@@ -11,7 +11,12 @@ from typing import Any, Iterable
 
 from .database import connect_database, initialize_database
 from .text_analysis import latest_text_analysis
-from .text_embeddings import latest_embedding_analysis
+from .text_embeddings import (
+    contextualize_tokens,
+    latest_embedding_analysis,
+    load_latest_embedding_model,
+    semantic_search,
+)
 
 
 DEFAULT_NOTEBOOK = Path("notebooks") / "Trabalho PLN.ipynb"
@@ -394,6 +399,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
 
     text_analysis = latest_text_analysis(connection)
     embedding_analysis = latest_embedding_analysis(connection)
+    embedding_model = load_latest_embedding_model(connection)
     generated_at = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
 
     summary_rows = [
@@ -450,6 +456,30 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
     embedding_token_rows = _embedding_token_rows(embedding_analysis)
     context_rows = _context_rows(embedding_analysis)
     embedding_similarity_rows = (embedding_analysis or {}).get("similarities", [])
+    semantic_query = "carne com cebola"
+    semantic_rows = semantic_search(embedding_model, semantic_query, limit=5) if embedding_model else []
+    contextual_rows: list[dict[str, Any]] = []
+    if embedding_model and embedding_model.documents:
+        contextual_document = embedding_model.documents[0]
+        occurrences = contextualize_tokens(contextual_document.tokens, embedding_model)
+        counts: dict[str, int] = {}
+        for token in contextual_document.tokens:
+            counts[token] = counts.get(token, 0) + 1
+        repeated = next((token for token in contextual_document.tokens if counts[token] > 1), None)
+        selected = repeated or (contextual_document.tokens[0] if contextual_document.tokens else None)
+        for occurrence in occurrences:
+            if occurrence.token == selected:
+                contextual_rows.append(
+                    {
+                        "recipe": contextual_document.title,
+                        "token": occurrence.token,
+                        "position": occurrence.position,
+                        "context": ", ".join(occurrence.context) or "—",
+                        "dimensions": len(occurrence.vector),
+                    }
+                )
+            if len(contextual_rows) >= 4:
+                break
     svg = _svg_3d((text_analysis or {}).get("documents", []))
 
     connection.close()
@@ -474,7 +504,13 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
 
             from scraper.database import connect_database, initialize_database, rebuild_text_preparations
             from scraper.text_analysis import run_text_analysis, latest_text_analysis
-            from scraper.text_embeddings import run_embedding_analysis, latest_embedding_analysis
+            from scraper.text_embeddings import (
+                contextualize_tokens,
+                load_latest_embedding_model,
+                run_embedding_analysis,
+                latest_embedding_analysis,
+                semantic_search,
+            )
 
             DATABASE_PATH = Path("data/recipes.sqlite")
             print(f"Banco configurado: {DATABASE_PATH.resolve()}")
@@ -885,12 +921,87 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         ),
         _markdown_cell(
             """
+            ## 12. Aula 7 — busca semântica
+
+            A consulta é preparada e projetada no mesmo espaço denso das receitas. Diferentemente da busca literal, ela compara a direção dos vetores. Com o banco atual de uma receita, o mecanismo pode ser executado, mas ainda não há diversidade suficiente para avaliar o ranking.
+            """
+        ),
+        _code_cell(
+            f"""
+            consulta_semantica = {semantic_query!r}
+            connection = connect_database(DATABASE_PATH)
+            modelo_embeddings = load_latest_embedding_model(connection)
+            resultados_semanticos = semantic_search(modelo_embeddings, consulta_semantica, limit=5) if modelo_embeddings else []
+            connection.close()
+            display(HTML("Resultado da busca semântica já exibido no output."))
+            """,
+            [
+                _html_output(
+                    _html_table(
+                        semantic_rows,
+                        [
+                            ("title", "Receita"),
+                            ("cosine_similarity", "Similaridade"),
+                            ("matched_tokens", "Termos reconhecidos"),
+                        ],
+                        empty_message="A consulta não encontrou termos presentes no vocabulário.",
+                    )
+                )
+            ],
+            14,
+        ),
+        _markdown_cell(
+            """
+            ## 13. Aula 7 — embedding estático e representação contextual
+
+            O vetor estático associa uma palavra a um único vetor. A composição contextual abaixo combina esse vetor com as palavras da janela local, produzindo um vetor por ocorrência. É uma demonstração didática da ideia `palavra + contexto → vetor`, não uma implementação de BERT ou de atenção Transformer.
+            """
+        ),
+        _code_cell(
+            """
+            connection = connect_database(DATABASE_PATH)
+            modelo_embeddings = load_latest_embedding_model(connection)
+            exemplos_contextuais = []
+            if modelo_embeddings and modelo_embeddings.documents:
+                documento = modelo_embeddings.documents[0]
+                ocorrencias = contextualize_tokens(documento.tokens, modelo_embeddings)
+                exemplos_contextuais = [
+                    {
+                        "token": item.token,
+                        "posição": item.position,
+                        "contexto": item.context,
+                        "dimensões": len(item.vector),
+                    }
+                    for item in ocorrencias[:8]
+                ]
+            connection.close()
+            display(HTML("Ocorrências contextualizadas já exibidas no output."))
+            """,
+            [
+                _html_output(
+                    _html_table(
+                        contextual_rows,
+                        [
+                            ("recipe", "Receita"),
+                            ("token", "Token"),
+                            ("position", "Posição"),
+                            ("context", "Janela local"),
+                            ("dimensions", "Dimensões"),
+                        ],
+                        empty_message="Não há tokens suficientes para a demonstração contextual.",
+                    )
+                )
+            ],
+            15,
+        ),
+        _markdown_cell(
+            """
             ## Como estudar este notebook
 
             - Primeiro veja os dados coletados e os filtros.
             - Depois compare texto bruto, texto limpo e tokens.
             - Em seguida veja os termos com maior TF-IDF e o mapa 3D.
-            - Por fim, leia a etapa de embeddings: ela troca a ideia de contar palavras pela ideia de aprender contexto.
+            - Por fim, leia a etapa de embeddings, a busca semântica e a comparação entre vetores estáticos e contextuais.
             """
         ),
     ]

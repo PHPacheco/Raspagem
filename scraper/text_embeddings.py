@@ -10,6 +10,7 @@ from typing import Any
 
 from .database import utc_now
 from .text_analysis import TextDocument, cosine_similarity, load_documents
+from .text_utils import prepare_text
 
 
 EMBEDDING_VERSION = "pln-aula-7-distributional-v1"
@@ -24,6 +25,14 @@ class EmbeddingModel:
     word_vectors: dict[str, list[float]]
     document_vectors: dict[str, list[float]]
     top_contexts: dict[str, list[dict[str, float]]]
+
+
+@dataclass(frozen=True)
+class ContextualOccurrence:
+    token: str
+    position: int
+    context: list[str]
+    vector: list[float]
 
 
 def _hash_sign(term: str, index: int) -> float:
@@ -107,6 +116,115 @@ def _mean_embedding(tokens: list[str], word_vectors: dict[str, list[float]], dim
             sum(vector[index] for vector in vectors) / len(vectors)
             for index in range(dimension)
         ]
+    )
+
+
+def embed_text(text: str, model: EmbeddingModel) -> tuple[list[float], list[str]]:
+    """Representa uma consulta com o mesmo espaço vetorial aprendido no corpus."""
+    prepared = prepare_text(text)
+    tokens = [token for token in prepared.lemma_tokens if token in model.word_vectors]
+    return _mean_embedding(tokens, model.word_vectors, model.dimension), tokens
+
+
+def semantic_search(
+    model: EmbeddingModel,
+    query: str,
+    *,
+    limit: int = 5,
+) -> list[dict[str, Any]]:
+    """Ordena documentos pela similaridade entre a consulta e seus embeddings."""
+    query_vector, matched_tokens = embed_text(query, model)
+    if not matched_tokens or not any(query_vector):
+        return []
+    ranked = [
+        {
+            "recipe_id": document.recipe_id,
+            "title": document.title,
+            "cosine_similarity": cosine_similarity(query_vector, model.document_vectors[document.recipe_id]),
+            "matched_tokens": matched_tokens,
+        }
+        for document in model.documents
+    ]
+    return sorted(
+        ranked,
+        key=lambda item: (-float(item["cosine_similarity"]), str(item["recipe_id"])),
+    )[: max(0, limit)]
+
+
+def contextualize_tokens(
+    tokens: list[str],
+    model: EmbeddingModel,
+    *,
+    window_size: int | None = None,
+    context_weight: float = 0.5,
+) -> list[ContextualOccurrence]:
+    """Cria vetores por ocorrência combinando o vetor estático ao contexto local.
+
+    É uma composição didática, não um Transformer: a mesma palavra parte do
+    embedding estático, mas recebe uma contribuição diferente de suas vizinhas.
+    """
+    window = max(1, window_size or model.window_size)
+    weight = min(1.0, max(0.0, context_weight))
+    occurrences: list[ContextualOccurrence] = []
+    for position, token in enumerate(tokens):
+        static_vector = model.word_vectors.get(token, [0.0] * model.dimension)
+        context = [
+            tokens[index]
+            for index in range(max(0, position - window), min(len(tokens), position + window + 1))
+            if index != position and tokens[index] in model.word_vectors
+        ]
+        context_vector = _mean_embedding(context, model.word_vectors, model.dimension)
+        combined = _normalize(
+            [
+                (1.0 - weight) * static_vector[index] + weight * context_vector[index]
+                for index in range(model.dimension)
+            ]
+        )
+        occurrences.append(
+            ContextualOccurrence(
+                token=token,
+                position=position,
+                context=context,
+                vector=combined,
+            )
+        )
+    return occurrences
+
+
+def contextual_similarity(left: ContextualOccurrence, right: ContextualOccurrence) -> float:
+    return cosine_similarity(left.vector, right.vector)
+
+
+def load_latest_embedding_model(connection: sqlite3.Connection) -> EmbeddingModel | None:
+    run = connection.execute(
+        "SELECT * FROM embedding_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    if run is None:
+        return None
+    run_id = int(run["id"])
+    documents = load_documents(connection)
+    word_rows = connection.execute(
+        "SELECT term, vector_json, top_contexts_json FROM word_embeddings WHERE run_id = ?",
+        (run_id,),
+    ).fetchall()
+    word_vectors = {row["term"]: list(json.loads(row["vector_json"])) for row in word_rows}
+    top_contexts = {row["term"]: list(json.loads(row["top_contexts_json"])) for row in word_rows}
+    document_rows = connection.execute(
+        "SELECT recipe_id, vector_json FROM document_embeddings WHERE run_id = ?",
+        (run_id,),
+    ).fetchall()
+    document_vectors = {
+        row["recipe_id"]: list(json.loads(row["vector_json"]))
+        for row in document_rows
+    }
+    return EmbeddingModel(
+        documents=documents,
+        vocabulary=sorted(word_vectors),
+        dimension=int(run["dimension"]),
+        window_size=int(run["window_size"]),
+        word_vectors=word_vectors,
+        document_vectors=document_vectors,
+        top_contexts=top_contexts,
     )
 
 

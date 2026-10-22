@@ -47,8 +47,12 @@ def test_export_analysis_notebook_writes_ipynb_with_ready_outputs(tmp_path: Path
     assert notebook["nbformat"] == 4
     assert len(code_cells) >= 8
     assert len(ready_cells) == len(code_cells)
-    assert "Trabalho PLN" in notebook["cells"][0]["source"]
+    assert notebook["cells"][0]["cell_type"] == "code"
+    assert "# Trabalho PLN" not in "\n".join(cell["source"] for cell in notebook["cells"])
     all_source = "\n".join(cell["source"] for cell in notebook["cells"])
+    assert "Classificar significa" not in all_source
+    for index, cell in enumerate(code_cells, start=1):
+        compile(cell["source"], f"<notebook cell {index}>", "exec")
     assert "Aula 7" in all_source
     assert "Aula 8" in all_source
     assert "Aula 9" in all_source

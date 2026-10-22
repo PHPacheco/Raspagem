@@ -5,7 +5,7 @@ import json
 import math
 import sqlite3
 import sys
-from datetime import datetime, timezone
+import textwrap
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -49,11 +49,13 @@ def _html_table(
       table.raspagem-table {
         border-collapse: collapse;
         width: 100%;
+        margin: 0 0 16px;
         font: 14px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
       .raspagem-table th, .raspagem-table td {
         border: 1px solid #d9dbe3;
         padding: 8px 10px;
+        text-align: left !important;
         vertical-align: top;
       }
       .raspagem-table th {
@@ -227,7 +229,7 @@ def _svg_output(svg: str) -> dict[str, Any]:
 
 
 def _markdown_cell(source: str) -> dict[str, Any]:
-    return {"cell_type": "markdown", "metadata": {}, "source": source.strip() + "\n"}
+    return {"cell_type": "markdown", "metadata": {}, "source": textwrap.dedent(source).strip() + "\n"}
 
 
 def _code_cell(source: str, outputs: list[dict[str, Any]], execution_count: int) -> dict[str, Any]:
@@ -236,7 +238,7 @@ def _code_cell(source: str, outputs: list[dict[str, Any]], execution_count: int)
         "execution_count": execution_count,
         "metadata": {},
         "outputs": outputs,
-        "source": source.strip() + "\n",
+        "source": textwrap.dedent(source).strip() + "\n",
     }
 
 
@@ -404,8 +406,6 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
     embedding_model = load_latest_embedding_model(connection)
     classification_analysis = latest_text_classification(connection)
     linguistic_analysis = latest_linguistic_analysis(connection)
-    generated_at = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
-
     summary_rows = [
         {"metric": "Receitas", "value": _count(connection, "recipes")},
         {"metric": "Ingredientes", "value": _count(connection, "ingredients")},
@@ -528,15 +528,6 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
     connection.close()
 
     cells: list[dict[str, Any]] = [
-        _markdown_cell(
-            f"""
-            # Trabalho PLN
-
-            Este notebook é a interface executável da análise e foi gerado com outputs prontos em `{generated_at}`. O relatório HTML permanece separado em `relatorio-web/` e contém somente documentação.
-
-            A leitura está organizada em blocos: dados coletados, preparação, TF-IDF, gráfico 3D, embeddings da aula 7, classificação da aula 8 e extração de informação da aula 9.
-            """
-        ),
         _code_cell(
             """
             from pathlib import Path
@@ -557,15 +548,42 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                 semantic_search,
             )
 
+            def exibir_tabela(registros, colunas, mensagem_vazia="Nenhum registro encontrado."):
+                registros = list(registros)
+                estilo = (
+                    '<style>'
+                    'table.raspagem-table{border-collapse:collapse;width:100%;margin:0 0 16px;'
+                    'font:14px/1.4 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}'
+                    '.raspagem-table th,.raspagem-table td{border:1px solid #d9dbe3;padding:8px 10px;'
+                    'text-align:left!important;vertical-align:top}'
+                    '.raspagem-table th{background:#f4f6fb;font-weight:600}'
+                    '</style>'
+                )
+                if not registros:
+                    display(HTML(estilo + f'<p>{escape(mensagem_vazia)}</p>'))
+                    return
+                cabecalho = ''.join(f'<th>{escape(rotulo)}</th>' for chave, rotulo in colunas)
+                linhas = []
+                for registro in registros:
+                    celulas = ''.join(
+                        f'<td>{escape(str(registro.get(chave) if registro.get(chave) not in (None, "") else "—"))}</td>'
+                        for chave, rotulo in colunas
+                    )
+                    linhas.append(f'<tr>{celulas}</tr>')
+                display(HTML(
+                    estilo
+                    + '<table class="raspagem-table"><thead><tr>'
+                    + cabecalho
+                    + '</tr></thead><tbody>'
+                    + ''.join(linhas)
+                    + '</tbody></table>'
+                ))
+
             DATABASE_PATH = Path("data/recipes.sqlite")
-            print(f"Banco configurado: {DATABASE_PATH.resolve()}")
-            print("Se quiser atualizar os resultados, execute as células na ordem.")
+            print("Banco configurado: data/recipes.sqlite")
             """,
             [
-                _stream(
-                    f"Banco configurado: {database.resolve()}\n"
-                    "Se quiser atualizar os resultados, execute as células na ordem.\n"
-                )
+                _stream("Banco configurado: data/recipes.sqlite\n")
             ],
             1,
         ),
@@ -613,9 +631,13 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                 {"metric": "Passos de preparo", "value": connection.execute("SELECT COUNT(*) FROM preparation_steps").fetchone()[0]},
                 {"metric": "Categorias", "value": connection.execute("SELECT COUNT(*) FROM categories").fetchone()[0]},
                 {"metric": "Textos preparados", "value": connection.execute("SELECT COUNT(*) FROM text_preparations").fetchone()[0]},
+                {"metric": "Última análise TF-IDF", "value": connection.execute("SELECT MAX(id) FROM text_analysis_runs").fetchone()[0]},
+                {"metric": "Última análise de embeddings", "value": connection.execute("SELECT MAX(id) FROM embedding_runs").fetchone()[0]},
+                {"metric": "Última classificação", "value": connection.execute("SELECT MAX(id) FROM classification_runs").fetchone()[0]},
+                {"metric": "Última análise linguística", "value": connection.execute("SELECT MAX(id) FROM linguistic_analysis_runs").fetchone()[0]},
             ]
             connection.close()
-            display(HTML("Resumo já exibido no output desta célula."))
+            exibir_tabela(resumo, [("metric", "Métrica"), ("value", "Valor")])
             """,
             [
                 _html_output(
@@ -660,13 +682,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             4,
         ),
-        _markdown_cell(
-            """
-            ## 3. Filtros em notebook
-
-            A página web tinha campos de filtro. No notebook, a mesma ideia fica em variáveis: altere `busca`, `dificuldade`, `custo`, `tempo_maximo` e `nota_minima`, depois execute a célula.
-            """
-        ),
+        _markdown_cell("## 3. Filtros em notebook"),
         _code_cell(
             """
             busca = ""
@@ -975,13 +991,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             13,
         ),
-        _markdown_cell(
-            """
-            ## 12. Aula 7 — busca semântica
-
-            A consulta é preparada e projetada no mesmo espaço denso das receitas. Diferentemente da busca literal, ela compara a direção dos vetores. Com o banco atual de uma receita, o mecanismo pode ser executado, mas ainda não há diversidade suficiente para avaliar o ranking.
-            """
-        ),
+        _markdown_cell("## 12. Aula 7 — busca semântica"),
         _code_cell(
             f"""
             consulta_semantica = {semantic_query!r}
@@ -1006,13 +1016,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             14,
         ),
-        _markdown_cell(
-            """
-            ## 13. Aula 7 — embedding estático e representação contextual
-
-            O vetor estático associa uma palavra a um único vetor. A composição contextual abaixo combina esse vetor com as palavras da janela local, produzindo um vetor por ocorrência. É uma demonstração didática da ideia `palavra + contexto → vetor`, não uma implementação de BERT ou de atenção Transformer.
-            """
-        ),
+        _markdown_cell("## 13. Aula 7 — embedding estático e representação contextual"),
         _code_cell(
             """
             connection = connect_database(DATABASE_PATH)
@@ -1050,15 +1054,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             15,
         ),
-        _markdown_cell(
-            """
-            ## 14. Aula 8 — classificação supervisionada
-
-            Classificar significa aprender, a partir de receitas já rotuladas, uma função que associa texto a uma classe. O baseline implementado usa os tokens preparados e Naive Bayes multinomial. O alvo padrão é `difficulty`, uma classificação ordinal porque as categorias possuem uma ordem conceitual.
-
-            O campo `status` evita interpretações incorretas: `evaluated` indica que existiam ao menos duas classes e exemplos de teste; `insufficient_classes` ou `insufficient_test_data` indicam que as métricas não devem ser calculadas.
-            """
-        ),
+        _markdown_cell("## 14. Aula 8 — classificação supervisionada"),
         _code_cell(
             """
             connection = connect_database(DATABASE_PATH)
@@ -1086,13 +1082,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             16,
         ),
-        _markdown_cell(
-            """
-            ## 15. Aula 8 — previsões, probabilidades e divisão treino/teste
-
-            A divisão é estratificada e determinística. Cada classe com pelo menos dois exemplos mantém dados no treino e separa uma parte para teste. A probabilidade abaixo é a distribuição normalizada dos escores do classificador, não uma garantia de acerto.
-            """
-        ),
+        _markdown_cell("## 15. Aula 8 — previsões, probabilidades e divisão treino/teste"),
         _code_cell(
             """
             previsoes = (classificacao or {}).get("predictions", [])
@@ -1115,13 +1105,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             17,
         ),
-        _markdown_cell(
-            """
-            ## 16. Aula 8 — matriz de confusão e métricas
-
-            Acurácia mede o total de acertos. Precisão pergunta quantas previsões de uma classe estavam corretas; revocação mede quantos exemplos reais daquela classe foram encontrados; F1 combina as duas. O projeto calcula esses valores somente no conjunto de teste. Com o banco demonstrativo atual, eles permanecem indisponíveis porque existe apenas uma receita e uma classe.
-            """
-        ),
+        _markdown_cell("## 16. Aula 8 — matriz de confusão e métricas"),
         _code_cell(
             """
             metricas = (classificacao or {}).get("metrics", [])
@@ -1163,15 +1147,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             18,
         ),
-        _markdown_cell(
-            """
-            ## 17. Aula 9 — análise linguística e extração de informação
-
-            Esta etapa vai além dos vetores e produz informação explícita. O pipeline local reúne quatro tarefas: dependências sintáticas rasas, sentimento baseado em léxico e regras, entidades do domínio culinário e relações em forma de triplas.
-
-            Os métodos são determinísticos e interpretáveis. Eles não substituem spaCy, Stanza, BERT ou um modelo de NER treinado; servem como baseline de domínio e deixam cada decisão auditável.
-            """
-        ),
+        _markdown_cell("## 17. Aula 9 — análise linguística e extração de informação"),
         _code_cell(
             """
             connection = connect_database(DATABASE_PATH)
@@ -1198,13 +1174,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             19,
         ),
-        _markdown_cell(
-            """
-            ## 18. Aula 9 — parsing e dependências
-
-            O parser raso procura a ação culinária central e liga os demais tokens com relações inspiradas em Universal Dependencies: `root`, `obj`, `nsubj`, `det`, `case` e `nmod`. O resultado ajuda a formar pares ação–objeto, mas não representa uma árvore sintática neural completa.
-            """
-        ),
+        _markdown_cell("## 18. Aula 9 — parsing e dependências"),
         _code_cell(
             """
             dependencias = (linguistica or {}).get("dependencies", [])
@@ -1228,13 +1198,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             20,
         ),
-        _markdown_cell(
-            """
-            ## 19. Aula 9 — análise de sentimentos e aspectos
-
-            A polaridade usa um léxico pequeno, inversão por negação e pesos de intensidade. Também marca aspectos culinários como sabor, textura, tempo, custo e preparo. Textos descritivos tendem a ser neutros; a técnica é mais útil quando o corpus contém avaliações ou comentários.
-            """
-        ),
+        _markdown_cell("## 19. Aula 9 — análise de sentimentos e aspectos"),
         _code_cell(
             """
             sentimentos = (linguistica or {}).get("sentiments", [])
@@ -1259,13 +1223,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             21,
         ),
-        _markdown_cell(
-            """
-            ## 20. Aula 9 — entidades nomeadas de domínio
-
-            O esquema de entidades foi adaptado ao domínio de receitas: `INGREDIENT`, `UTENSIL`, `CATEGORY`, `QUANTITY`, `UNIT`, `DURATION` e `TEMPERATURE`. Campos estruturados funcionam como gazetteers confiáveis; expressões regulares reconhecem medidas, tempos e temperaturas. A coluna BIO mostra o início da entidade.
-            """
-        ),
+        _markdown_cell("## 20. Aula 9 — entidades nomeadas de domínio"),
         _code_cell(
             """
             entidades = (linguistica or {}).get("entities", [])
@@ -1290,13 +1248,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             ],
             22,
         ),
-        _markdown_cell(
-            """
-            ## 21. Aula 9 — extração de relações
-
-            As relações são armazenadas como `(sujeito, relação, objeto)`. As triplas estruturais têm confiança 1, pois vêm de ingredientes, utensílios e categorias já extraídos. As triplas ação–objeto recebem confiança menor porque resultam do parser raso.
-            """
-        ),
+        _markdown_cell("## 21. Aula 9 — extração de relações"),
         _code_cell(
             """
             relacoes = (linguistica or {}).get("relations", [])
@@ -1318,18 +1270,6 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                 )
             ],
             23,
-        ),
-        _markdown_cell(
-            """
-            ## Como estudar este notebook
-
-            - Primeiro veja os dados coletados e os filtros.
-            - Depois compare texto bruto, texto limpo e tokens.
-            - Em seguida veja os termos com maior TF-IDF e o mapa 3D.
-            - Por fim, leia a etapa de embeddings, a busca semântica e a comparação entre vetores estáticos e contextuais.
-            - Na aula 8, observe como rótulos transformam representação em decisão e por que métricas exigem dados de teste.
-            - Na aula 9, acompanhe a passagem de texto livre para dependências, sentimentos, entidades e triplas estruturadas.
-            """
         ),
     ]
 

@@ -110,8 +110,8 @@ def _json_list(value: str | None) -> list[Any]:
 
 
 def _svg_3d(documents: list[dict[str, Any]]) -> str:
-    width = 920
-    height = 560
+    width = 960
+    height = 620
     colors = ["#1763dc", "#00856f", "#ab571e", "#8455a1", "#b42318", "#126d89"]
 
     def normalize(axis: str) -> list[float]:
@@ -142,10 +142,10 @@ def _svg_3d(documents: list[dict[str, Any]]) -> str:
         x2 = x * cy + z1 * sy
         z2 = -x * sy + z1 * cy
         perspective = 0.84 / (1.8 - z2 * 0.38)
-        size = min(width, height) * 0.34
+        size = min(width, height) * 0.40
         return (
-            width / 2 + x2 * size * perspective,
-            height / 2 + y1 * size * perspective,
+            width * 0.43 + x2 * size * perspective,
+            height * 0.56 + y1 * size * perspective,
             z2,
         )
 
@@ -165,39 +165,57 @@ def _svg_3d(documents: list[dict[str, Any]]) -> str:
         points.append((depth, px, py, row))
     points.sort(key=lambda item: item[0])
 
+    cluster_counts: dict[int, int] = {}
     point_markup = []
-    for _, px, py, row in points:
+    for depth, px, py, row in points:
         cluster = int(row.get("cluster_label") or 0)
+        cluster_counts[cluster] = cluster_counts.get(cluster, 0) + 1
         color = colors[cluster % len(colors)]
         title = html.escape(str(row.get("title") or row.get("recipe_id") or "Receita"))
         terms = ", ".join(str(item.get("term")) for item in row.get("top_terms_data", [])[:6])
-        tooltip = html.escape(f"{title} | cluster {cluster} | termos: {terms or 'sem termos'}")
+        tooltip = html.escape(f"{title}\nCluster {cluster}\nTermos: {terms or 'sem termos'}")
+        radius = max(4.5, min(7.0, 5.6 + depth * 0.45))
         point_markup.append(
-            f'<g><title>{tooltip}</title>'
-            f'<circle cx="{px:.1f}" cy="{py:.1f}" r="9" fill="{color}" stroke="#fff" stroke-width="2" />'
-            f'<text x="{px + 12:.1f}" y="{py - 10:.1f}" fill="#252936" font-size="12" '
-            f'font-family="system-ui, sans-serif">{title}</text></g>'
+            f'<g class="recipe-point"><title>{tooltip}</title>'
+            f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{radius:.1f}" fill="{color}" '
+            f'stroke="#fff" stroke-width="1.5" /></g>'
         )
 
     if not documents:
         point_markup.append(
-            '<text x="460" y="280" text-anchor="middle" fill="#596174" font-size="16" '
+            '<text x="413" y="347" text-anchor="middle" fill="#596174" font-size="16" '
             'font-family="system-ui, sans-serif">Sem documentos para projetar.</text>'
         )
 
+    legend_markup = []
+    for position, cluster in enumerate(sorted(cluster_counts)):
+        legend_y = 104 + position * 26
+        color = colors[cluster % len(colors)]
+        legend_markup.append(
+            f'<circle cx="780" cy="{legend_y}" r="6" fill="{color}" />'
+            f'<text x="794" y="{legend_y + 4}" fill="#374151" font-size="13" '
+            f'font-family="system-ui, sans-serif">Cluster {cluster} ({cluster_counts[cluster]})</text>'
+        )
+
     return f"""
-<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 {width} {height}" role="img"
+     style="display:block;max-width:{width}px;height:auto">
+  <style>
+    .recipe-point circle {{ opacity: 0.72; transition: opacity 120ms ease, stroke-width 120ms ease; }}
+    .recipe-point:hover circle {{ opacity: 1; stroke: #111827; stroke-width: 2.5; }}
+  </style>
   <rect width="100%" height="100%" rx="10" fill="#fbfcff" stroke="#d9dbe3" />
   <text x="24" y="36" fill="#252936" font-size="20" font-weight="700" font-family="system-ui, sans-serif">
     Mapa 3D das receitas
   </text>
   <text x="24" y="60" fill="#596174" font-size="13" font-family="system-ui, sans-serif">
-    Projeção 3D da matriz TF-IDF. Cores indicam clusters.
+    Projeção 3D da matriz TF-IDF. Passe o mouse sobre um ponto para ver a receita.
   </text>
   {line("X", (1.18, 0, 0), "#687083")}
   {line("Y", (0, 1.18, 0), "#687083")}
   {line("Z", (0, 0, 1.18), "#687083")}
   {''.join(point_markup)}
+  {''.join(legend_markup)}
 </svg>
 """.strip()
 
@@ -821,7 +839,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
 
             def renderizar_mapa_3d(analise):
                 docs = (analise or {}).get("documents", [])
-                width, height = 920, 560
+                width, height = 960, 620
                 colors = ["#1763dc", "#00856f", "#ab571e", "#8455a1", "#b42318", "#126d89"]
 
                 def normalizar(axis):
@@ -844,8 +862,8 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                     x2 = x * cy + z1 * sy
                     z2 = -x * sy + z1 * cy
                     perspective = 0.84 / (1.8 - z2 * 0.38)
-                    size = min(width, height) * 0.34
-                    return width / 2 + x2 * size * perspective, height / 2 + y1 * size * perspective, z2
+                    size = min(width, height) * 0.40
+                    return width * 0.43 + x2 * size * perspective, height * 0.56 + y1 * size * perspective, z2
 
                 def eixo(label, end, color):
                     origin = projetar(0, 0, 0)
@@ -860,31 +878,57 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                 pontos = []
                 for index, row in enumerate(docs):
                     px, py, depth = projetar(xs[index], ys[index], zs[index])
+                    pontos.append((depth, px, py, row))
+                pontos.sort(key=lambda item: item[0])
+
+                contagem_clusters = {}
+                marcadores = []
+                for depth, px, py, row in pontos:
                     cluster = int(row.get("cluster_label") or 0)
+                    contagem_clusters[cluster] = contagem_clusters.get(cluster, 0) + 1
                     title = escape(str(row.get("title") or row.get("recipe_id") or "Receita"))
                     color = colors[cluster % len(colors)]
-                    pontos.append(
-                        f'<g><circle cx="{px:.1f}" cy="{py:.1f}" r="9" fill="{color}" stroke="#fff" stroke-width="2" />'
-                        f'<text x="{px + 12:.1f}" y="{py - 10:.1f}" fill="#252936" font-size="12" '
-                        f'font-family="system-ui, sans-serif">{title}</text></g>'
+                    terms = ", ".join(str(item.get("term")) for item in row.get("top_terms_data", [])[:6])
+                    tooltip = escape(f"{title}\\nCluster {cluster}\\nTermos: {terms or 'sem termos'}")
+                    radius = max(4.5, min(7.0, 5.6 + depth * 0.45))
+                    marcadores.append(
+                        f'<g class="recipe-point"><title>{tooltip}</title>'
+                        f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{radius:.1f}" fill="{color}" '
+                        f'stroke="#fff" stroke-width="1.5" /></g>'
                     )
 
-                if not pontos:
-                    pontos.append('<text x="460" y="280" text-anchor="middle">Sem documentos para projetar.</text>')
+                if not marcadores:
+                    marcadores.append('<text x="413" y="347" text-anchor="middle">Sem documentos para projetar.</text>')
+
+                legenda = []
+                for position, cluster in enumerate(sorted(contagem_clusters)):
+                    legend_y = 104 + position * 26
+                    color = colors[cluster % len(colors)]
+                    legenda.append(
+                        f'<circle cx="780" cy="{legend_y}" r="6" fill="{color}" />'
+                        f'<text x="794" y="{legend_y + 4}" fill="#374151" font-size="13" '
+                        f'font-family="system-ui, sans-serif">Cluster {cluster} ({contagem_clusters[cluster]})</text>'
+                    )
 
                 return f'''
-                <svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 {width} {height}"
+                     style="display:block;max-width:{width}px;height:auto">
+                  <style>
+                    .recipe-point circle {{ opacity: 0.72; transition: opacity 120ms ease, stroke-width 120ms ease; }}
+                    .recipe-point:hover circle {{ opacity: 1; stroke: #111827; stroke-width: 2.5; }}
+                  </style>
                   <rect width="100%" height="100%" rx="10" fill="#fbfcff" stroke="#d9dbe3" />
                   <text x="24" y="36" fill="#252936" font-size="20" font-weight="700" font-family="system-ui, sans-serif">
                     Mapa 3D das receitas
                   </text>
                   <text x="24" y="60" fill="#596174" font-size="13" font-family="system-ui, sans-serif">
-                    Projeção 3D da matriz TF-IDF. Cores indicam clusters.
+                    Projeção 3D da matriz TF-IDF. Passe o mouse sobre um ponto para ver a receita.
                   </text>
                   {eixo("X", (1.18, 0, 0), "#687083")}
                   {eixo("Y", (0, 1.18, 0), "#687083")}
                   {eixo("Z", (0, 0, 1.18), "#687083")}
-                  {''.join(pontos)}
+                  {''.join(marcadores)}
+                  {''.join(legenda)}
                 </svg>
                 '''
 

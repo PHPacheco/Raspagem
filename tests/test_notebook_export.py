@@ -56,8 +56,15 @@ def test_export_analysis_notebook_writes_ipynb_with_ready_outputs(tmp_path: Path
     assert "Aula 7" in all_source
     assert "Aula 8" in all_source
     assert "Aula 9" in all_source
-    assert any(
+    svg_outputs = [
         output.get("data", {}).get("image/svg+xml")
         for cell in code_cells
         for output in cell["outputs"]
-    )
+        if output.get("data", {}).get("image/svg+xml")
+    ]
+    assert svg_outputs
+    map_svg = svg_outputs[0]
+    assert 'class="recipe-point"' in map_svg
+    assert "Passe o mouse sobre um ponto" in map_svg
+    assert "Cluster 0" in map_svg
+    assert "<title>" in map_svg

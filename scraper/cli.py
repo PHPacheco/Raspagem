@@ -24,6 +24,7 @@ from .http_client import AcademicHttpClient, RecipeAuthorizationRequired, Robots
 from .recipe_parser import parse_recipe
 from .text_embeddings import run_embedding_analysis
 from .text_analysis import run_text_analysis
+from .text_classification import run_text_classification
 from .text_utils import canonical_url, site_category_id_from_url
 from .notebook_export import DEFAULT_NOTEBOOK, export_analysis_notebook
 
@@ -277,6 +278,35 @@ def build_embeddings(args: argparse.Namespace) -> int:
     return 0
 
 
+def classify_texts(args: argparse.Namespace) -> int:
+    connection = _open_database(args.database)
+    prepared_count = rebuild_text_preparations(connection)
+    run_id = run_text_classification(
+        connection,
+        target_field=args.target,
+        test_ratio=args.test_ratio,
+    )
+    summary = connection.execute(
+        """
+        SELECT document_count, train_count, test_count, class_count, status,
+               accuracy, macro_f1
+        FROM classification_runs WHERE id = ?
+        """,
+        (run_id,),
+    ).fetchone()
+    connection.close()
+    accuracy = "indisponível" if summary["accuracy"] is None else f"{summary['accuracy']:.3f}"
+    macro_f1 = "indisponível" if summary["macro_f1"] is None else f"{summary['macro_f1']:.3f}"
+    print(
+        f"Classificação {run_id}: {summary['document_count']} documento(s), "
+        f"{summary['class_count']} classe(s), treino={summary['train_count']}, "
+        f"teste={summary['test_count']}, status={summary['status']}, "
+        f"acurácia={accuracy}, F1 macro={macro_f1}. "
+        f"Preparação atualizada: {prepared_count} unidade(s)."
+    )
+    return 0
+
+
 def export_notebook(args: argparse.Namespace) -> int:
     notebook_path = export_analysis_notebook(args.database, args.output)
     print(f"Notebook gerado com outputs prontos: {notebook_path}")
@@ -313,6 +343,15 @@ def build_parser() -> argparse.ArgumentParser:
     embeddings_parser.add_argument("--window", type=int, default=2)
     embeddings_parser.add_argument("--neighbors", type=int, default=5)
     embeddings_parser.set_defaults(handler=build_embeddings)
+
+    classification_parser = subparsers.add_parser(
+        "classify-texts",
+        help="treina e avalia classificação supervisionada de dificuldade ou custo",
+    )
+    classification_parser.add_argument("--database", default=DEFAULT_DATABASE)
+    classification_parser.add_argument("--target", choices=("difficulty", "cost"), default="difficulty")
+    classification_parser.add_argument("--test-ratio", type=float, default=0.25)
+    classification_parser.set_defaults(handler=classify_texts)
 
     notebook_parser = subparsers.add_parser(
         "export-notebook",

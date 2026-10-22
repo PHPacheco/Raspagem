@@ -183,6 +183,46 @@ CREATE TABLE IF NOT EXISTS embedding_similarities (
     UNIQUE(run_id, recipe_id, neighbor_recipe_id)
 );
 
+CREATE TABLE IF NOT EXISTS classification_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    model_version TEXT NOT NULL,
+    target_field TEXT NOT NULL,
+    classification_type TEXT NOT NULL,
+    document_count INTEGER NOT NULL DEFAULT 0,
+    train_count INTEGER NOT NULL DEFAULT 0,
+    test_count INTEGER NOT NULL DEFAULT 0,
+    class_count INTEGER NOT NULL DEFAULT 0,
+    status TEXT NOT NULL,
+    accuracy REAL,
+    macro_precision REAL,
+    macro_recall REAL,
+    macro_f1 REAL,
+    model_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS classification_predictions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES classification_runs(id) ON DELETE CASCADE,
+    recipe_id TEXT NOT NULL REFERENCES recipes(site_recipe_id) ON DELETE CASCADE,
+    split TEXT NOT NULL CHECK (split IN ('train', 'test')),
+    actual_label TEXT NOT NULL,
+    predicted_label TEXT NOT NULL,
+    probabilities_json TEXT NOT NULL,
+    UNIQUE(run_id, recipe_id)
+);
+
+CREATE TABLE IF NOT EXISTS classification_metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES classification_runs(id) ON DELETE CASCADE,
+    label TEXT NOT NULL,
+    precision REAL NOT NULL,
+    recall REAL NOT NULL,
+    f1 REAL NOT NULL,
+    support INTEGER NOT NULL,
+    UNIQUE(run_id, label)
+);
+
 CREATE INDEX IF NOT EXISTS idx_recipes_rating ON recipes(rating_value);
 CREATE INDEX IF NOT EXISTS idx_recipes_difficulty ON recipes(difficulty);
 CREATE INDEX IF NOT EXISTS idx_recipes_cost ON recipes(cost_label);
@@ -198,3 +238,5 @@ CREATE INDEX IF NOT EXISTS idx_document_similarities_run ON document_similaritie
 CREATE INDEX IF NOT EXISTS idx_word_embeddings_run ON word_embeddings(run_id, term);
 CREATE INDEX IF NOT EXISTS idx_document_embeddings_run ON document_embeddings(run_id);
 CREATE INDEX IF NOT EXISTS idx_embedding_similarities_run ON embedding_similarities(run_id, recipe_id, rank);
+CREATE INDEX IF NOT EXISTS idx_classification_predictions_run ON classification_predictions(run_id, split);
+CREATE INDEX IF NOT EXISTS idx_classification_metrics_run ON classification_metrics(run_id, label);

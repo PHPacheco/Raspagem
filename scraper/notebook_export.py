@@ -11,6 +11,7 @@ from typing import Any, Iterable
 
 from .database import connect_database, initialize_database
 from .text_analysis import latest_text_analysis
+from .text_classification import latest_text_classification
 from .text_embeddings import (
     contextualize_tokens,
     latest_embedding_analysis,
@@ -400,6 +401,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
     text_analysis = latest_text_analysis(connection)
     embedding_analysis = latest_embedding_analysis(connection)
     embedding_model = load_latest_embedding_model(connection)
+    classification_analysis = latest_text_classification(connection)
     generated_at = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
 
     summary_rows = [
@@ -410,6 +412,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         {"metric": "Textos preparados", "value": _count(connection, "text_preparations")},
         {"metric": "Última análise TF-IDF", "value": _latest_id(connection, "text_analysis_runs")},
         {"metric": "Última análise de embeddings", "value": _latest_id(connection, "embedding_runs")},
+        {"metric": "Última classificação", "value": _latest_id(connection, "classification_runs")},
     ]
     prepared_text_count = int(summary_rows[4]["value"])
     recipe_rows = _rows(
@@ -456,6 +459,25 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
     embedding_token_rows = _embedding_token_rows(embedding_analysis)
     context_rows = _context_rows(embedding_analysis)
     embedding_similarity_rows = (embedding_analysis or {}).get("similarities", [])
+    classification_run = (classification_analysis or {}).get("run", {})
+    classification_prediction_rows = []
+    for prediction in (classification_analysis or {}).get("predictions", []):
+        probabilities = prediction.get("probabilities", {})
+        classification_prediction_rows.append(
+            {
+                "title": prediction.get("title"),
+                "split": prediction.get("split"),
+                "actual_label": prediction.get("actual_label"),
+                "predicted_label": prediction.get("predicted_label"),
+                "confidence": max(probabilities.values()) if probabilities else None,
+            }
+        )
+    classification_metric_rows = (classification_analysis or {}).get("metrics", [])
+    confusion_rows = [
+        {"actual": actual, "predicted": predicted, "count": count}
+        for actual, candidates in (classification_analysis or {}).get("confusion", {}).items()
+        for predicted, count in candidates.items()
+    ]
     semantic_query = "carne com cebola"
     semantic_rows = semantic_search(embedding_model, semantic_query, limit=5) if embedding_model else []
     contextual_rows: list[dict[str, Any]] = []
@@ -504,6 +526,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
 
             from scraper.database import connect_database, initialize_database, rebuild_text_preparations
             from scraper.text_analysis import run_text_analysis, latest_text_analysis
+            from scraper.text_classification import run_text_classification, latest_text_classification
             from scraper.text_embeddings import (
                 contextualize_tokens,
                 load_latest_embedding_model,
@@ -531,17 +554,20 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             prepared_count = rebuild_text_preparations(connection)
             analysis_run_id = run_text_analysis(connection, cluster_count=4, neighbor_count=5)
             embedding_run_id = run_embedding_analysis(connection, dimension=32, window_size=2, neighbor_count=5)
+            classification_run_id = run_text_classification(connection, target_field="difficulty", test_ratio=0.25)
             connection.close()
 
             print(f"Preparação atualizada: {prepared_count} unidade(s)")
             print(f"Análise TF-IDF gerada: execução {analysis_run_id}")
             print(f"Embeddings gerados: execução {embedding_run_id}")
+            print(f"Classificação gerada: execução {classification_run_id}")
             """,
             [
                 _stream(
                     f"Preparação atualizada: {prepared_text_count} unidade(s)\n"
                     f"Análise TF-IDF disponível: execução {text_run.get('id', '—')}\n"
                     f"Embeddings disponíveis: execução {embedding_run.get('id', '—')}\n"
+                    f"Classificação disponível: execução {classification_run.get('id', '—')}\n"
                 )
             ],
             2,
@@ -996,12 +1022,126 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         ),
         _markdown_cell(
             """
+            ## 14. Aula 8 — classificação supervisionada
+
+            Classificar significa aprender, a partir de receitas já rotuladas, uma função que associa texto a uma classe. O baseline implementado usa os tokens preparados e Naive Bayes multinomial. O alvo padrão é `difficulty`, uma classificação ordinal porque as categorias possuem uma ordem conceitual.
+
+            O campo `status` evita interpretações incorretas: `evaluated` indica que existiam ao menos duas classes e exemplos de teste; `insufficient_classes` ou `insufficient_test_data` indicam que as métricas não devem ser calculadas.
+            """
+        ),
+        _code_cell(
+            """
+            connection = connect_database(DATABASE_PATH)
+            classificacao = latest_text_classification(connection)
+            connection.close()
+            display(HTML("Resumo da classificação já exibido no output."))
+            """,
+            [
+                _html_output(
+                    _html_table(
+                        [
+                            {"metric": "Execução", "value": classification_run.get("id")},
+                            {"metric": "Modelo", "value": classification_run.get("model_version")},
+                            {"metric": "Alvo", "value": classification_run.get("target_field")},
+                            {"metric": "Tipo", "value": classification_run.get("classification_type")},
+                            {"metric": "Documentos", "value": classification_run.get("document_count")},
+                            {"metric": "Treino", "value": classification_run.get("train_count")},
+                            {"metric": "Teste", "value": classification_run.get("test_count")},
+                            {"metric": "Classes", "value": classification_run.get("class_count")},
+                            {"metric": "Status", "value": classification_run.get("status")},
+                        ],
+                        [("metric", "Métrica"), ("value", "Valor")],
+                    )
+                )
+            ],
+            16,
+        ),
+        _markdown_cell(
+            """
+            ## 15. Aula 8 — previsões, probabilidades e divisão treino/teste
+
+            A divisão é estratificada e determinística. Cada classe com pelo menos dois exemplos mantém dados no treino e separa uma parte para teste. A probabilidade abaixo é a distribuição normalizada dos escores do classificador, não uma garantia de acerto.
+            """
+        ),
+        _code_cell(
+            """
+            previsoes = (classificacao or {}).get("predictions", [])
+            display(HTML("Previsões já exibidas no output."))
+            """,
+            [
+                _html_output(
+                    _html_table(
+                        classification_prediction_rows,
+                        [
+                            ("title", "Receita"),
+                            ("split", "Conjunto"),
+                            ("actual_label", "Classe real"),
+                            ("predicted_label", "Classe prevista"),
+                            ("confidence", "Maior probabilidade"),
+                        ],
+                        empty_message="Nenhuma previsão foi gerada.",
+                    )
+                )
+            ],
+            17,
+        ),
+        _markdown_cell(
+            """
+            ## 16. Aula 8 — matriz de confusão e métricas
+
+            Acurácia mede o total de acertos. Precisão pergunta quantas previsões de uma classe estavam corretas; revocação mede quantos exemplos reais daquela classe foram encontrados; F1 combina as duas. O projeto calcula esses valores somente no conjunto de teste. Com o banco demonstrativo atual, eles permanecem indisponíveis porque existe apenas uma receita e uma classe.
+            """
+        ),
+        _code_cell(
+            """
+            metricas = (classificacao or {}).get("metrics", [])
+            matriz_confusao = (classificacao or {}).get("confusion", {})
+            display(HTML("Métricas e matriz de confusão já exibidas no output."))
+            """,
+            [
+                _html_output(
+                    _html_table(
+                        [
+                            {"metric": "Acurácia", "value": classification_run.get("accuracy")},
+                            {"metric": "Precisão macro", "value": classification_run.get("macro_precision")},
+                            {"metric": "Revocação macro", "value": classification_run.get("macro_recall")},
+                            {"metric": "F1 macro", "value": classification_run.get("macro_f1")},
+                        ],
+                        [("metric", "Métrica global"), ("value", "Valor")],
+                    )
+                    + _html_table(
+                        classification_metric_rows,
+                        [
+                            ("label", "Classe"),
+                            ("precision", "Precisão"),
+                            ("recall", "Revocação"),
+                            ("f1", "F1"),
+                            ("support", "Suporte"),
+                        ],
+                        empty_message="Sem métricas válidas: são necessárias classes e amostras de teste suficientes.",
+                    )
+                    + _html_table(
+                        confusion_rows,
+                        [
+                            ("actual", "Classe real"),
+                            ("predicted", "Classe prevista"),
+                            ("count", "Quantidade"),
+                        ],
+                        empty_message="A matriz de confusão exige exemplos no conjunto de teste.",
+                    )
+                )
+            ],
+            18,
+        ),
+        _markdown_cell(
+            """
             ## Como estudar este notebook
 
             - Primeiro veja os dados coletados e os filtros.
             - Depois compare texto bruto, texto limpo e tokens.
             - Em seguida veja os termos com maior TF-IDF e o mapa 3D.
             - Por fim, leia a etapa de embeddings, a busca semântica e a comparação entre vetores estáticos e contextuais.
+            - Na aula 8, observe como rótulos transformam representação em decisão e por que métricas exigem dados de teste.
             """
         ),
     ]

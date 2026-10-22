@@ -12,6 +12,7 @@ from typing import Any, Iterable
 from .database import connect_database, initialize_database
 from .text_analysis import latest_text_analysis
 from .text_classification import latest_text_classification
+from .linguistic_analysis import latest_linguistic_analysis
 from .text_embeddings import (
     contextualize_tokens,
     latest_embedding_analysis,
@@ -402,6 +403,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
     embedding_analysis = latest_embedding_analysis(connection)
     embedding_model = load_latest_embedding_model(connection)
     classification_analysis = latest_text_classification(connection)
+    linguistic_analysis = latest_linguistic_analysis(connection)
     generated_at = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
 
     summary_rows = [
@@ -413,6 +415,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         {"metric": "Última análise TF-IDF", "value": _latest_id(connection, "text_analysis_runs")},
         {"metric": "Última análise de embeddings", "value": _latest_id(connection, "embedding_runs")},
         {"metric": "Última classificação", "value": _latest_id(connection, "classification_runs")},
+        {"metric": "Última análise linguística", "value": _latest_id(connection, "linguistic_analysis_runs")},
     ]
     prepared_text_count = int(summary_rows[4]["value"])
     recipe_rows = _rows(
@@ -478,6 +481,24 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         for actual, candidates in (classification_analysis or {}).get("confusion", {}).items()
         for predicted, count in candidates.items()
     ]
+    linguistic_run = (linguistic_analysis or {}).get("run", {})
+    dependency_rows = (linguistic_analysis or {}).get("dependencies", [])[:80]
+    sentiment_rows = []
+    for item in (linguistic_analysis or {}).get("sentiments", [])[:40]:
+        sentiment_rows.append(
+            {
+                "title": item.get("title"),
+                "field_name": item.get("field_name"),
+                "position": item.get("position"),
+                "polarity": item.get("polarity"),
+                "score": item.get("score"),
+                "subjectivity": item.get("subjectivity"),
+                "evidence": ", ".join(evidence.get("token", "") for evidence in item.get("evidence", [])) or "—",
+                "aspects": ", ".join(aspect.get("aspect", "") for aspect in item.get("aspects", [])) or "—",
+            }
+        )
+    entity_rows = (linguistic_analysis or {}).get("entities", [])[:80]
+    relation_rows = (linguistic_analysis or {}).get("relations", [])[:80]
     semantic_query = "carne com cebola"
     semantic_rows = semantic_search(embedding_model, semantic_query, limit=5) if embedding_model else []
     contextual_rows: list[dict[str, Any]] = []
@@ -527,6 +548,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             from scraper.database import connect_database, initialize_database, rebuild_text_preparations
             from scraper.text_analysis import run_text_analysis, latest_text_analysis
             from scraper.text_classification import run_text_classification, latest_text_classification
+            from scraper.linguistic_analysis import run_linguistic_analysis, latest_linguistic_analysis
             from scraper.text_embeddings import (
                 contextualize_tokens,
                 load_latest_embedding_model,
@@ -555,12 +577,14 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             analysis_run_id = run_text_analysis(connection, cluster_count=4, neighbor_count=5)
             embedding_run_id = run_embedding_analysis(connection, dimension=32, window_size=2, neighbor_count=5)
             classification_run_id = run_text_classification(connection, target_field="difficulty", test_ratio=0.25)
+            linguistic_run_id = run_linguistic_analysis(connection)
             connection.close()
 
             print(f"Preparação atualizada: {prepared_count} unidade(s)")
             print(f"Análise TF-IDF gerada: execução {analysis_run_id}")
             print(f"Embeddings gerados: execução {embedding_run_id}")
             print(f"Classificação gerada: execução {classification_run_id}")
+            print(f"Análise linguística gerada: execução {linguistic_run_id}")
             """,
             [
                 _stream(
@@ -568,6 +592,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                     f"Análise TF-IDF disponível: execução {text_run.get('id', '—')}\n"
                     f"Embeddings disponíveis: execução {embedding_run.get('id', '—')}\n"
                     f"Classificação disponível: execução {classification_run.get('id', '—')}\n"
+                    f"Análise linguística disponível: execução {linguistic_run.get('id', '—')}\n"
                 )
             ],
             2,
@@ -1135,6 +1160,162 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         ),
         _markdown_cell(
             """
+            ## 17. Aula 9 — análise linguística e extração de informação
+
+            Esta etapa vai além dos vetores e produz informação explícita. O pipeline local reúne quatro tarefas: dependências sintáticas rasas, sentimento baseado em léxico e regras, entidades do domínio culinário e relações em forma de triplas.
+
+            Os métodos são determinísticos e interpretáveis. Eles não substituem spaCy, Stanza, BERT ou um modelo de NER treinado; servem como baseline de domínio e deixam cada decisão auditável.
+            """
+        ),
+        _code_cell(
+            """
+            connection = connect_database(DATABASE_PATH)
+            linguistica = latest_linguistic_analysis(connection)
+            connection.close()
+            display(HTML("Resumo da aula 9 já exibido no output."))
+            """,
+            [
+                _html_output(
+                    _html_table(
+                        [
+                            {"metric": "Execução", "value": linguistic_run.get("id")},
+                            {"metric": "Versão", "value": linguistic_run.get("model_version")},
+                            {"metric": "Documentos", "value": linguistic_run.get("document_count")},
+                            {"metric": "Sentenças", "value": linguistic_run.get("sentence_count")},
+                            {"metric": "Dependências", "value": linguistic_run.get("dependency_count")},
+                            {"metric": "Sentimentos", "value": linguistic_run.get("sentiment_count")},
+                            {"metric": "Entidades", "value": linguistic_run.get("entity_count")},
+                            {"metric": "Relações", "value": linguistic_run.get("relation_count")},
+                        ],
+                        [("metric", "Métrica"), ("value", "Valor")],
+                    )
+                )
+            ],
+            19,
+        ),
+        _markdown_cell(
+            """
+            ## 18. Aula 9 — parsing e dependências
+
+            O parser raso procura a ação culinária central e liga os demais tokens com relações inspiradas em Universal Dependencies: `root`, `obj`, `nsubj`, `det`, `case` e `nmod`. O resultado ajuda a formar pares ação–objeto, mas não representa uma árvore sintática neural completa.
+            """
+        ),
+        _code_cell(
+            """
+            dependencias = (linguistica or {}).get("dependencies", [])
+            display(HTML("Dependências sintáticas rasas já exibidas no output."))
+            """,
+            [
+                _html_output(
+                    _html_table(
+                        dependency_rows,
+                        [
+                            ("title", "Receita"),
+                            ("sentence_index", "Sentença"),
+                            ("token_index", "Índice"),
+                            ("token", "Token"),
+                            ("lemma", "Lema"),
+                            ("head_index", "Núcleo"),
+                            ("relation", "Relação"),
+                        ],
+                    )
+                )
+            ],
+            20,
+        ),
+        _markdown_cell(
+            """
+            ## 19. Aula 9 — análise de sentimentos e aspectos
+
+            A polaridade usa um léxico pequeno, inversão por negação e pesos de intensidade. Também marca aspectos culinários como sabor, textura, tempo, custo e preparo. Textos descritivos tendem a ser neutros; a técnica é mais útil quando o corpus contém avaliações ou comentários.
+            """
+        ),
+        _code_cell(
+            """
+            sentimentos = (linguistica or {}).get("sentiments", [])
+            display(HTML("Análises de sentimento já exibidas no output."))
+            """,
+            [
+                _html_output(
+                    _html_table(
+                        sentiment_rows,
+                        [
+                            ("title", "Receita"),
+                            ("field_name", "Campo"),
+                            ("position", "Posição"),
+                            ("polarity", "Polaridade"),
+                            ("score", "Escore"),
+                            ("subjectivity", "Subjetividade"),
+                            ("evidence", "Evidências"),
+                            ("aspects", "Aspectos"),
+                        ],
+                    )
+                )
+            ],
+            21,
+        ),
+        _markdown_cell(
+            """
+            ## 20. Aula 9 — entidades nomeadas de domínio
+
+            O esquema de entidades foi adaptado ao domínio de receitas: `INGREDIENT`, `UTENSIL`, `CATEGORY`, `QUANTITY`, `UNIT`, `DURATION` e `TEMPERATURE`. Campos estruturados funcionam como gazetteers confiáveis; expressões regulares reconhecem medidas, tempos e temperaturas. A coluna BIO mostra o início da entidade.
+            """
+        ),
+        _code_cell(
+            """
+            entidades = (linguistica or {}).get("entities", [])
+            display(HTML("Entidades de domínio já exibidas no output."))
+            """,
+            [
+                _html_output(
+                    _html_table(
+                        entity_rows,
+                        [
+                            ("title", "Receita"),
+                            ("field_name", "Campo"),
+                            ("position", "Posição"),
+                            ("entity_text", "Entidade"),
+                            ("entity_type", "Tipo"),
+                            ("normalized_value", "Valor normalizado"),
+                            ("bio_tag", "BIO"),
+                            ("extraction_method", "Método"),
+                        ],
+                    )
+                )
+            ],
+            22,
+        ),
+        _markdown_cell(
+            """
+            ## 21. Aula 9 — extração de relações
+
+            As relações são armazenadas como `(sujeito, relação, objeto)`. As triplas estruturais têm confiança 1, pois vêm de ingredientes, utensílios e categorias já extraídos. As triplas ação–objeto recebem confiança menor porque resultam do parser raso.
+            """
+        ),
+        _code_cell(
+            """
+            relacoes = (linguistica or {}).get("relations", [])
+            display(HTML("Relações semânticas já exibidas no output."))
+            """,
+            [
+                _html_output(
+                    _html_table(
+                        relation_rows,
+                        [
+                            ("title", "Receita"),
+                            ("subject", "Sujeito"),
+                            ("relation", "Relação"),
+                            ("object", "Objeto"),
+                            ("confidence", "Confiança"),
+                            ("extraction_method", "Método"),
+                        ],
+                    )
+                )
+            ],
+            23,
+        ),
+        _markdown_cell(
+            """
             ## Como estudar este notebook
 
             - Primeiro veja os dados coletados e os filtros.
@@ -1142,6 +1323,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             - Em seguida veja os termos com maior TF-IDF e o mapa 3D.
             - Por fim, leia a etapa de embeddings, a busca semântica e a comparação entre vetores estáticos e contextuais.
             - Na aula 8, observe como rótulos transformam representação em decisão e por que métricas exigem dados de teste.
+            - Na aula 9, acompanhe a passagem de texto livre para dependências, sentimentos, entidades e triplas estruturadas.
             """
         ),
     ]

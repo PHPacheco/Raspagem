@@ -223,6 +223,77 @@ CREATE TABLE IF NOT EXISTS classification_metrics (
     UNIQUE(run_id, label)
 );
 
+CREATE TABLE IF NOT EXISTS linguistic_analysis_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    model_version TEXT NOT NULL,
+    document_count INTEGER NOT NULL DEFAULT 0,
+    sentence_count INTEGER NOT NULL DEFAULT 0,
+    dependency_count INTEGER NOT NULL DEFAULT 0,
+    sentiment_count INTEGER NOT NULL DEFAULT 0,
+    entity_count INTEGER NOT NULL DEFAULT 0,
+    relation_count INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS syntactic_dependencies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES linguistic_analysis_runs(id) ON DELETE CASCADE,
+    recipe_id TEXT NOT NULL REFERENCES recipes(site_recipe_id) ON DELETE CASCADE,
+    sentence_index INTEGER NOT NULL,
+    token_index INTEGER NOT NULL,
+    token TEXT NOT NULL,
+    lemma TEXT NOT NULL,
+    head_index INTEGER,
+    relation TEXT NOT NULL,
+    source_text TEXT NOT NULL,
+    UNIQUE(run_id, recipe_id, sentence_index, token_index)
+);
+
+CREATE TABLE IF NOT EXISTS sentiment_analyses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES linguistic_analysis_runs(id) ON DELETE CASCADE,
+    recipe_id TEXT NOT NULL REFERENCES recipes(site_recipe_id) ON DELETE CASCADE,
+    field_name TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    source_text TEXT NOT NULL,
+    polarity TEXT NOT NULL,
+    score REAL NOT NULL,
+    subjectivity REAL NOT NULL,
+    evidence_json TEXT NOT NULL,
+    aspects_json TEXT NOT NULL,
+    UNIQUE(run_id, recipe_id, field_name, position)
+);
+
+CREATE TABLE IF NOT EXISTS named_entities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES linguistic_analysis_runs(id) ON DELETE CASCADE,
+    recipe_id TEXT NOT NULL REFERENCES recipes(site_recipe_id) ON DELETE CASCADE,
+    field_name TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    start_char INTEGER NOT NULL,
+    end_char INTEGER NOT NULL,
+    entity_text TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
+    normalized_value TEXT NOT NULL,
+    bio_tag TEXT NOT NULL,
+    extraction_method TEXT NOT NULL,
+    UNIQUE(run_id, recipe_id, field_name, position, start_char, end_char, entity_type)
+);
+
+CREATE TABLE IF NOT EXISTS semantic_relations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER NOT NULL REFERENCES linguistic_analysis_runs(id) ON DELETE CASCADE,
+    recipe_id TEXT NOT NULL REFERENCES recipes(site_recipe_id) ON DELETE CASCADE,
+    subject TEXT NOT NULL,
+    relation TEXT NOT NULL,
+    object TEXT NOT NULL,
+    source_field TEXT NOT NULL,
+    source_position INTEGER NOT NULL,
+    confidence REAL NOT NULL,
+    extraction_method TEXT NOT NULL,
+    UNIQUE(run_id, recipe_id, subject, relation, object, source_field, source_position)
+);
+
 CREATE INDEX IF NOT EXISTS idx_recipes_rating ON recipes(rating_value);
 CREATE INDEX IF NOT EXISTS idx_recipes_difficulty ON recipes(difficulty);
 CREATE INDEX IF NOT EXISTS idx_recipes_cost ON recipes(cost_label);
@@ -240,3 +311,7 @@ CREATE INDEX IF NOT EXISTS idx_document_embeddings_run ON document_embeddings(ru
 CREATE INDEX IF NOT EXISTS idx_embedding_similarities_run ON embedding_similarities(run_id, recipe_id, rank);
 CREATE INDEX IF NOT EXISTS idx_classification_predictions_run ON classification_predictions(run_id, split);
 CREATE INDEX IF NOT EXISTS idx_classification_metrics_run ON classification_metrics(run_id, label);
+CREATE INDEX IF NOT EXISTS idx_syntactic_dependencies_run ON syntactic_dependencies(run_id, recipe_id);
+CREATE INDEX IF NOT EXISTS idx_sentiment_analyses_run ON sentiment_analyses(run_id, recipe_id);
+CREATE INDEX IF NOT EXISTS idx_named_entities_run ON named_entities(run_id, recipe_id, entity_type);
+CREATE INDEX IF NOT EXISTS idx_semantic_relations_run ON semantic_relations(run_id, recipe_id, relation);

@@ -25,6 +25,7 @@ from .recipe_parser import parse_recipe
 from .text_embeddings import run_embedding_analysis
 from .text_analysis import run_text_analysis
 from .text_classification import run_text_classification
+from .linguistic_analysis import run_linguistic_analysis
 from .text_utils import canonical_url, site_category_id_from_url
 from .notebook_export import DEFAULT_NOTEBOOK, export_analysis_notebook
 
@@ -307,6 +308,27 @@ def classify_texts(args: argparse.Namespace) -> int:
     return 0
 
 
+def analyze_linguistics(args: argparse.Namespace) -> int:
+    connection = _open_database(args.database)
+    run_id = run_linguistic_analysis(connection)
+    summary = connection.execute(
+        """
+        SELECT document_count, sentence_count, dependency_count, sentiment_count,
+               entity_count, relation_count
+        FROM linguistic_analysis_runs WHERE id = ?
+        """,
+        (run_id,),
+    ).fetchone()
+    connection.close()
+    print(
+        f"Análise linguística {run_id}: {summary['document_count']} documento(s), "
+        f"{summary['sentence_count']} sentença(s), {summary['dependency_count']} dependência(s), "
+        f"{summary['sentiment_count']} análise(s) de sentimento, "
+        f"{summary['entity_count']} entidade(s) e {summary['relation_count']} relação(ões)."
+    )
+    return 0
+
+
 def export_notebook(args: argparse.Namespace) -> int:
     notebook_path = export_analysis_notebook(args.database, args.output)
     print(f"Notebook gerado com outputs prontos: {notebook_path}")
@@ -352,6 +374,13 @@ def build_parser() -> argparse.ArgumentParser:
     classification_parser.add_argument("--target", choices=("difficulty", "cost"), default="difficulty")
     classification_parser.add_argument("--test-ratio", type=float, default=0.25)
     classification_parser.set_defaults(handler=classify_texts)
+
+    linguistics_parser = subparsers.add_parser(
+        "analyze-linguistics",
+        help="gera parsing raso, sentimentos, entidades de domínio e relações da aula 9",
+    )
+    linguistics_parser.add_argument("--database", default=DEFAULT_DATABASE)
+    linguistics_parser.set_defaults(handler=analyze_linguistics)
 
     notebook_parser = subparsers.add_parser(
         "export-notebook",

@@ -83,6 +83,16 @@ echo Gerando embeddings densos da etapa 7...
 if errorlevel 1 goto :finish_error
 
 echo.
+echo Gerando classificacao textual e metricas da aula 8...
+"%PYTHON%" -m scraper classify-texts --database "%DATABASE%" --target difficulty
+if errorlevel 1 goto :finish_error
+
+echo.
+echo Gerando parsing, sentimentos, entidades e relacoes da aula 9...
+"%PYTHON%" -m scraper analyze-linguistics --database "%DATABASE%"
+if errorlevel 1 goto :finish_error
+
+echo.
 echo Gerando notebook com outputs prontos...
 "%PYTHON%" -m scraper export-notebook --database "%DATABASE%" --output "%NOTEBOOK%"
 if errorlevel 1 goto :finish_error
@@ -167,7 +177,9 @@ echo O que voce vera no notebook:
 echo   - dados coletados e filtros;
 echo   - limpeza e preparacao textual;
 echo   - grafico 3D, TF-IDF, similaridade e clusters;
-echo   - etapa 7 com embeddings densos e vizinhos por contexto.
+echo   - aula 7 com embeddings, busca semantica e contexto;
+echo   - aula 8 com classificacao, previsoes e metricas;
+echo   - aula 9 com parsing, sentimentos, entidades e relacoes.
 echo.
 set "EXIT_CODE=0"
 goto :finish

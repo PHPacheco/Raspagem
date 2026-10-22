@@ -137,7 +137,32 @@ Para gerar essa etapa no banco:
 ```
 
 O resultado fica nas tabelas `embedding_runs`, `word_embeddings`, `document_embeddings` e `embedding_similarities`.
-No notebook, a seção "Etapa 7" mostra os embeddings, vizinhos por similaridade densa e contextos aprendidos.
+No notebook, a aula 7 mostra embeddings, vizinhos por similaridade densa, busca semântica e uma composição contextual didática. Essa composição demonstra `palavra + contexto -> vetor`, mas não é BERT nem um Transformer.
+
+## Classificação textual — aula 8
+
+O projeto implementa um baseline supervisionado com Naive Bayes multinomial. O alvo pode ser a dificuldade ou o custo da receita. O pipeline inclui divisão estratificada entre treino e teste, probabilidades, matriz de confusão, acurácia, precisão, revocação e F1.
+
+```powershell
+.\.venv\bin\python.exe -m scraper classify-texts --target difficulty
+```
+
+Quando o corpus não possui classes ou exemplos suficientes, a execução registra essa limitação e não publica métricas inválidas. Os resultados ficam em `classification_runs`, `classification_predictions` e `classification_metrics`.
+
+## Análise linguística — aula 9
+
+A etapa 9 produz informação explicitamente estruturada para o domínio de receitas:
+
+- dependências sintáticas rasas de instruções;
+- sentimento por léxico, negação, intensidade e aspectos;
+- entidades de ingrediente, utensílio, categoria, quantidade, unidade, duração e temperatura;
+- relações em triplas, incluindo relações estruturais e pares ação–objeto.
+
+```powershell
+.\.venv\bin\python.exe -m scraper analyze-linguistics
+```
+
+Os métodos são baselines determinísticos e interpretáveis, não substitutos de um parser neural, BERT ou NER treinado. Os resultados ficam nas tabelas `linguistic_analysis_runs`, `syntactic_dependencies`, `sentiment_analyses`, `named_entities` e `semantic_relations`.
 
 ## Gerar e abrir o notebook
 
@@ -152,10 +177,22 @@ Para atualizar tudo antes de gerar o notebook:
 ```powershell
 .\.venv\bin\python.exe -m scraper analyze-texts
 .\.venv\bin\python.exe -m scraper build-embeddings
+.\.venv\bin\python.exe -m scraper classify-texts --target difficulty
+.\.venv\bin\python.exe -m scraper analyze-linguistics
 .\.venv\bin\python.exe -m scraper export-notebook
 ```
 
-O notebook mantém os filtros em forma de variáveis editáveis, além das tabelas, detalhes das receitas, preparação textual, gráfico 3D, TF-IDF e embeddings.
+O notebook mantém os filtros em forma de variáveis editáveis, além das tabelas, detalhes das receitas, preparação textual, gráfico 3D, TF-IDF, embeddings, classificação e extração de informação.
+
+## Relatório web separado
+
+O relatório estático fica isolado em `relatorio-web\`. Essa pasta não importa módulos Python, não executa análises e contém apenas HTML, CSS, documentação e um atalho próprio. O notebook continua sendo a interface executável da análise.
+
+No Windows, abra o relatório com:
+
+```text
+relatorio-web\abrir_relatorio.bat
+```
 
 ## Testes
 
@@ -181,4 +218,4 @@ Para visualizar as implementações mais recentes sem decorar os comandos, use:
 bats\visualizar_novidades.bat
 ```
 
-Esse atalho atualiza a limpeza/preparação dos textos, gera a análise TF-IDF com projeção 3D, gera os embeddings da etapa 7, exporta `notebooks\Trabalho PLN.ipynb` com outputs prontos e tenta abrir o notebook no VS Code ou no aplicativo padrão. Se o banco `data\recipes.sqlite` ainda não existir, ele carrega a fixture local antes de gerar o notebook.
+Esse atalho atualiza a preparação dos textos, TF-IDF, projeção 3D, embeddings da aula 7, classificação da aula 8 e análise linguística da aula 9. Depois exporta `notebooks\Trabalho PLN.ipynb` com outputs prontos e tenta abrir o notebook no VS Code ou no aplicativo padrão. Se o banco `data\recipes.sqlite` ainda não existir, ele carrega a fixture local antes de gerar o notebook.

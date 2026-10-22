@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Relatório técnico das etapas 7, 8 e 9 do Trabalho PLN.">
+  <title>Relatório técnico — Trabalho PLN</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div>
+      <p class="document-type">Relatório técnico</p>
+      <h1>Trabalho PLN</h1>
+      <p>Estado das implementações correspondentes às aulas 7, 8 e 9.</p>
+    </div>
+    <dl class="metadata">
+      <div><dt>Corpus atual</dt><dd>1 receita de fixture</dd></div>
+      <div><dt>Testes</dt><dd>30 aprovados</dd></div>
+      <div><dt>Interface de análise</dt><dd>notebooks/Trabalho PLN.ipynb</dd></div>
+    </dl>
+  </header>
+
+  <main>
+    <section aria-labelledby="resumo">
+      <h2 id="resumo">Resumo</h2>
+      <p>O projeto executa o fluxo desde a coleta e preparação textual até embeddings, classificação e extração de informação. As etapas 7, 8 e 9 estão implementadas com métodos locais e reproduzíveis. A principal limitação é a quantidade de dados: o banco versionado contém uma única receita, suficiente para verificar o pipeline, mas insuficiente para avaliar comparações, classes ou generalização.</p>
+
+      <table>
+        <thead><tr><th>Etapa</th><th>Implementação</th><th>Estado</th><th>Limitação principal</th></tr></thead>
+        <tbody>
+          <tr><td>Aula 7</td><td>Embeddings, busca semântica e contexto por ocorrência</td><td><span class="status implemented">Implementado</span></td><td>Não usa Word2Vec neural nem BERT</td></tr>
+          <tr><td>Aula 8</td><td>Classificação supervisionada e métricas</td><td><span class="status implemented">Implementado</span></td><td>Corpus atual possui uma única classe</td></tr>
+          <tr><td>Aula 9</td><td>Parsing raso, sentimentos, NER de domínio e relações</td><td><span class="status implemented">Implementado</span></td><td>Métodos heurísticos, sem modelo linguístico neural</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="aula-7">
+      <h2 id="aula-7">Aula 7 — embeddings</h2>
+      <h3>O que foi implementado</h3>
+      <ul>
+        <li>Contagem de coocorrências em janelas locais.</li>
+        <li>Ponderação PPMI e projeção densa determinística.</li>
+        <li>Embeddings estáticos de palavras e média vetorial por receita.</li>
+        <li>Similaridade de cosseno entre receitas.</li>
+        <li>Busca semântica: a consulta é projetada no mesmo espaço das receitas.</li>
+        <li>Representação contextual didática: cada ocorrência combina o vetor da palavra com sua janela local.</li>
+      </ul>
+      <h3>Interpretação</h3>
+      <p>A implementação demonstra a hipótese distribucional e a diferença entre vetor estático e vetor dependente do contexto. A composição contextual não implementa atenção nem Transformer e não deve ser descrita como BERT.</p>
+      <h3>Saída</h3>
+      <p>As execuções são armazenadas nas tabelas <code>embedding_runs</code>, <code>word_embeddings</code>, <code>document_embeddings</code> e <code>embedding_similarities</code>.</p>
+    </section>
+
+    <section aria-labelledby="aula-8">
+      <h2 id="aula-8">Aula 8 — classificação textual</h2>
+      <h3>O que foi implementado</h3>
+      <ul>
+        <li>Carregamento de receitas rotuladas por dificuldade ou custo.</li>
+        <li>Divisão estratificada e determinística entre treino e teste.</li>
+        <li>Classificador Naive Bayes multinomial.</li>
+        <li>Classe prevista e distribuição de probabilidades.</li>
+        <li>Matriz de confusão, acurácia, precisão, revocação e F1 por classe e macro.</li>
+        <li>Estados explícitos para falta de classes ou de amostras de teste.</li>
+      </ul>
+      <h3>Resultado atual</h3>
+      <p>A execução usa o alvo <code>difficulty</code>. Como existe apenas uma receita rotulada como “Fácil”, o status é <code>insufficient_classes</code>. Acurácia e F1 permanecem vazias para evitar uma avaliação inválida.</p>
+      <h3>Saída</h3>
+      <p>Os resultados ficam em <code>classification_runs</code>, <code>classification_predictions</code> e <code>classification_metrics</code>.</p>
+    </section>
+
+    <section aria-labelledby="aula-9">
+      <h2 id="aula-9">Aula 9 — análise linguística e extração de informação</h2>
+      <h3>O que foi implementado</h3>
+      <ul>
+        <li>Parsing raso das instruções, com relações <code>root</code>, <code>obj</code>, <code>nsubj</code>, <code>det</code>, <code>case</code> e <code>nmod</code>.</li>
+        <li>Análise de sentimento por léxico, incluindo negação, intensidade, subjetividade e aspectos culinários.</li>
+        <li>Entidades de domínio: ingrediente, utensílio, categoria, quantidade, unidade, duração e temperatura.</li>
+        <li>Rótulos BIO de início de entidade.</li>
+        <li>Relações em triplas, como <code>(receita, tem_ingrediente, ingrediente)</code> e pares ação–objeto.</li>
+      </ul>
+      <h3>Resultado atual</h3>
+      <dl class="results">
+        <div><dt>Sentenças de preparo</dt><dd>4</dd></div>
+        <div><dt>Dependências</dt><dd>67</dd></div>
+        <div><dt>Análises de sentimento</dt><dd>21</dd></div>
+        <div><dt>Entidades</dt><dd>24</dd></div>
+        <div><dt>Relações</dt><dd>19</dd></div>
+      </dl>
+      <h3>Saída</h3>
+      <p>Os dados ficam em <code>linguistic_analysis_runs</code>, <code>syntactic_dependencies</code>, <code>sentiment_analyses</code>, <code>named_entities</code> e <code>semantic_relations</code>.</p>
+    </section>
+
+    <section aria-labelledby="pendencias">
+      <h2 id="pendencias">Pendências</h2>
+      <ol>
+        <li><strong>Ampliar o corpus com autorização.</strong> É o requisito para avaliar similaridade, clusters, classificação e extração.</li>
+        <li><strong>Criar conjuntos anotados.</strong> Sentimento, entidades e relações precisam de exemplos de referência para medir precisão, revocação e F1.</li>
+        <li><strong>Comparar baselines com modelos treinados.</strong> Exemplos: Word2Vec/FastText, BERTimbau, spaCy ou Stanza para português.</li>
+        <li><strong>Validar as classes de dificuldade e custo.</strong> É necessário verificar distribuição, desbalanceamento e consistência dos rótulos.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="reproducao">
+      <h2 id="reproducao">Reprodução</h2>
+      <p>O comando abaixo atualiza todas as análises e gera o notebook com outputs salvos:</p>
+      <pre><code>bats\visualizar_novidades.bat</code></pre>
+      <p>O relatório pode ser aberto separadamente com:</p>
+      <pre><code>relatorio-web\abrir_relatorio.bat</code></pre>
+    </section>
+
+    <section aria-labelledby="fontes">
+      <h2 id="fontes">Aulas de referência</h2>
+      <ul class="sources">
+        <li><a href="https://mrspiess.cloud/aulas/pln-2026/aula-7/">Aula 7 — Word2Vec e embeddings modernos</a></li>
+        <li><a href="https://mrspiess.cloud/aulas/pln-2026/aula-8/">Aula 8 — Classificação de textos</a></li>
+        <li><a href="https://mrspiess.cloud/aulas/pln-2026/aula-9/">Aula 9 — Análise linguística e extração de informação</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>Relatório estático e independente. A implementação executável permanece fora desta pasta.</footer>
+</body>
+</html>

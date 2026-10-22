@@ -532,9 +532,9 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             f"""
             # Trabalho PLN
 
-            Este notebook substitui a antiga visualização em página web. Ele já foi gerado com output pronto em `{generated_at}`.
+            Este notebook é a interface executável da análise e foi gerado com outputs prontos em `{generated_at}`. O relatório HTML permanece separado em `relatorio-web/` e contém somente documentação.
 
-            A ideia é ler o projeto em blocos: dados coletados, filtros, detalhes das receitas, limpeza/preparação, TF-IDF, gráfico 3D e embeddings da etapa 7.
+            A leitura está organizada em blocos: dados coletados, preparação, TF-IDF, gráfico 3D, embeddings da aula 7, classificação da aula 8 e extração de informação da aula 9.
             """
         ),
         _code_cell(
@@ -576,14 +576,19 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             prepared_count = rebuild_text_preparations(connection)
             analysis_run_id = run_text_analysis(connection, cluster_count=4, neighbor_count=5)
             embedding_run_id = run_embedding_analysis(connection, dimension=32, window_size=2, neighbor_count=5)
-            classification_run_id = run_text_classification(connection, target_field="difficulty", test_ratio=0.25)
+            try:
+                classification_run_id = run_text_classification(connection, target_field="difficulty", test_ratio=0.25)
+            except ValueError as error:
+                classification_run_id = None
+                print(f"Classificação não gerada: {error}")
             linguistic_run_id = run_linguistic_analysis(connection)
             connection.close()
 
             print(f"Preparação atualizada: {prepared_count} unidade(s)")
             print(f"Análise TF-IDF gerada: execução {analysis_run_id}")
             print(f"Embeddings gerados: execução {embedding_run_id}")
-            print(f"Classificação gerada: execução {classification_run_id}")
+            if classification_run_id is not None:
+                print(f"Classificação gerada: execução {classification_run_id}")
             print(f"Análise linguística gerada: execução {linguistic_run_id}")
             """,
             [

@@ -1,12 +1,15 @@
+from collections import Counter
 from pathlib import Path
 
 from scraper.database import connect_database, initialize_database, save_recipe
 from scraper.models import RecipeData
 from scraper.text_analysis import (
     build_tfidf_model,
+    cluster_vectors,
     cosine_similarity,
     latest_text_analysis,
     run_text_analysis,
+    select_cluster_count,
     TextDocument,
 )
 
@@ -56,6 +59,8 @@ def test_text_analysis_pipeline_persists_vectors_similarity_clusters_and_project
     assert nearest_to_first["cosine_similarity"] > 0
     assert latest is not None
     assert latest["run"]["id"] == run_id
+    assert latest["run"]["clustering_method"] == "tfidf-l2+kmeans++"
+    assert latest["run"]["silhouette_score"] is not None
     assert len(latest["documents"]) == 3
     assert "z" in latest["documents"][0]
 
@@ -71,3 +76,28 @@ def test_tfidf_model_gives_weight_to_terms_that_do_not_appear_in_every_document(
 
     chocolate_index = model.vocabulary.index("chocolate")
     assert model.vectors["1"][chocolate_index] > 0
+
+
+def test_cluster_selection_uses_silhouette_and_is_deterministic() -> None:
+    documents = [
+        TextDocument(str(index), f"Fruta {index}", ["banana", "maca", "fruta"])
+        for index in range(1, 4)
+    ] + [
+        TextDocument(str(index), f"Carne {index}", ["frango", "alho", "carne"])
+        for index in range(4, 7)
+    ] + [
+        TextDocument(str(index), f"Bolo {index}", ["bolo", "cacau", "sobremesa"])
+        for index in range(7, 10)
+    ]
+    model = build_tfidf_model(documents)
+
+    cluster_count, assignments, score = select_cluster_count(
+        model,
+        max_clusters=5,
+        restarts=2,
+    )
+
+    assert cluster_count == 3
+    assert score > 0.99
+    assert sorted(Counter(assignments.values()).values()) == [3, 3, 3]
+    assert cluster_vectors(model, cluster_count=3) == cluster_vectors(model, cluster_count=3)

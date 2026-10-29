@@ -33,6 +33,9 @@ CREATE TABLE IF NOT EXISTS recipes (
     servings INTEGER,
     description TEXT,
     search_text TEXT NOT NULL DEFAULT '',
+    content_fingerprint TEXT NOT NULL DEFAULT '',
+    duplicate_of_recipe_id TEXT REFERENCES recipes(site_recipe_id) ON DELETE SET NULL,
+    duplicate_similarity REAL,
     retrieved_at TEXT NOT NULL,
     parser_version TEXT NOT NULL
 );
@@ -106,6 +109,8 @@ CREATE TABLE IF NOT EXISTS text_analysis_runs (
     document_count INTEGER NOT NULL DEFAULT 0,
     vocabulary_size INTEGER NOT NULL DEFAULT 0,
     cluster_count INTEGER NOT NULL DEFAULT 0,
+    clustering_method TEXT NOT NULL DEFAULT 'legacy',
+    silhouette_score REAL,
     created_at TEXT NOT NULL
 );
 

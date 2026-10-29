@@ -10,6 +10,7 @@ from typing import Any
 
 from .database import utc_now
 from .text_analysis import TextDocument, load_documents
+from .text_utils import normalize_cost_label, normalize_difficulty
 
 
 CLASSIFICATION_VERSION = "pln-aula-8-naive-bayes-v1"
@@ -40,8 +41,9 @@ def load_labeled_documents(
 ) -> list[LabeledDocument]:
     if target_field not in TARGET_COLUMNS:
         raise ValueError(f"Alvo inválido: {target_field}. Use difficulty ou cost.")
+    normalizer = normalize_difficulty if target_field == "difficulty" else normalize_cost_label
     labels = {
-        row["site_recipe_id"]: str(row["label"]).strip()
+        row["site_recipe_id"]: normalizer(row["label"])
         for row in connection.execute(
             f"SELECT site_recipe_id, {TARGET_COLUMNS[target_field]} AS label FROM recipes "
             f"WHERE NULLIF(TRIM({TARGET_COLUMNS[target_field]}), '') IS NOT NULL"

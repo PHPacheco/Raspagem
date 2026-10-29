@@ -1,4 +1,4 @@
-from scraper.text_utils import prepare_text, search_terms
+from scraper.text_utils import clean_text, prepare_text, search_terms
 
 
 def test_prepare_text_preserves_raw_and_derives_clean_versions() -> None:
@@ -14,10 +14,14 @@ def test_prepare_text_preserves_raw_and_derives_clean_versions() -> None:
     assert "das" not in prepared.content_tokens
     assert "cebola" in prepared.lemma_tokens
     assert "cebol" in prepared.stemmed_tokens
-    assert prepared.pipeline_version == "pln-aula-5-v1"
+    assert prepared.pipeline_version == "pln-aula-5-v2"
+    assert "html_entities_decoded" in prepared.transformations
     assert "html_residual_removed" in prepared.transformations
 
 
 def test_search_terms_use_derived_forms_without_requiring_the_original_plural() -> None:
     assert search_terms("cebolas") == ["cebola", "cebol"]
 
+
+def test_clean_text_decodes_nested_html_entities() -> None:
+    assert clean_text("d&amp;#039;&amp;aacute;gua") == "d'água"

@@ -98,3 +98,23 @@ def test_single_class_is_recorded_without_fake_evaluation(tmp_path: Path) -> Non
     assert run["status"] == "insufficient_classes"
     assert run["accuracy"] is None
     assert run["test_count"] == 0
+
+
+def test_difficulty_labels_differing_only_by_case_are_one_class(tmp_path: Path) -> None:
+    connection = connect_database(tmp_path / "recipes.sqlite")
+    initialize_database(connection)
+    save_recipe(connection, _recipe("1", "Fácil", "receita simples"))
+    save_recipe(connection, _recipe("2", "fácil", "receita rápida"))
+
+    run_id = run_text_classification(connection, target_field="difficulty", test_ratio=0.5)
+    run = connection.execute("SELECT * FROM classification_runs WHERE id = ?", (run_id,)).fetchone()
+    labels = {
+        row["actual_label"]
+        for row in connection.execute(
+            "SELECT actual_label FROM classification_predictions WHERE run_id = ?", (run_id,)
+        )
+    }
+
+    assert run["class_count"] == 1
+    assert run["status"] == "insufficient_classes"
+    assert labels == {"fácil"}

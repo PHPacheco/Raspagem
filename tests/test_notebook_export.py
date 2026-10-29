@@ -3,7 +3,7 @@ from pathlib import Path
 
 from scraper.database import connect_database, initialize_database, save_recipe
 from scraper.models import RecipeData
-from scraper.notebook_export import export_analysis_notebook
+from scraper.notebook_export import _details_html, export_analysis_notebook
 from scraper.linguistic_analysis import run_linguistic_analysis
 from scraper.text_analysis import run_text_analysis
 from scraper.text_classification import run_text_classification
@@ -23,6 +23,30 @@ def _recipe(recipe_id: str, title: str, description: str, difficulty: str) -> Re
         retrieved_at="2026-10-08T12:00:00+00:00",
         parser_version="test",
     )
+
+
+def test_details_uses_origin_category_and_omits_empty_placeholder() -> None:
+    details = {
+        "title": "Almoço rápido",
+        "description": "Receita de peixe",
+        "rating_value": 4.5,
+        "ratings_count": 690,
+        "prep_time_minutes": 30,
+        "difficulty": "fácil",
+        "cost_label": None,
+        "ingredients": [],
+        "utensils": [],
+        "preparation_steps": [],
+        "categories": [],
+        "origin_category": "Peixes e frutos do mar",
+    }
+
+    markup = _details_html(details)
+    assert "<h4>Categorias</h4><p>Peixes e frutos do mar</p>" in markup
+
+    details["origin_category"] = None
+    markup = _details_html(details)
+    assert "<h4>Categorias</h4>" not in markup
 
 
 def test_export_analysis_notebook_writes_ipynb_with_ready_outputs(tmp_path: Path) -> None:

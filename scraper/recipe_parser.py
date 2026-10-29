@@ -13,6 +13,8 @@ from .models import RecipeData, RelatedCategory
 from .text_utils import (
     canonical_url,
     clean_text,
+    normalize_cost_label,
+    normalize_difficulty,
     normalize_text,
     parse_localized_number,
     parse_minutes,
@@ -128,13 +130,13 @@ def _extract_time(soup: BeautifulSoup, recipe_json: dict[str, Any]) -> tuple[int
 def _extract_difficulty(soup: BeautifulSoup) -> str | None:
     text = clean_text(soup.get_text(" ", strip=True))
     match = re.search(r"\b(Fácil|Médio|Média|Difícil)\b", text, re.IGNORECASE)
-    return clean_text(match.group(1)) if match else None
+    return normalize_difficulty(match.group(1)) if match else None
 
 
 def _extract_cost(soup: BeautifulSoup) -> str | None:
     text = clean_text(soup.get_text(" ", strip=True))
     match = re.search(r"\b(Custo\s+(?:baixo|médio|medio|alto))\b", text, re.IGNORECASE)
-    return clean_text(match.group(1)) if match else None
+    return normalize_cost_label(match.group(1)) if match else None
 
 
 def _extract_servings(soup: BeautifulSoup, recipe_json: dict[str, Any]) -> int | None:

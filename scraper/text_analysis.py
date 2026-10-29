@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import random
 import sqlite3
 from collections import Counter
 from dataclasses import dataclass
@@ -10,7 +11,7 @@ from typing import Any
 from .database import utc_now
 
 
-ANALYSIS_VERSION = "pln-aula-6-v1"
+ANALYSIS_VERSION = "pln-aula-6-v2"
 
 
 @dataclass(frozen=True)
@@ -45,6 +46,7 @@ def load_documents(connection: sqlite3.Connection) -> list[TextDocument]:
         SELECT r.site_recipe_id, r.title, tp.lemma_tokens_json
         FROM recipes r
         LEFT JOIN text_preparations tp ON tp.recipe_id = r.site_recipe_id
+        WHERE r.duplicate_of_recipe_id IS NULL
         ORDER BY r.site_recipe_id, tp.field_name, tp.position
         """
     ).fetchall()
@@ -131,38 +133,244 @@ def _mean_vector(vectors: list[list[float]], dimension: int) -> list[float]:
     ]
 
 
-def cluster_vectors(model: TfidfModel, *, cluster_count: int = 4, max_iterations: int = 30) -> dict[str, int]:
+def _normalized_document_vectors(model: TfidfModel) -> dict[str, list[float]]:
+    return {
+        document.recipe_id: _normalize(model.vectors[document.recipe_id])
+        for document in model.documents
+    }
+
+
+def _kmeans_plus_plus(
+    ordered_vectors: list[list[float]],
+    cluster_count: int,
+    *,
+    random_seed: int,
+) -> list[list[float]]:
+    randomizer = random.Random(random_seed)
+    selected = [randomizer.randrange(len(ordered_vectors))]
+    while len(selected) < cluster_count:
+        weights = [
+            0.0
+            if index in selected
+            else min(
+                _euclidean_squared(vector, ordered_vectors[selected_index])
+                for selected_index in selected
+            )
+            for index, vector in enumerate(ordered_vectors)
+        ]
+        total = sum(weights)
+        if total <= 0.0:
+            selected.append(next(index for index in range(len(ordered_vectors)) if index not in selected))
+            continue
+        threshold = randomizer.random() * total
+        cumulative = 0.0
+        next_index = len(ordered_vectors) - 1
+        for index, weight in enumerate(weights):
+            cumulative += weight
+            if cumulative >= threshold:
+                next_index = index
+                break
+        selected.append(next_index)
+    return [list(ordered_vectors[index]) for index in selected]
+
+
+def _fit_kmeans(
+    recipe_ids: list[str],
+    vectors: dict[str, list[float]],
+    *,
+    cluster_count: int,
+    max_iterations: int,
+    random_seed: int,
+) -> tuple[dict[str, int], float]:
+    ordered_vectors = [vectors[recipe_id] for recipe_id in recipe_ids]
+    dimension = len(ordered_vectors[0]) if ordered_vectors else 0
+    centroids = _kmeans_plus_plus(ordered_vectors, cluster_count, random_seed=random_seed)
+    previous_labels: list[int] | None = None
+    labels: list[int] = []
+
+    for _ in range(max_iterations):
+        labels = [
+            min(
+                range(cluster_count),
+                key=lambda label: (_euclidean_squared(vector, centroids[label]), label),
+            )
+            for vector in ordered_vectors
+        ]
+        counts = Counter(labels)
+        for empty_label in (label for label in range(cluster_count) if counts[label] == 0):
+            candidates = [
+                index
+                for index, label in enumerate(labels)
+                if counts[label] > 1
+            ]
+            if not candidates:
+                break
+            candidate = max(
+                candidates,
+                key=lambda index: (
+                    _euclidean_squared(ordered_vectors[index], centroids[labels[index]]),
+                    recipe_ids[index],
+                ),
+            )
+            counts[labels[candidate]] -= 1
+            labels[candidate] = empty_label
+            counts[empty_label] += 1
+
+        centroids = [
+            _mean_vector(
+                [vector for vector, assigned in zip(ordered_vectors, labels) if assigned == label],
+                dimension,
+            )
+            for label in range(cluster_count)
+        ]
+        if labels == previous_labels:
+            break
+        previous_labels = list(labels)
+
+    inertia = sum(
+        _euclidean_squared(vector, centroids[label])
+        for vector, label in zip(ordered_vectors, labels)
+    )
+    assignments = dict(zip(recipe_ids, labels))
+    members = {
+        label: sorted(recipe_id for recipe_id, assigned in assignments.items() if assigned == label)
+        for label in range(cluster_count)
+    }
+    label_order = sorted(members, key=lambda label: members[label][0] if members[label] else "")
+    label_map = {old_label: new_label for new_label, old_label in enumerate(label_order)}
+    return ({recipe_id: label_map[label] for recipe_id, label in assignments.items()}, inertia)
+
+
+def _cluster_normalized_vectors(
+    model: TfidfModel,
+    *,
+    cluster_count: int,
+    max_iterations: int,
+    restarts: int,
+    random_seed: int,
+) -> dict[str, int]:
+    recipe_ids = [document.recipe_id for document in model.documents]
+    vectors = _normalized_document_vectors(model)
+    candidates = [
+        _fit_kmeans(
+            recipe_ids,
+            vectors,
+            cluster_count=cluster_count,
+            max_iterations=max_iterations,
+            random_seed=random_seed + restart,
+        )
+        for restart in range(max(1, restarts))
+    ]
+    return min(
+        candidates,
+        key=lambda item: (
+            item[1],
+            tuple(item[0][recipe_id] for recipe_id in recipe_ids),
+        ),
+    )[0]
+
+
+def _pairwise_distances(
+    recipe_ids: list[str],
+    vectors: dict[str, list[float]],
+) -> dict[tuple[str, str], float]:
+    distances: dict[tuple[str, str], float] = {}
+    for left_index, left_id in enumerate(recipe_ids):
+        distances[(left_id, left_id)] = 0.0
+        for right_id in recipe_ids[left_index + 1 :]:
+            distance = math.sqrt(_euclidean_squared(vectors[left_id], vectors[right_id]))
+            distances[(left_id, right_id)] = distance
+            distances[(right_id, left_id)] = distance
+    return distances
+
+
+def _silhouette_from_distances(
+    recipe_ids: list[str],
+    assignments: dict[str, int],
+    distances: dict[tuple[str, str], float],
+) -> float:
+    groups: dict[int, list[str]] = {}
+    for recipe_id in recipe_ids:
+        groups.setdefault(assignments[recipe_id], []).append(recipe_id)
+    if len(groups) < 2:
+        return 0.0
+
+    scores = []
+    for recipe_id in recipe_ids:
+        own_label = assignments[recipe_id]
+        own_group = groups[own_label]
+        if len(own_group) == 1:
+            scores.append(0.0)
+            continue
+        intra = sum(distances[(recipe_id, other)] for other in own_group if other != recipe_id) / (
+            len(own_group) - 1
+        )
+        nearest = min(
+            sum(distances[(recipe_id, other)] for other in group) / len(group)
+            for label, group in groups.items()
+            if label != own_label
+        )
+        denominator = max(intra, nearest)
+        scores.append((nearest - intra) / denominator if denominator else 0.0)
+    return sum(scores) / len(scores)
+
+
+def silhouette_score(model: TfidfModel, assignments: dict[str, int]) -> float:
+    recipe_ids = [document.recipe_id for document in model.documents]
+    vectors = _normalized_document_vectors(model)
+    return _silhouette_from_distances(recipe_ids, assignments, _pairwise_distances(recipe_ids, vectors))
+
+
+def cluster_vectors(
+    model: TfidfModel,
+    *,
+    cluster_count: int = 4,
+    max_iterations: int = 50,
+    restarts: int = 6,
+    random_seed: int = 42,
+) -> dict[str, int]:
     if not model.documents:
         return {}
-    k = max(1, min(cluster_count, len(model.documents)))
-    dimension = len(model.vocabulary)
-    centroids = [
-        list(model.vectors[document.recipe_id])
-        for document in model.documents[:k]
-    ]
-    assignments: dict[str, int] = {}
-    for _ in range(max_iterations):
-        changed = False
-        for document in model.documents:
-            vector = model.vectors[document.recipe_id]
-            label = min(
-                range(k),
-                key=lambda index: (_euclidean_squared(vector, centroids[index]), index),
-            )
-            if assignments.get(document.recipe_id) != label:
-                assignments[document.recipe_id] = label
-                changed = True
-        if not changed:
-            break
-        for label in range(k):
-            label_vectors = [
-                model.vectors[document.recipe_id]
-                for document in model.documents
-                if assignments[document.recipe_id] == label
-            ]
-            if label_vectors:
-                centroids[label] = _mean_vector(label_vectors, dimension)
-    return assignments
+    effective_count = max(1, min(cluster_count, len(model.documents)))
+    return _cluster_normalized_vectors(
+        model,
+        cluster_count=effective_count,
+        max_iterations=max_iterations,
+        restarts=restarts,
+        random_seed=random_seed,
+    )
+
+
+def select_cluster_count(
+    model: TfidfModel,
+    *,
+    max_clusters: int = 8,
+    max_iterations: int = 50,
+    restarts: int = 4,
+    random_seed: int = 42,
+) -> tuple[int, dict[str, int], float]:
+    document_count = len(model.documents)
+    if document_count <= 1:
+        assignments = {document.recipe_id: 0 for document in model.documents}
+        return document_count, assignments, 0.0
+
+    recipe_ids = [document.recipe_id for document in model.documents]
+    vectors = _normalized_document_vectors(model)
+    distances = _pairwise_distances(recipe_ids, vectors)
+    upper_bound = max(2, min(max_clusters, document_count - 1))
+    candidates = []
+    for cluster_count in range(2, upper_bound + 1):
+        assignments = _cluster_normalized_vectors(
+            model,
+            cluster_count=cluster_count,
+            max_iterations=max_iterations,
+            restarts=restarts,
+            random_seed=random_seed + cluster_count * 100,
+        )
+        score = _silhouette_from_distances(recipe_ids, assignments, distances)
+        candidates.append((score, cluster_count, assignments))
+    score, cluster_count, assignments = max(candidates, key=lambda item: (item[0], -item[1]))
+    return cluster_count, assignments, score
 
 
 def _centered_vectors(vectors: list[list[float]]) -> list[list[float]]:
@@ -268,13 +476,19 @@ def top_terms(model: TfidfModel, recipe_id: str, *, limit: int = 8) -> list[dict
 def run_text_analysis(
     connection: sqlite3.Connection,
     *,
-    cluster_count: int = 4,
+    cluster_count: int = 0,
     neighbor_count: int = 5,
 ) -> int:
     documents = load_documents(connection)
     model = build_tfidf_model(documents)
-    effective_cluster_count = max(1, min(cluster_count, len(model.documents))) if model.documents else 0
-    clusters = cluster_vectors(model, cluster_count=effective_cluster_count)
+    if cluster_count <= 0:
+        effective_cluster_count, clusters, clustering_score = select_cluster_count(model)
+        clustering_method = "tfidf-l2+kmeans++-silhouette-auto"
+    else:
+        effective_cluster_count = max(1, min(cluster_count, len(model.documents))) if model.documents else 0
+        clusters = cluster_vectors(model, cluster_count=effective_cluster_count)
+        clustering_score = silhouette_score(model, clusters) if clusters else 0.0
+        clustering_method = "tfidf-l2+kmeans++"
     projection = project_vectors_3d(model)
     neighbors = nearest_neighbors(model, limit=neighbor_count)
     created_at = utc_now()
@@ -282,10 +496,19 @@ def run_text_analysis(
     cursor = connection.execute(
         """
         INSERT INTO text_analysis_runs
-            (model_version, document_count, vocabulary_size, cluster_count, created_at)
-        VALUES (?, ?, ?, ?, ?)
+            (model_version, document_count, vocabulary_size, cluster_count,
+             clustering_method, silhouette_score, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """,
-        (ANALYSIS_VERSION, len(model.documents), len(model.vocabulary), effective_cluster_count, created_at),
+        (
+            ANALYSIS_VERSION,
+            len(model.documents),
+            len(model.vocabulary),
+            effective_cluster_count,
+            clustering_method,
+            clustering_score,
+            created_at,
+        ),
     )
     run_id = int(cursor.lastrowid)
     connection.executemany(

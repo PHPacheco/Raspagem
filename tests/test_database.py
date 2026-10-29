@@ -13,6 +13,7 @@ from scraper.database import (
     save_recipe,
 )
 from scraper.recipe_parser import parse_recipe
+from scraper.models import RecipeData
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -117,9 +118,69 @@ def test_recipe_text_preparation_is_saved_with_raw_and_derived_versions(tmp_path
     assert title["raw_text"] == "Carne de panela de pressão"
     assert title["clean_text"] == "Carne de panela de pressão"
     assert "pressao" in title["tokens_json"]
-    assert title["pipeline_version"] == "pln-aula-5-v1"
+    assert title["pipeline_version"] == "pln-aula-5-v2"
 
     details = recipe_details(connection, recipe.site_recipe_id)
     assert details is not None
     assert len(details["prepared_texts"]) == len(rows)
+
+
+def test_save_normalizes_labels_and_nested_html_entities(tmp_path: Path) -> None:
+    connection = connect_database(tmp_path / "recipes.sqlite")
+    initialize_database(connection)
+    recipe = RecipeData(
+        site_recipe_id="10",
+        title="P&amp;atilde;o d&amp;#039;&amp;aacute;gua",
+        url="https://example.test/receita/10.html",
+        difficulty="FÁCIL",
+        description="Receita com lim&amp;atilde;o",
+        ingredients=["1 x&amp;iacute;cara"],
+        preparation_steps=["Misture e asse."],
+        retrieved_at="2026-10-22T12:00:00+00:00",
+        parser_version="test",
+    )
+
+    save_recipe(connection, recipe)
+    row = connection.execute(
+        "SELECT title, difficulty, description FROM recipes WHERE site_recipe_id = '10'"
+    ).fetchone()
+
+    assert dict(row) == {
+        "title": "Pão d'água",
+        "difficulty": "fácil",
+        "description": "Receita com limão",
+    }
+    assert connection.execute("SELECT raw_text FROM ingredients").fetchone()["raw_text"] == "1 xícara"
+
+
+def test_deduplication_marks_equal_content_but_keeps_distinct_same_title_versions(tmp_path: Path) -> None:
+    connection = connect_database(tmp_path / "recipes.sqlite")
+    initialize_database(connection)
+
+    def recipe(recipe_id: str, ingredient: str) -> RecipeData:
+        return RecipeData(
+            site_recipe_id=recipe_id,
+            title="Bolo caseiro",
+            url=f"https://example.test/receita/{recipe_id}.html",
+            ingredients=[ingredient],
+            preparation_steps=["Misture e asse."],
+            retrieved_at="2026-10-22T12:00:00+00:00",
+            parser_version="test",
+        )
+
+    save_recipe(connection, recipe("10", "2 ovos"))
+    save_recipe(connection, recipe("20", "2 ovos"))
+    save_recipe(connection, recipe("30", "3 bananas"))
+
+    rows = {
+        row["site_recipe_id"]: row
+        for row in connection.execute(
+            "SELECT site_recipe_id, content_fingerprint, duplicate_of_recipe_id "
+            "FROM recipes ORDER BY site_recipe_id"
+        )
+    }
+    assert rows["20"]["duplicate_of_recipe_id"] == "10"
+    assert rows["20"]["content_fingerprint"] == rows["10"]["content_fingerprint"]
+    assert rows["30"]["duplicate_of_recipe_id"] is None
+    assert connection.execute("SELECT COUNT(*) AS count FROM recipes").fetchone()["count"] == 3
 

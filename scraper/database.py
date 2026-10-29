@@ -2,13 +2,23 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
 from . import PARSER_VERSION, USER_AGENT
 from .models import RecipeData, RecipeLink, RelatedCategory
-from .text_utils import normalize_text, prepare_text, search_index_text, search_terms
+from .text_utils import (
+    canonical_url,
+    clean_text,
+    normalize_cost_label,
+    normalize_difficulty,
+    normalize_text,
+    prepare_text,
+    search_index_text,
+    search_terms,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -42,6 +52,32 @@ def _column_names(connection: sqlite3.Connection, table_name: str) -> set[str]:
 def _apply_schema_migrations(connection: sqlite3.Connection) -> None:
     if "z" not in _column_names(connection, "document_vectors"):
         connection.execute("ALTER TABLE document_vectors ADD COLUMN z REAL NOT NULL DEFAULT 0")
+    analysis_columns = _column_names(connection, "text_analysis_runs")
+    if "clustering_method" not in analysis_columns:
+        connection.execute(
+            "ALTER TABLE text_analysis_runs ADD COLUMN clustering_method TEXT NOT NULL DEFAULT 'legacy'"
+        )
+    if "silhouette_score" not in analysis_columns:
+        connection.execute("ALTER TABLE text_analysis_runs ADD COLUMN silhouette_score REAL")
+    recipe_columns = _column_names(connection, "recipes")
+    if "content_fingerprint" not in recipe_columns:
+        connection.execute(
+            "ALTER TABLE recipes ADD COLUMN content_fingerprint TEXT NOT NULL DEFAULT ''"
+        )
+    if "duplicate_of_recipe_id" not in recipe_columns:
+        connection.execute(
+            "ALTER TABLE recipes ADD COLUMN duplicate_of_recipe_id TEXT "
+            "REFERENCES recipes(site_recipe_id) ON DELETE SET NULL"
+        )
+    if "duplicate_similarity" not in recipe_columns:
+        connection.execute("ALTER TABLE recipes ADD COLUMN duplicate_similarity REAL")
+    connection.execute(
+        "CREATE INDEX IF NOT EXISTS idx_recipes_content_fingerprint "
+        "ON recipes(content_fingerprint)"
+    )
+    connection.execute(
+        "CREATE INDEX IF NOT EXISTS idx_recipes_duplicate_of ON recipes(duplicate_of_recipe_id)"
+    )
 
 
 def create_scrape_run(
@@ -100,7 +136,7 @@ def _upsert_category(
             name = excluded.name,
             url = COALESCE(excluded.url, categories.url)
         """,
-        (site_category_id, name, url),
+        (site_category_id, clean_text(name), canonical_url(url) if url else None),
     )
 
 
@@ -134,8 +170,8 @@ def save_listing(
             run_id,
             category_id,
             recipe_id,
-            recipe_link.url,
-            recipe_link.title,
+            canonical_url(recipe_link.url),
+            clean_text(recipe_link.title),
             recipe_link.page_number,
             recipe_link.position,
         ),
@@ -153,6 +189,32 @@ def _search_text(recipe: RecipeData) -> str:
     values.extend(recipe.preparation_steps)
     values.extend(category.name for category in recipe.related_categories)
     return search_index_text(values)
+
+
+def _normalized_recipe(recipe: RecipeData) -> RecipeData:
+    return replace(
+        recipe,
+        title=clean_text(recipe.title),
+        url=canonical_url(recipe.url),
+        prep_time_raw=clean_text(recipe.prep_time_raw) or None,
+        difficulty=normalize_difficulty(recipe.difficulty) or None,
+        cost_label=normalize_cost_label(recipe.cost_label) or None,
+        description=clean_text(recipe.description) or None,
+        ingredients=[value for item in recipe.ingredients if (value := clean_text(item))],
+        utensils=[value for item in recipe.utensils if (value := clean_text(item))],
+        preparation_steps=[
+            value for item in recipe.preparation_steps if (value := clean_text(item))
+        ],
+        related_categories=[
+            RelatedCategory(
+                site_category_id=category.site_category_id,
+                name=clean_text(category.name),
+                url=canonical_url(category.url) if category.url else None,
+            )
+            for category in recipe.related_categories
+            if clean_text(category.name)
+        ],
+    )
 
 
 def _recipe_text_units(recipe: RecipeData) -> Iterable[tuple[str, int, str]]:
@@ -206,6 +268,171 @@ def _database_text_units(connection: sqlite3.Connection, recipe_id: str) -> Iter
         yield "related_category", position, row["name"]
 
 
+def _database_search_values(connection: sqlite3.Connection, recipe_id: str) -> list[str]:
+    recipe = connection.execute(
+        "SELECT title, description FROM recipes WHERE site_recipe_id = ?", (recipe_id,)
+    ).fetchone()
+    if recipe is None:
+        return []
+    values = [recipe["title"], recipe["description"] or ""]
+    for table, column in (
+        ("ingredients", "raw_text"),
+        ("utensils", "name"),
+        ("preparation_steps", "raw_text"),
+    ):
+        values.extend(
+            row[column]
+            for row in connection.execute(
+                f"SELECT {column} FROM {table} WHERE recipe_id = ? ORDER BY position",
+                (recipe_id,),
+            )
+        )
+    values.extend(
+        row["name"]
+        for row in connection.execute(
+            """
+            SELECT c.name
+            FROM recipe_categories rc
+            JOIN categories c ON c.site_category_id = rc.category_id
+            WHERE rc.recipe_id = ?
+            ORDER BY c.name COLLATE NOCASE
+            """,
+            (recipe_id,),
+        )
+    )
+    return values
+
+
+def normalize_stored_data(connection: sqlite3.Connection) -> int:
+    """Apply the current cleanup rules to data collected by older pipeline versions."""
+    changes = 0
+    specifications = (
+        ("recipes", "site_recipe_id", "title", clean_text, False),
+        ("recipes", "site_recipe_id", "prep_time_raw", clean_text, True),
+        ("recipes", "site_recipe_id", "difficulty", normalize_difficulty, True),
+        ("recipes", "site_recipe_id", "cost_label", normalize_cost_label, True),
+        ("recipes", "site_recipe_id", "description", clean_text, True),
+        ("ingredients", "id", "raw_text", clean_text, False),
+        ("utensils", "id", "name", clean_text, False),
+        ("preparation_steps", "id", "raw_text", clean_text, False),
+        ("categories", "site_category_id", "name", clean_text, False),
+        ("category_listings", "id", "listed_title", clean_text, False),
+    )
+    for table, key_column, value_column, normalizer, nullable in specifications:
+        rows = connection.execute(
+            f"SELECT {key_column} AS row_key, {value_column} AS value FROM {table}"
+        ).fetchall()
+        updates = []
+        for row in rows:
+            normalized = normalizer(row["value"])
+            if nullable and not normalized:
+                normalized = None
+            if normalized != row["value"]:
+                updates.append((normalized, row["row_key"]))
+        connection.executemany(
+            f"UPDATE {table} SET {value_column} = ? WHERE {key_column} = ?",
+            updates,
+        )
+        changes += len(updates)
+
+    recipe_ids = [
+        row["site_recipe_id"]
+        for row in connection.execute("SELECT site_recipe_id FROM recipes ORDER BY site_recipe_id")
+    ]
+    connection.executemany(
+        "UPDATE recipes SET search_text = ? WHERE site_recipe_id = ?",
+        (
+            (search_index_text(_database_search_values(connection, recipe_id)), recipe_id)
+            for recipe_id in recipe_ids
+        ),
+    )
+    rebuild_recipe_deduplication(connection)
+    return changes
+
+
+def _deduplication_sort_key(recipe_id: str) -> tuple[int, int | str]:
+    return (0, int(recipe_id)) if recipe_id.isdigit() else (1, recipe_id)
+
+
+def _recipe_content_fingerprint(connection: sqlite3.Connection, recipe_id: str) -> str:
+    recipe = connection.execute(
+        "SELECT title, description FROM recipes WHERE site_recipe_id = ?", (recipe_id,)
+    ).fetchone()
+    if recipe is None:
+        return ""
+    ingredients = [
+        row["raw_text"]
+        for row in connection.execute(
+            "SELECT raw_text FROM ingredients WHERE recipe_id = ? ORDER BY position", (recipe_id,)
+        )
+    ]
+    steps = [
+        row["raw_text"]
+        for row in connection.execute(
+            "SELECT raw_text FROM preparation_steps WHERE recipe_id = ? ORDER BY position", (recipe_id,)
+        )
+    ]
+    content = [recipe["title"], *ingredients, *steps]
+    if not ingredients and not steps and recipe["description"]:
+        content.append(recipe["description"])
+    if len(content) == 1:
+        return ""
+    return prepare_text("\n".join(content)).duplicate_key
+
+
+def rebuild_recipe_deduplication(connection: sqlite3.Connection) -> dict[str, int]:
+    """Mark only exact content copies; equal titles alone remain independent recipes."""
+    recipe_ids = [
+        row["site_recipe_id"]
+        for row in connection.execute("SELECT site_recipe_id FROM recipes ORDER BY site_recipe_id")
+    ]
+    fingerprints = {
+        recipe_id: _recipe_content_fingerprint(connection, recipe_id)
+        for recipe_id in recipe_ids
+    }
+    connection.execute(
+        "UPDATE recipes SET content_fingerprint = '', duplicate_of_recipe_id = NULL, "
+        "duplicate_similarity = NULL"
+    )
+    connection.executemany(
+        "UPDATE recipes SET content_fingerprint = ? WHERE site_recipe_id = ?",
+        ((fingerprint, recipe_id) for recipe_id, fingerprint in fingerprints.items()),
+    )
+    groups: dict[str, list[str]] = {}
+    for recipe_id, fingerprint in fingerprints.items():
+        if fingerprint:
+            groups.setdefault(fingerprint, []).append(recipe_id)
+    duplicate_count = 0
+    for members in groups.values():
+        if len(members) < 2:
+            continue
+        ordered = sorted(members, key=_deduplication_sort_key)
+        canonical = ordered[0]
+        connection.executemany(
+            "UPDATE recipes SET duplicate_of_recipe_id = ?, duplicate_similarity = 1.0 "
+            "WHERE site_recipe_id = ?",
+            ((canonical, duplicate) for duplicate in ordered[1:]),
+        )
+        duplicate_count += len(ordered) - 1
+    title_collision_count = int(
+        connection.execute(
+            """
+            SELECT COUNT(*) AS count FROM (
+                SELECT title
+                FROM recipes
+                GROUP BY title COLLATE NOCASE
+                HAVING COUNT(*) > 1
+            )
+            """
+        ).fetchone()["count"]
+    )
+    return {
+        "recipes": len(recipe_ids),
+        "exact_duplicates": duplicate_count,
+        "distinct_same_title_groups": title_collision_count,
+    }
+
+
 def _save_prepared_texts(
     connection: sqlite3.Connection,
     recipe_id: str,
@@ -252,6 +479,7 @@ def _save_prepared_texts(
 
 
 def save_recipe(connection: sqlite3.Connection, recipe: RecipeData) -> None:
+    recipe = _normalized_recipe(recipe)
     connection.execute(
         """
         INSERT INTO recipes
@@ -323,10 +551,12 @@ def save_recipe(connection: sqlite3.Connection, recipe: RecipeData) -> None:
             (recipe.site_recipe_id, category_id),
         )
     _save_prepared_texts(connection, recipe.site_recipe_id, _recipe_text_units(recipe), prepared_at=recipe.retrieved_at)
+    rebuild_recipe_deduplication(connection)
     connection.commit()
 
 
 def rebuild_text_preparations(connection: sqlite3.Connection) -> int:
+    normalize_stored_data(connection)
     total = 0
     recipe_ids = [
         row["site_recipe_id"]

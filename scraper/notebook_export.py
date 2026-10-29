@@ -320,7 +320,15 @@ def _details_html(details: dict[str, Any] | None) -> str:
         f"<li>{html.escape(item)}</li>"
         for item in details["preparation_steps"]
     )
-    categories = ", ".join(html.escape(item) for item in details["categories"]) or "—"
+    category_values = list(details["categories"])
+    if not category_values and details.get("origin_category"):
+        category_values.append(str(details["origin_category"]))
+    categories = ", ".join(html.escape(item) for item in category_values)
+    category_block = (
+        f"<div><h4>Categorias</h4><p>{categories}</p></div>"
+        if categories
+        else ""
+    )
     return f"""
     <style>
       .recipe-card {{
@@ -353,7 +361,7 @@ def _details_html(details: dict[str, Any] | None) -> str:
         <div><h4>Ingredientes</h4><ul>{ingredients or "<li>—</li>"}</ul></div>
         <div><h4>Utensílios</h4><ul>{utensils or "<li>—</li>"}</ul></div>
         <div><h4>Modo de preparo</h4><ol>{steps or "<li>—</li>"}</ol></div>
-        <div><h4>Categorias</h4><p>{categories}</p></div>
+        {category_block}
       </div>
     </div>
     """.strip()
@@ -430,6 +438,23 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         {"metric": "Passos de preparo", "value": _count(connection, "preparation_steps")},
         {"metric": "Categorias", "value": _count(connection, "categories")},
         {"metric": "Textos preparados", "value": _count(connection, "text_preparations")},
+        {
+            "metric": "Duplicatas exatas excluídas das análises",
+            "value": int(
+                connection.execute(
+                    "SELECT COUNT(*) AS count FROM recipes WHERE duplicate_of_recipe_id IS NOT NULL"
+                ).fetchone()["count"]
+            ),
+        },
+        {
+            "metric": "Grupos com título repetido auditados",
+            "value": int(
+                connection.execute(
+                    "SELECT COUNT(*) AS count FROM ("
+                    "SELECT title FROM recipes GROUP BY title COLLATE NOCASE HAVING COUNT(*) > 1)"
+                ).fetchone()["count"]
+            ),
+        },
         {"metric": "Última análise TF-IDF", "value": _latest_id(connection, "text_analysis_runs")},
         {"metric": "Última análise de embeddings", "value": _latest_id(connection, "embedding_runs")},
         {"metric": "Última classificação", "value": _latest_id(connection, "classification_runs")},
@@ -448,6 +473,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             difficulty,
             cost_label,
             servings,
+            duplicate_of_recipe_id,
             url
         FROM recipes
         ORDER BY title COLLATE NOCASE
@@ -476,6 +502,23 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
     text_run = text_analysis["run"] if text_analysis else {}
     embedding_run = embedding_analysis["run"] if embedding_analysis else {}
     tfidf_rows = _top_terms_rows(text_analysis)
+    analysis_run = (text_analysis or {}).get("run", {})
+    cluster_sizes: dict[int, int] = {}
+    for document in (text_analysis or {}).get("documents", []):
+        label = int(document.get("cluster_label") or 0)
+        cluster_sizes[label] = cluster_sizes.get(label, 0) + 1
+    clustering_rows = [
+        {"metric": "Método", "value": analysis_run.get("clustering_method")},
+        {"metric": "Clusters selecionados", "value": analysis_run.get("cluster_count")},
+        {"metric": "Silhouette", "value": analysis_run.get("silhouette_score")},
+        {
+            "metric": "Distribuição",
+            "value": ", ".join(
+                f"cluster {label}: {count}"
+                for label, count in sorted(cluster_sizes.items())
+            ),
+        },
+    ]
     tfidf_similarity_rows = (text_analysis or {}).get("similarities", [])
     embedding_token_rows = _embedding_token_rows(embedding_analysis)
     context_rows = _context_rows(embedding_analysis)
@@ -610,7 +653,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             connection = connect_database(DATABASE_PATH)
             initialize_database(connection)
             prepared_count = rebuild_text_preparations(connection)
-            analysis_run_id = run_text_analysis(connection, cluster_count=4, neighbor_count=5)
+            analysis_run_id = run_text_analysis(connection, cluster_count=0, neighbor_count=5)
             embedding_run_id = run_embedding_analysis(connection, dimension=32, window_size=2, neighbor_count=5)
             try:
                 classification_run_id = run_text_classification(connection, target_field="difficulty", test_ratio=0.25)
@@ -649,6 +692,8 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                 {"metric": "Passos de preparo", "value": connection.execute("SELECT COUNT(*) FROM preparation_steps").fetchone()[0]},
                 {"metric": "Categorias", "value": connection.execute("SELECT COUNT(*) FROM categories").fetchone()[0]},
                 {"metric": "Textos preparados", "value": connection.execute("SELECT COUNT(*) FROM text_preparations").fetchone()[0]},
+                {"metric": "Duplicatas exatas excluídas das análises", "value": connection.execute("SELECT COUNT(*) FROM recipes WHERE duplicate_of_recipe_id IS NOT NULL").fetchone()[0]},
+                {"metric": "Grupos com título repetido auditados", "value": connection.execute("SELECT COUNT(*) FROM (SELECT title FROM recipes GROUP BY title COLLATE NOCASE HAVING COUNT(*) > 1)").fetchone()[0]},
                 {"metric": "Última análise TF-IDF", "value": connection.execute("SELECT MAX(id) FROM text_analysis_runs").fetchone()[0]},
                 {"metric": "Última análise de embeddings", "value": connection.execute("SELECT MAX(id) FROM embedding_runs").fetchone()[0]},
                 {"metric": "Última classificação", "value": connection.execute("SELECT MAX(id) FROM classification_runs").fetchone()[0]},
@@ -673,7 +718,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             connection = connect_database(DATABASE_PATH)
             receitas = [dict(row) for row in connection.execute(\"\"\"
                 SELECT site_recipe_id AS id, title, rating_value, ratings_count, prep_time_minutes,
-                       difficulty, cost_label, servings, url
+                       difficulty, cost_label, servings, duplicate_of_recipe_id, url
                 FROM recipes
                 ORDER BY title COLLATE NOCASE
             \"\"\")]
@@ -693,6 +738,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("difficulty", "Dificuldade"),
                             ("cost_label", "Custo"),
                             ("servings", "Porções"),
+                            ("duplicate_of_recipe_id", "Duplicata de"),
                             ("url", "URL"),
                         ],
                     )
@@ -816,6 +862,10 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             [
                 _html_output(
                     _html_table(
+                        clustering_rows,
+                        [("metric", "Configuração"), ("value", "Valor")],
+                    )
+                    + _html_table(
                         tfidf_rows,
                         [
                             ("recipe", "Receita"),

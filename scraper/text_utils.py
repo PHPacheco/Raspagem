@@ -14,8 +14,9 @@ WHITESPACE_RE = re.compile(r"\s+")
 HTML_TAG_RE = re.compile(r"</?[a-zA-Z][^>]*>")
 URL_RE = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
 TOKEN_RE = re.compile(r"[a-z0-9]+", re.IGNORECASE)
-PREPARATION_PIPELINE_VERSION = "pln-aula-5-v1"
+PREPARATION_PIPELINE_VERSION = "pln-aula-5-v2"
 PREPARATION_TRANSFORMATIONS = (
+    "html_entities_decoded",
     "html_residual_removed",
     "urls_removed",
     "spaces_normalized",
@@ -206,10 +207,46 @@ class PreparedText:
     transformations: tuple[str, ...] = PREPARATION_TRANSFORMATIONS
 
 
+def decode_html_entities(value: str | None, *, max_rounds: int = 4) -> str:
+    """Decode entities repeatedly to repair values such as ``&amp;#039;``."""
+    text = "" if value is None else str(value)
+    for _ in range(max_rounds):
+        decoded = html.unescape(text)
+        if decoded == text:
+            break
+        text = decoded
+    return text
+
+
 def clean_text(value: str | None) -> str:
     if not value:
         return ""
-    return WHITESPACE_RE.sub(" ", html.unescape(value)).strip()
+    return WHITESPACE_RE.sub(" ", decode_html_entities(value)).strip()
+
+
+def normalize_difficulty(value: str | None) -> str:
+    cleaned = clean_text(value)
+    if not cleaned:
+        return ""
+    canonical = {
+        "facil": "fácil",
+        "medio": "médio",
+        "media": "médio",
+        "dificil": "difícil",
+    }
+    return canonical.get(normalize_text(cleaned), cleaned.casefold())
+
+
+def normalize_cost_label(value: str | None) -> str:
+    cleaned = clean_text(value)
+    if not cleaned:
+        return ""
+    canonical = {
+        "custo baixo": "Custo baixo",
+        "custo medio": "Custo médio",
+        "custo alto": "Custo alto",
+    }
+    return canonical.get(normalize_text(cleaned), cleaned)
 
 
 def remove_html_residual(value: str | None) -> str:

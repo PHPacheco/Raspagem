@@ -18,7 +18,7 @@ def test_extracts_recipe_metadata_and_ordered_sections() -> None:
     assert recipe.ratings_count == 1548
     assert recipe.prep_time_minutes == 25
     assert recipe.prep_time_raw == "25min"
-    assert recipe.difficulty == "Fácil"
+    assert recipe.difficulty == "fácil"
     assert recipe.cost_label == "Custo médio"
     assert recipe.servings == 5
     assert len(recipe.ingredients) == 3

@@ -245,13 +245,18 @@ def analyze_texts(args: argparse.Namespace) -> int:
         neighbor_count=args.neighbors,
     )
     summary = connection.execute(
-        "SELECT document_count, vocabulary_size, cluster_count FROM text_analysis_runs WHERE id = ?",
+        """
+        SELECT document_count, vocabulary_size, cluster_count,
+               clustering_method, silhouette_score
+        FROM text_analysis_runs WHERE id = ?
+        """,
         (run_id,),
     ).fetchone()
     connection.close()
     print(
         f"Análise textual {run_id}: {summary['document_count']} documento(s), "
         f"{summary['vocabulary_size']} termo(s), {summary['cluster_count']} cluster(s). "
+        f"Método: {summary['clustering_method']}; silhouette: {summary['silhouette_score']:.4f}. "
         f"Preparação atualizada: {prepared_count} unidade(s)."
     )
     return 0
@@ -352,7 +357,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="gera TF-IDF, matriz documento-termo, similaridades, clusters e projeção 3D",
     )
     analyze_parser.add_argument("--database", default=DEFAULT_DATABASE)
-    analyze_parser.add_argument("--clusters", type=int, default=4)
+    analyze_parser.add_argument(
+        "--clusters",
+        type=int,
+        default=0,
+        help="quantidade de clusters; 0 seleciona automaticamente pela silhouette",
+    )
     analyze_parser.add_argument("--neighbors", type=int, default=5)
     analyze_parser.set_defaults(handler=analyze_texts)
 

@@ -73,6 +73,7 @@ O projeto mantém o texto bruto extraído e registra versões derivadas na tabel
 O pipeline aplicado segue as etapas da aula de PLN:
 
 - remoção de HTML residual, menus e URLs;
+- decodificação repetida de entidades HTML, inclusive valores duplamente codificados;
 - normalização de espaços, caixa e acentos;
 - remoção de pontuação, símbolos e emojis para a versão tokenizada;
 - tokenização por palavras;
@@ -80,6 +81,8 @@ O pipeline aplicado segue as etapas da aula de PLN:
 - stemming leve;
 - lematização heurística para termos comuns do domínio;
 - chaves de duplicidade literal e quase duplicidade;
+- normalização dos rótulos de dificuldade e custo;
+- deduplicação por título, ingredientes e preparo, preservando receitas diferentes com o mesmo nome;
 - versão do pipeline e lista de transformações aplicadas.
 
 Para reconstruir essas versões em um banco já existente:
@@ -100,7 +103,7 @@ A partir da matriz, o projeto calcula:
 
 - termos principais de cada receita;
 - similaridade por cosseno entre receitas;
-- clusters com K-Means simples;
+- clusters com vetores TF-IDF normalizados, inicialização K-Means++ e seleção automática por silhouette;
 - coordenadas 3D por projeção linear para visualização.
 
 Para gerar essa etapa no banco:

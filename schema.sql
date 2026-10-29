@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS recipes (
     cost_label TEXT,
     servings INTEGER,
     description TEXT,
+    origin_category TEXT,
     search_text TEXT NOT NULL DEFAULT '',
     content_fingerprint TEXT NOT NULL DEFAULT '',
     duplicate_of_recipe_id TEXT REFERENCES recipes(site_recipe_id) ON DELETE SET NULL,

@@ -33,6 +33,7 @@ class RecipeData:
     cost_label: str | None = None
     servings: int | None = None
     description: str | None = None
+    origin_category: str | None = None
     ingredients: list[str] = field(default_factory=list)
     utensils: list[str] = field(default_factory=list)
     preparation_steps: list[str] = field(default_factory=list)

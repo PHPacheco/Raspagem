@@ -34,6 +34,14 @@ python -m venv .venv
 .\.venv\bin\python.exe -m pip install -r requirements.txt
 ```
 
+Para abrir e executar o notebook com kernel próprio, instale também as dependências de Jupyter:
+
+```powershell
+.\.venv\bin\python.exe -m pip install -r requirements-notebook.txt
+```
+
+Esse arquivo inclui as dependências básicas e adiciona JupyterLab e IPykernel.
+
 ## Usar dados de fixture
 
 Este comando cria `data/recipes.sqlite` com uma página de categoria e uma receita de exemplo, sem acessar a internet:
@@ -83,6 +91,7 @@ O pipeline aplicado segue as etapas da aula de PLN:
 - chaves de duplicidade literal e quase duplicidade;
 - normalização dos rótulos de dificuldade e custo;
 - deduplicação por título, ingredientes e preparo, preservando receitas diferentes com o mesmo nome;
+- preenchimento das relações de categoria a partir da categoria de origem coletada;
 - versão do pipeline e lista de transformações aplicadas.
 
 Para reconstruir essas versões em um banco já existente:
@@ -186,6 +195,7 @@ Para atualizar tudo antes de gerar o notebook:
 ```
 
 O notebook mantém os filtros em forma de variáveis editáveis, além das tabelas, detalhes das receitas, preparação textual, gráfico 3D, TF-IDF, embeddings, classificação e extração de informação.
+O resumo informa a cobertura dos metadados. Valores ausentes, como custo não publicado pela fonte, permanecem nulos e aparecem como `Não informado`, sem dados inventados.
 
 ## Relatório web separado
 
@@ -222,3 +232,4 @@ bats\visualizar_novidades.bat
 ```
 
 Esse atalho atualiza a preparação dos textos, TF-IDF, projeção 3D, embeddings da aula 7, classificação da aula 8 e análise linguística da aula 9. Depois exporta `notebooks\Trabalho PLN.ipynb` com outputs prontos e tenta abrir o notebook no VS Code ou no aplicativo padrão. Se o banco `data\recipes.sqlite` ainda não existir, ele carrega a fixture local antes de gerar o notebook.
+Quando necessário, o atalho instala `requirements-notebook.txt`, incluindo o kernel usado para executar células.

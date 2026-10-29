@@ -60,6 +60,8 @@ def _apply_schema_migrations(connection: sqlite3.Connection) -> None:
     if "silhouette_score" not in analysis_columns:
         connection.execute("ALTER TABLE text_analysis_runs ADD COLUMN silhouette_score REAL")
     recipe_columns = _column_names(connection, "recipes")
+    if "origin_category" not in recipe_columns:
+        connection.execute("ALTER TABLE recipes ADD COLUMN origin_category TEXT")
     if "content_fingerprint" not in recipe_columns:
         connection.execute(
             "ALTER TABLE recipes ADD COLUMN content_fingerprint TEXT NOT NULL DEFAULT ''"
@@ -183,7 +185,7 @@ def _category_key(category: RelatedCategory) -> str:
 
 
 def _search_text(recipe: RecipeData) -> str:
-    values: list[str] = [recipe.title, recipe.description or ""]
+    values: list[str] = [recipe.title, recipe.description or "", recipe.origin_category or ""]
     values.extend(recipe.ingredients)
     values.extend(recipe.utensils)
     values.extend(recipe.preparation_steps)
@@ -200,6 +202,7 @@ def _normalized_recipe(recipe: RecipeData) -> RecipeData:
         difficulty=normalize_difficulty(recipe.difficulty) or None,
         cost_label=normalize_cost_label(recipe.cost_label) or None,
         description=clean_text(recipe.description) or None,
+        origin_category=clean_text(recipe.origin_category) or None,
         ingredients=[value for item in recipe.ingredients if (value := clean_text(item))],
         utensils=[value for item in recipe.utensils if (value := clean_text(item))],
         preparation_steps=[
@@ -215,20 +218,6 @@ def _normalized_recipe(recipe: RecipeData) -> RecipeData:
             if clean_text(category.name)
         ],
     )
-
-
-def _recipe_text_units(recipe: RecipeData) -> Iterable[tuple[str, int, str]]:
-    yield "title", 0, recipe.title
-    if recipe.description:
-        yield "description", 0, recipe.description
-    for position, value in enumerate(recipe.ingredients, 1):
-        yield "ingredient", position, value
-    for position, value in enumerate(recipe.utensils, 1):
-        yield "utensil", position, value
-    for position, value in enumerate(recipe.preparation_steps, 1):
-        yield "preparation_step", position, value
-    for position, category in enumerate(recipe.related_categories, 1):
-        yield "related_category", position, category.name
 
 
 def _database_text_units(connection: sqlite3.Connection, recipe_id: str) -> Iterable[tuple[str, int, str]]:
@@ -255,7 +244,7 @@ def _database_text_units(connection: sqlite3.Connection, recipe_id: str) -> Iter
     for position, row in enumerate(
         connection.execute(
             """
-            SELECT c.name
+            SELECT c.name, rc.relation_type
             FROM recipe_categories rc
             JOIN categories c ON c.site_category_id = rc.category_id
             WHERE rc.recipe_id = ?
@@ -265,16 +254,17 @@ def _database_text_units(connection: sqlite3.Connection, recipe_id: str) -> Iter
         ),
         1,
     ):
-        yield "related_category", position, row["name"]
+        field_name = "origin_category" if row["relation_type"] == "origin" else "related_category"
+        yield field_name, position, row["name"]
 
 
 def _database_search_values(connection: sqlite3.Connection, recipe_id: str) -> list[str]:
     recipe = connection.execute(
-        "SELECT title, description FROM recipes WHERE site_recipe_id = ?", (recipe_id,)
+        "SELECT title, description, origin_category FROM recipes WHERE site_recipe_id = ?", (recipe_id,)
     ).fetchone()
     if recipe is None:
         return []
-    values = [recipe["title"], recipe["description"] or ""]
+    values = [recipe["title"], recipe["description"] or "", recipe["origin_category"] or ""]
     for table, column in (
         ("ingredients", "raw_text"),
         ("utensils", "name"),
@@ -303,6 +293,49 @@ def _database_search_values(connection: sqlite3.Connection, recipe_id: str) -> l
     return values
 
 
+def backfill_origin_categories(connection: sqlite3.Connection) -> int:
+    """Turn each collected origin label into a queryable category relationship."""
+    category_ids = {
+        normalize_text(row["name"]): row["site_category_id"]
+        for row in connection.execute("SELECT site_category_id, name FROM categories")
+    }
+    inserted = 0
+    for row in connection.execute(
+        """
+        SELECT site_recipe_id, origin_category
+        FROM recipes
+        WHERE NULLIF(TRIM(origin_category), '') IS NOT NULL
+        ORDER BY site_recipe_id
+        """
+    ).fetchall():
+        category_name = clean_text(row["origin_category"])
+        normalized_name = normalize_text(category_name)
+        category_id = category_ids.get(normalized_name)
+        if category_id is None:
+            slug = normalized_name.replace(" ", "-") or "sem-nome"
+            category_id = f"origin:{slug}"
+            _upsert_category(
+                connection,
+                site_category_id=category_id,
+                name=category_name,
+                url=None,
+            )
+            category_ids[normalized_name] = category_id
+        cursor = connection.execute(
+            """
+            INSERT INTO recipe_categories(recipe_id, category_id, relation_type)
+            SELECT ?, ?, 'origin'
+            WHERE NOT EXISTS (
+                SELECT 1 FROM recipe_categories
+                WHERE recipe_id = ? AND category_id = ?
+            )
+            """,
+            (row["site_recipe_id"], category_id, row["site_recipe_id"], category_id),
+        )
+        inserted += max(0, cursor.rowcount)
+    return inserted
+
+
 def normalize_stored_data(connection: sqlite3.Connection) -> int:
     """Apply the current cleanup rules to data collected by older pipeline versions."""
     changes = 0
@@ -312,6 +345,7 @@ def normalize_stored_data(connection: sqlite3.Connection) -> int:
         ("recipes", "site_recipe_id", "difficulty", normalize_difficulty, True),
         ("recipes", "site_recipe_id", "cost_label", normalize_cost_label, True),
         ("recipes", "site_recipe_id", "description", clean_text, True),
+        ("recipes", "site_recipe_id", "origin_category", clean_text, True),
         ("ingredients", "id", "raw_text", clean_text, False),
         ("utensils", "id", "name", clean_text, False),
         ("preparation_steps", "id", "raw_text", clean_text, False),
@@ -335,6 +369,7 @@ def normalize_stored_data(connection: sqlite3.Connection) -> int:
         )
         changes += len(updates)
 
+    backfill_origin_categories(connection)
     recipe_ids = [
         row["site_recipe_id"]
         for row in connection.execute("SELECT site_recipe_id FROM recipes ORDER BY site_recipe_id")
@@ -485,8 +520,8 @@ def save_recipe(connection: sqlite3.Connection, recipe: RecipeData) -> None:
         INSERT INTO recipes
             (site_recipe_id, title, url, rating_value, ratings_count,
              prep_time_minutes, prep_time_raw, difficulty, cost_label,
-             servings, description, search_text, retrieved_at, parser_version)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             servings, description, origin_category, search_text, retrieved_at, parser_version)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(site_recipe_id) DO UPDATE SET
             title = excluded.title,
             url = excluded.url,
@@ -498,6 +533,7 @@ def save_recipe(connection: sqlite3.Connection, recipe: RecipeData) -> None:
             cost_label = excluded.cost_label,
             servings = excluded.servings,
             description = excluded.description,
+            origin_category = COALESCE(excluded.origin_category, recipes.origin_category),
             search_text = excluded.search_text,
             retrieved_at = excluded.retrieved_at,
             parser_version = excluded.parser_version
@@ -514,6 +550,7 @@ def save_recipe(connection: sqlite3.Connection, recipe: RecipeData) -> None:
             recipe.cost_label,
             recipe.servings,
             recipe.description,
+            recipe.origin_category,
             _search_text(recipe),
             recipe.retrieved_at,
             recipe.parser_version,
@@ -550,7 +587,20 @@ def save_recipe(connection: sqlite3.Connection, recipe: RecipeData) -> None:
             """,
             (recipe.site_recipe_id, category_id),
         )
-    _save_prepared_texts(connection, recipe.site_recipe_id, _recipe_text_units(recipe), prepared_at=recipe.retrieved_at)
+    backfill_origin_categories(connection)
+    connection.execute(
+        "UPDATE recipes SET search_text = ? WHERE site_recipe_id = ?",
+        (
+            search_index_text(_database_search_values(connection, recipe.site_recipe_id)),
+            recipe.site_recipe_id,
+        ),
+    )
+    _save_prepared_texts(
+        connection,
+        recipe.site_recipe_id,
+        _database_text_units(connection, recipe.site_recipe_id),
+        prepared_at=recipe.retrieved_at,
+    )
     rebuild_recipe_deduplication(connection)
     connection.commit()
 

@@ -147,11 +147,11 @@ if not defined PYTHON (
 exit /b 0
 
 :ensure_dependencies
-"%PYTHON%" -c "import bs4, requests" >nul 2>&1
+"%PYTHON%" -c "import bs4, requests, IPython, ipykernel, jupyterlab" >nul 2>&1
 if not errorlevel 1 exit /b 0
 
-echo Instalando dependencias do projeto...
-"%PYTHON%" -m pip install -r requirements.txt
+echo Instalando dependencias do projeto e do notebook...
+"%PYTHON%" -m pip install -r requirements-notebook.txt
 if errorlevel 1 (
     echo Nao foi possivel instalar as dependencias.
     exit /b 1

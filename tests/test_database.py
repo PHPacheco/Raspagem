@@ -184,3 +184,39 @@ def test_deduplication_marks_equal_content_but_keeps_distinct_same_title_version
     assert rows["30"]["duplicate_of_recipe_id"] is None
     assert connection.execute("SELECT COUNT(*) AS count FROM recipes").fetchone()["count"] == 3
 
+
+def test_origin_category_becomes_a_filterable_relationship(tmp_path: Path) -> None:
+    connection = connect_database(tmp_path / "recipes.sqlite")
+    initialize_database(connection)
+    recipe = RecipeData(
+        site_recipe_id="40",
+        title="Frango assado",
+        url="https://example.test/receita/40.html",
+        origin_category="Aves",
+        ingredients=["1 frango"],
+        preparation_steps=["Asse o frango."],
+        retrieved_at="2026-10-22T12:00:00+00:00",
+        parser_version="test",
+    )
+
+    save_recipe(connection, recipe)
+    relation = connection.execute(
+        """
+        SELECT c.site_category_id, c.name, rc.relation_type
+        FROM recipe_categories rc
+        JOIN categories c ON c.site_category_id = rc.category_id
+        WHERE rc.recipe_id = '40'
+        """
+    ).fetchone()
+
+    assert dict(relation) == {
+        "site_category_id": "origin:aves",
+        "name": "Aves",
+        "relation_type": "origin",
+    }
+    assert [row["site_recipe_id"] for row in query_recipes(connection, category_id="origin:aves")] == ["40"]
+    assert connection.execute(
+        "SELECT COUNT(*) AS count FROM text_preparations "
+        "WHERE recipe_id = '40' AND field_name = 'origin_category'"
+    ).fetchone()["count"] == 1
+

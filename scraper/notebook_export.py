@@ -329,6 +329,7 @@ def _details_html(details: dict[str, Any] | None) -> str:
         if categories
         else ""
     )
+    cost_label = details.get("cost_label") or "Não informado"
     return f"""
     <style>
       .recipe-card {{
@@ -355,7 +356,7 @@ def _details_html(details: dict[str, Any] | None) -> str:
         <span>Avaliações: {html.escape(_plain(details.get("ratings_count")))}</span>
         <span>Tempo: {html.escape(_plain(details.get("prep_time_minutes")))} min</span>
         <span>Dificuldade: {html.escape(_plain(details.get("difficulty")))}</span>
-        <span>Custo: {html.escape(_plain(details.get("cost_label")))}</span>
+        <span>Custo: {html.escape(str(cost_label))}</span>
       </div>
       <div class="recipe-grid">
         <div><h4>Ingredientes</h4><ul>{ingredients or "<li>—</li>"}</ul></div>
@@ -432,8 +433,21 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
     embedding_model = load_latest_embedding_model(connection)
     classification_analysis = latest_text_classification(connection)
     linguistic_analysis = latest_linguistic_analysis(connection)
+    total_recipes = _count(connection, "recipes")
+    costs_available = int(
+        connection.execute(
+            "SELECT COUNT(*) AS count FROM recipes WHERE NULLIF(TRIM(cost_label), '') IS NOT NULL"
+        ).fetchone()["count"]
+    )
+    categories_available = int(
+        connection.execute(
+            "SELECT COUNT(DISTINCT recipe_id) AS count FROM recipe_categories"
+        ).fetchone()["count"]
+    )
     summary_rows = [
-        {"metric": "Receitas", "value": _count(connection, "recipes")},
+        {"metric": "Receitas", "value": total_recipes},
+        {"metric": "Custos informados", "value": f"{costs_available}/{total_recipes}"},
+        {"metric": "Receitas com categoria", "value": f"{categories_available}/{total_recipes}"},
         {"metric": "Ingredientes", "value": _count(connection, "ingredients")},
         {"metric": "Passos de preparo", "value": _count(connection, "preparation_steps")},
         {"metric": "Categorias", "value": _count(connection, "categories")},
@@ -460,7 +474,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         {"metric": "Última classificação", "value": _latest_id(connection, "classification_runs")},
         {"metric": "Última análise linguística", "value": _latest_id(connection, "linguistic_analysis_runs")},
     ]
-    prepared_text_count = int(summary_rows[4]["value"])
+    prepared_text_count = _count(connection, "text_preparations")
     recipe_rows = _rows(
         connection,
         """
@@ -473,12 +487,15 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             difficulty,
             cost_label,
             servings,
+            origin_category,
             duplicate_of_recipe_id,
             url
         FROM recipes
         ORDER BY title COLLATE NOCASE
         """,
     )
+    for row in recipe_rows:
+        row["cost_label"] = row["cost_label"] or "Não informado"
     prepared_rows = _rows(
         connection,
         """
@@ -686,8 +703,17 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             """
             connection = connect_database(DATABASE_PATH)
             initialize_database(connection)
+            total_receitas = connection.execute("SELECT COUNT(*) FROM recipes").fetchone()[0]
+            custos_informados = connection.execute(
+                "SELECT COUNT(*) FROM recipes WHERE NULLIF(TRIM(cost_label), '') IS NOT NULL"
+            ).fetchone()[0]
+            receitas_com_categoria = connection.execute(
+                "SELECT COUNT(DISTINCT recipe_id) FROM recipe_categories"
+            ).fetchone()[0]
             resumo = [
-                {"metric": "Receitas", "value": connection.execute("SELECT COUNT(*) FROM recipes").fetchone()[0]},
+                {"metric": "Receitas", "value": total_receitas},
+                {"metric": "Custos informados", "value": f"{custos_informados}/{total_receitas}"},
+                {"metric": "Receitas com categoria", "value": f"{receitas_com_categoria}/{total_receitas}"},
                 {"metric": "Ingredientes", "value": connection.execute("SELECT COUNT(*) FROM ingredients").fetchone()[0]},
                 {"metric": "Passos de preparo", "value": connection.execute("SELECT COUNT(*) FROM preparation_steps").fetchone()[0]},
                 {"metric": "Categorias", "value": connection.execute("SELECT COUNT(*) FROM categories").fetchone()[0]},
@@ -718,7 +744,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             connection = connect_database(DATABASE_PATH)
             receitas = [dict(row) for row in connection.execute(\"\"\"
                 SELECT site_recipe_id AS id, title, rating_value, ratings_count, prep_time_minutes,
-                       difficulty, cost_label, servings, duplicate_of_recipe_id, url
+                       difficulty, cost_label, servings, origin_category, duplicate_of_recipe_id, url
                 FROM recipes
                 ORDER BY title COLLATE NOCASE
             \"\"\")]
@@ -738,6 +764,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("difficulty", "Dificuldade"),
                             ("cost_label", "Custo"),
                             ("servings", "Porções"),
+                            ("origin_category", "Categoria de origem"),
                             ("duplicate_of_recipe_id", "Duplicata de"),
                             ("url", "URL"),
                         ],

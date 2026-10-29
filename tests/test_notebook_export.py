@@ -80,6 +80,9 @@ def test_export_analysis_notebook_writes_ipynb_with_ready_outputs(tmp_path: Path
     assert "Aula 7" in all_source
     assert "Aula 8" in all_source
     assert "Aula 9" in all_source
+    assert "Custos informados" in all_source
+    assert "Receitas com categoria" in all_source
+    assert "Não informado" in notebook_path.read_text(encoding="utf-8")
     svg_outputs = [
         output.get("data", {}).get("image/svg+xml")
         for cell in code_cells
@@ -92,3 +95,11 @@ def test_export_analysis_notebook_writes_ipynb_with_ready_outputs(tmp_path: Path
     assert "Passe o mouse sobre um ponto" in map_svg
     assert "Cluster 0" in map_svg
     assert "<title>" in map_svg
+
+
+def test_notebook_requirements_define_jupyter_kernel() -> None:
+    requirements = (Path(__file__).parents[1] / "requirements-notebook.txt").read_text(encoding="utf-8")
+
+    assert "-r requirements.txt" in requirements
+    assert "ipykernel" in requirements
+    assert "jupyterlab" in requirements

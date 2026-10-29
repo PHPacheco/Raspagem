@@ -17,7 +17,7 @@
     </div>
     <dl class="metadata">
       <div><dt>Corpus atual</dt><dd>120 receitas</dd></div>
-      <div><dt>Testes</dt><dd>36 aprovados</dd></div>
+      <div><dt>Testes</dt><dd>38 aprovados</dd></div>
       <div><dt>Interface de análise</dt><dd>notebooks/Trabalho PLN.ipynb</dd></div>
     </dl>
   </header>
@@ -44,6 +44,7 @@
         <li>Rótulos de dificuldade e custo são convertidos para formas canônicas antes do armazenamento e da classificação.</li>
         <li>Duplicatas são identificadas pela impressão digital de título, ingredientes e preparo. Receitas com o mesmo título e conteúdo diferente são preservadas.</li>
         <li>O banco atual possui quatro grupos com títulos repetidos auditados e nenhuma duplicata exata.</li>
+        <li>As 120 receitas possuem categoria de origem convertida em relação consultável. Custos ausentes permanecem como “Não informado”, sem preenchimento artificial.</li>
       </ul>
     </section>
 
@@ -95,9 +96,9 @@
       <dl class="results">
         <div><dt>Sentenças de preparo</dt><dd>780</dd></div>
         <div><dt>Dependências</dt><dd>11.241</dd></div>
-        <div><dt>Análises de sentimento</dt><dd>2.385</dd></div>
-        <div><dt>Entidades</dt><dd>3.307</dd></div>
-        <div><dt>Relações</dt><dd>2.131</dd></div>
+        <div><dt>Análises de sentimento</dt><dd>2.505</dd></div>
+        <div><dt>Entidades</dt><dd>3.427</dd></div>
+        <div><dt>Relações</dt><dd>2.251</dd></div>
       </dl>
       <h3>Saída</h3>
       <p>Os dados ficam em <code>linguistic_analysis_runs</code>, <code>syntactic_dependencies</code>, <code>sentiment_analyses</code>, <code>named_entities</code> e <code>semantic_relations</code>.</p>

@@ -138,6 +138,7 @@ def collect(args: argparse.Namespace) -> int:
                 try:
                     response = client.fetch(link.url, resource_kind="recipe")
                     recipe = parse_recipe(response.text, response.url)
+                    recipe.origin_category = category_name
                     save_recipe(connection, recipe)
                     saved_recipes += 1
                     _write_log(
@@ -206,6 +207,7 @@ def load_fixture(args: argparse.Namespace) -> int:
 
     recipe_html = Path(args.recipe_fixture).read_text(encoding="utf-8")
     recipe = parse_recipe(recipe_html, args.recipe_url)
+    recipe.origin_category = category_name
     save_recipe(connection, recipe)
     _write_log(log_path, "fixture_recipe_ok", recipe_id=recipe.site_recipe_id, issues=recipe.issues)
     finish_scrape_run(

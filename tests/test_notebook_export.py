@@ -3,7 +3,12 @@ from pathlib import Path
 
 from scraper.database import connect_database, initialize_database, save_recipe
 from scraper.models import RecipeData
-from scraper.notebook_export import _details_html, export_analysis_notebook
+from scraper.notebook_export import (
+    _details_html,
+    _distribution_bars,
+    _html_table,
+    export_analysis_notebook,
+)
 from scraper.linguistic_analysis import run_linguistic_analysis
 from scraper.text_analysis import run_text_analysis
 from scraper.text_classification import run_text_classification
@@ -49,6 +54,37 @@ def test_details_uses_origin_category_and_omits_empty_placeholder() -> None:
     assert "<h4>Categorias</h4>" not in markup
 
 
+def test_html_table_paginates_and_can_collapse_large_results() -> None:
+    rows = [{"id": index, "title": f"Receita {index:02d}"} for index in range(1, 26)]
+
+    markup = _html_table(
+        rows,
+        [("id", "ID"), ("title", "Receita")],
+        page_size=20,
+        collapsible=True,
+        title="Receitas",
+    )
+
+    assert "Exibindo 1–20 de 25" in markup
+    assert "Receita 20" in markup
+    assert "Receita 21" not in markup
+    assert '<details class="raspagem-details">' in markup
+    assert "Receitas — 25 registro(s)" in markup
+
+
+def test_distribution_bars_show_labels_and_counts() -> None:
+    markup = _distribution_bars(
+        [{"label": "Fácil", "count": 8}, {"label": "Difícil", "count": 2}],
+        label_key="label",
+        value_key="count",
+        title="Receitas por dificuldade",
+    )
+
+    assert "Receitas por dificuldade" in markup
+    assert "Fácil" in markup
+    assert ">8<" in markup
+
+
 def test_export_analysis_notebook_writes_ipynb_with_ready_outputs(tmp_path: Path) -> None:
     database_path = tmp_path / "recipes.sqlite"
     notebook_path = tmp_path / "Trabalho PLN.ipynb"
@@ -83,6 +119,9 @@ def test_export_analysis_notebook_writes_ipynb_with_ready_outputs(tmp_path: Path
     assert "Custos informados" in all_source
     assert "Receitas com categoria" in all_source
     assert "Não informado" in notebook_path.read_text(encoding="utf-8")
+    assert "itens_por_pagina = 20" in all_source
+    assert "Receitas por categoria de origem" in notebook_path.read_text(encoding="utf-8")
+    assert 'class=\\"raspagem-details\\"' in notebook_path.read_text(encoding="utf-8")
     svg_outputs = [
         output.get("data", {}).get("image/svg+xml")
         for cell in code_cells

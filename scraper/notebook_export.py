@@ -22,6 +22,7 @@ from .text_embeddings import (
 
 
 DEFAULT_NOTEBOOK = Path("notebooks") / "Trabalho PLN.ipynb"
+DEFAULT_PAGE_SIZE = 20
 
 
 def _ensure_parent(path: Path) -> None:
@@ -42,8 +43,27 @@ def _html_table(
     columns: list[tuple[str, str]],
     *,
     empty_message: str = "Nenhum registro encontrado.",
+    page: int = 1,
+    page_size: int | None = None,
+    total_count: int | None = None,
+    collapsible: bool = False,
+    title: str = "Tabela",
 ) -> str:
     row_list = list(rows)
+    effective_total = len(row_list) if total_count is None else max(0, total_count)
+    effective_page = max(1, page)
+    if page_size is not None:
+        effective_size = max(1, page_size)
+        if total_count is None:
+            start = (effective_page - 1) * effective_size
+            visible_rows = row_list[start : start + effective_size]
+        else:
+            start = (effective_page - 1) * effective_size
+            visible_rows = row_list[:effective_size]
+    else:
+        effective_size = len(row_list) or 1
+        start = 0
+        visible_rows = row_list
     style = """
     <style>
       table.raspagem-table {
@@ -69,20 +89,73 @@ def _html_table(
         color: #4a5263;
         background: #fbfcff;
       }
+      .raspagem-page-info { color: #596174; margin: 0 0 8px; font: 13px/1.4 system-ui, sans-serif; }
+      .raspagem-scroll { max-height: 460px; overflow: auto; margin-bottom: 14px; }
+      details.raspagem-details { border: 1px solid #d9dbe3; border-radius: 8px; padding: 10px 12px; margin: 8px 0 16px; }
+      .raspagem-details summary { cursor: pointer; font: 600 14px/1.4 system-ui, sans-serif; }
+      .raspagem-details[open] summary { margin-bottom: 10px; }
     </style>
     """
-    if not row_list:
+    if not visible_rows:
         return f"{style}<div class=\"raspagem-note\">{html.escape(empty_message)}</div>"
 
     header = "".join(f"<th>{html.escape(label)}</th>" for _, label in columns)
     body_rows = []
-    for row in row_list:
+    for row in visible_rows:
         cells = "".join(
             f"<td>{html.escape(_plain(row.get(key)))}</td>"
             for key, _ in columns
         )
         body_rows.append(f"<tr>{cells}</tr>")
-    return f"{style}<table class=\"raspagem-table\"><thead><tr>{header}</tr></thead><tbody>{''.join(body_rows)}</tbody></table>"
+    end = min(start + len(visible_rows), effective_total)
+    page_count = max(1, math.ceil(effective_total / effective_size))
+    page_info = (
+        f'<p class="raspagem-page-info">Exibindo {start + 1}–{end} de {effective_total} '
+        f'(página {effective_page} de {page_count}).</p>'
+    )
+    table = (
+        f'{page_info}<div class="raspagem-scroll"><table class="raspagem-table">'
+        f'<thead><tr>{header}</tr></thead><tbody>{"".join(body_rows)}</tbody></table></div>'
+    )
+    if collapsible:
+        table = (
+            f'<details class="raspagem-details"><summary>{html.escape(title)} — '
+            f'{effective_total} registro(s)</summary>{table}</details>'
+        )
+    return style + table
+
+
+def _distribution_bars(
+    rows: Iterable[dict[str, Any]],
+    *,
+    label_key: str,
+    value_key: str,
+    title: str,
+) -> str:
+    row_list = list(rows)
+    maximum = max((int(row.get(value_key) or 0) for row in row_list), default=0) or 1
+    bars = []
+    for row in row_list:
+        label = _plain(row.get(label_key))
+        value = int(row.get(value_key) or 0)
+        width = max(2.0, value / maximum * 100)
+        bars.append(
+            '<div class="raspagem-bar-row">'
+            f'<span>{html.escape(label)}</span>'
+            f'<div><i style="width:{width:.1f}%"></i></div>'
+            f'<strong>{value}</strong></div>'
+        )
+    return f"""
+    <style>
+      .raspagem-chart {{ border:1px solid #d9dbe3;border-radius:8px;padding:12px;margin:0 0 14px;font:13px/1.4 system-ui,sans-serif; }}
+      .raspagem-chart h4 {{ margin:0 0 10px;font-size:14px; }}
+      .raspagem-bar-row {{ display:grid;grid-template-columns:minmax(130px,1.2fr) 3fr 44px;gap:8px;align-items:center;margin:6px 0; }}
+      .raspagem-bar-row div {{ height:12px;background:#eef1f7;border-radius:999px;overflow:hidden; }}
+      .raspagem-bar-row i {{ display:block;height:100%;background:#1763dc;border-radius:999px; }}
+      .raspagem-bar-row strong {{ text-align:right; }}
+    </style>
+    <div class="raspagem-chart"><h4>{html.escape(title)}</h4>{''.join(bars)}</div>
+    """.strip()
 
 
 def _rows(connection: sqlite3.Connection, query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
@@ -496,6 +569,26 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
     )
     for row in recipe_rows:
         row["cost_label"] = row["cost_label"] or "Não informado"
+    category_distribution_rows = _rows(
+        connection,
+        """
+        SELECT COALESCE(NULLIF(TRIM(origin_category), ''), 'Não informado') AS label,
+               COUNT(*) AS count
+        FROM recipes
+        GROUP BY label
+        ORDER BY count DESC, label COLLATE NOCASE
+        """,
+    )
+    cost_distribution_rows = _rows(
+        connection,
+        """
+        SELECT COALESCE(NULLIF(TRIM(cost_label), ''), 'Não informado') AS label,
+               COUNT(*) AS count
+        FROM recipes
+        GROUP BY label
+        ORDER BY count DESC, label COLLATE NOCASE
+        """,
+    )
     prepared_rows = _rows(
         connection,
         """
@@ -509,7 +602,7 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         FROM text_preparations tp
         JOIN recipes r ON r.site_recipe_id = tp.recipe_id
         ORDER BY r.title COLLATE NOCASE, tp.field_name, tp.position
-        LIMIT 40
+        LIMIT 20
         """,
     )
     for row in prepared_rows:
@@ -626,8 +719,20 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                 semantic_search,
             )
 
-            def exibir_tabela(registros, colunas, mensagem_vazia="Nenhum registro encontrado."):
+            def exibir_tabela(
+                registros,
+                colunas,
+                mensagem_vazia="Nenhum registro encontrado.",
+                pagina=1,
+                itens_por_pagina=20,
+                titulo="Tabela",
+            ):
                 registros = list(registros)
+                pagina = max(1, int(pagina))
+                itens_por_pagina = max(1, int(itens_por_pagina))
+                total = len(registros)
+                inicio = (pagina - 1) * itens_por_pagina
+                registros_visiveis = registros[inicio:inicio + itens_por_pagina]
                 estilo = (
                     '<style>'
                     'table.raspagem-table{border-collapse:collapse;width:100%;margin:0 0 16px;'
@@ -635,26 +740,55 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                     '.raspagem-table th,.raspagem-table td{border:1px solid #d9dbe3;padding:8px 10px;'
                     'text-align:left!important;vertical-align:top}'
                     '.raspagem-table th{background:#f4f6fb;font-weight:600}'
+                    '.raspagem-scroll{max-height:460px;overflow:auto}'
+                    '.raspagem-page-info{color:#596174;font:13px/1.4 system-ui,sans-serif}'
                     '</style>'
                 )
-                if not registros:
+                if not registros_visiveis:
                     display(HTML(estilo + f'<p>{escape(mensagem_vazia)}</p>'))
                     return
                 cabecalho = ''.join(f'<th>{escape(rotulo)}</th>' for chave, rotulo in colunas)
                 linhas = []
-                for registro in registros:
+                for registro in registros_visiveis:
                     celulas = ''.join(
                         f'<td>{escape(str(registro.get(chave) if registro.get(chave) not in (None, "") else "—"))}</td>'
                         for chave, rotulo in colunas
                     )
                     linhas.append(f'<tr>{celulas}</tr>')
+                fim = min(inicio + len(registros_visiveis), total)
+                total_paginas = max(1, (total + itens_por_pagina - 1) // itens_por_pagina)
                 display(HTML(
                     estilo
-                    + '<table class="raspagem-table"><thead><tr>'
+                    + f'<p class="raspagem-page-info"><strong>{escape(titulo)}</strong>: '
+                    + f'exibindo {inicio + 1}–{fim} de {total} (página {pagina} de {total_paginas}).</p>'
+                    + '<div class="raspagem-scroll"><table class="raspagem-table"><thead><tr>'
                     + cabecalho
                     + '</tr></thead><tbody>'
                     + ''.join(linhas)
-                    + '</tbody></table>'
+                    + '</tbody></table></div>'
+                ))
+
+            def exibir_distribuicao(registros, titulo):
+                registros = list(registros)
+                maior = max((int(item.get("count") or 0) for item in registros), default=0) or 1
+                linhas = []
+                for item in registros:
+                    valor = int(item.get("count") or 0)
+                    largura = max(2, valor / maior * 100)
+                    linhas.append(
+                        '<div style="display:grid;grid-template-columns:minmax(130px,1.2fr) 3fr 44px;'
+                        'gap:8px;align-items:center;margin:6px 0">'
+                        f'<span>{escape(str(item.get("label") or "Não informado"))}</span>'
+                        f'<div style="height:12px;background:#eef1f7;border-radius:999px;overflow:hidden">'
+                        f'<i style="display:block;height:100%;width:{largura:.1f}%;background:#1763dc"></i></div>'
+                        f'<strong style="text-align:right">{valor}</strong></div>'
+                    )
+                display(HTML(
+                    '<div style="border:1px solid #d9dbe3;border-radius:8px;padding:12px;margin:0 0 14px;'
+                    'font:13px/1.4 system-ui,sans-serif">'
+                    f'<h4 style="margin:0 0 10px">{escape(titulo)}</h4>'
+                    + ''.join(linhas)
+                    + '</div>'
                 ))
 
             DATABASE_PATH = Path("data/recipes.sqlite")
@@ -697,6 +831,16 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                 )
             ],
             2,
+        ),
+        _markdown_cell(
+            """
+            ## Como navegar pelos resultados
+
+            - As tabelas exibem 20 registros por página. Altere `pagina` e execute novamente a célula.
+            - Use os filtros antes de aumentar `itens_por_pagina`.
+            - Resultados técnicos extensos ficam em blocos recolhíveis.
+            - O banco SQLite continua contendo todos os registros; a paginação altera somente a exibição.
+            """
         ),
         _markdown_cell("## 1. Resumo do banco"),
         _code_cell(
@@ -741,19 +885,63 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _markdown_cell("## 2. Dados coletados"),
         _code_cell(
             """
+            pagina = 1
+            itens_por_pagina = 20
+
             connection = connect_database(DATABASE_PATH)
             receitas = [dict(row) for row in connection.execute(\"\"\"
                 SELECT site_recipe_id AS id, title, rating_value, ratings_count, prep_time_minutes,
-                       difficulty, cost_label, servings, origin_category, duplicate_of_recipe_id, url
+                       difficulty, COALESCE(NULLIF(TRIM(cost_label), ''), 'Não informado') AS cost_label,
+                       servings, origin_category, duplicate_of_recipe_id, url
                 FROM recipes
                 ORDER BY title COLLATE NOCASE
             \"\"\")]
+            distribuicao_categorias = [dict(row) for row in connection.execute(\"\"\"
+                SELECT COALESCE(NULLIF(TRIM(origin_category), ''), 'Não informado') AS label,
+                       COUNT(*) AS count
+                FROM recipes
+                GROUP BY label
+                ORDER BY count DESC, label COLLATE NOCASE
+            \"\"\")]
+            distribuicao_custos = [dict(row) for row in connection.execute(\"\"\"
+                SELECT COALESCE(NULLIF(TRIM(cost_label), ''), 'Não informado') AS label,
+                       COUNT(*) AS count
+                FROM recipes
+                GROUP BY label
+                ORDER BY count DESC, label COLLATE NOCASE
+            \"\"\")]
             connection.close()
-            display(HTML("Tabela de receitas coletadas já exibida no output."))
+            exibir_distribuicao(distribuicao_categorias, "Receitas por categoria de origem")
+            exibir_distribuicao(distribuicao_custos, "Receitas por custo")
+            exibir_tabela(
+                receitas,
+                [
+                    ("id", "ID"), ("title", "Receita"), ("rating_value", "Nota"),
+                    ("ratings_count", "Avaliações"), ("prep_time_minutes", "Tempo min"),
+                    ("difficulty", "Dificuldade"), ("cost_label", "Custo"),
+                    ("servings", "Porções"), ("origin_category", "Categoria de origem"),
+                    ("duplicate_of_recipe_id", "Duplicata de"), ("url", "URL"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Receitas coletadas",
+            )
             """,
             [
                 _html_output(
-                    _html_table(
+                    _distribution_bars(
+                        category_distribution_rows,
+                        label_key="label",
+                        value_key="count",
+                        title="Receitas por categoria de origem",
+                    )
+                    + _distribution_bars(
+                        cost_distribution_rows,
+                        label_key="label",
+                        value_key="count",
+                        title="Receitas por custo",
+                    )
+                    + _html_table(
                         recipe_rows,
                         [
                             ("id", "ID"),
@@ -768,6 +956,8 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("duplicate_of_recipe_id", "Duplicata de"),
                             ("url", "URL"),
                         ],
+                        page_size=DEFAULT_PAGE_SIZE,
+                        title="Receitas coletadas",
                     )
                 )
             ],
@@ -781,10 +971,13 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             custo = ""
             tempo_maximo = None
             nota_minima = None
+            pagina = 1
+            itens_por_pagina = 20
 
             connection = connect_database(DATABASE_PATH)
             sql = [
-                "SELECT site_recipe_id AS id, title, rating_value, prep_time_minutes, difficulty, cost_label",
+                "SELECT site_recipe_id AS id, title, rating_value, prep_time_minutes, difficulty, "
+                "COALESCE(NULLIF(TRIM(cost_label), ''), 'Não informado') AS cost_label",
                 "FROM recipes WHERE 1 = 1",
             ]
             params = []
@@ -806,7 +999,17 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             sql.append("ORDER BY title COLLATE NOCASE")
             receitas_filtradas = [dict(row) for row in connection.execute(" ".join(sql), params)]
             connection.close()
-            display(HTML("Resultado dos filtros já exibido no output."))
+            exibir_tabela(
+                receitas_filtradas,
+                [
+                    ("id", "ID"), ("title", "Receita"), ("rating_value", "Nota"),
+                    ("prep_time_minutes", "Tempo min"), ("difficulty", "Dificuldade"),
+                    ("cost_label", "Custo"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Resultado dos filtros",
+            )
             """,
             [
                 _html_output(
@@ -830,6 +1033,8 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("difficulty", "Dificuldade"),
                             ("cost_label", "Custo"),
                         ],
+                        page_size=DEFAULT_PAGE_SIZE,
+                        title="Resultado dos filtros",
                     )
                 )
             ],
@@ -849,6 +1054,9 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _markdown_cell("## 5. Limpeza e preparação dos textos"),
         _code_cell(
             """
+            pagina = 1
+            itens_por_pagina = 20
+
             connection = connect_database(DATABASE_PATH)
             preparacao = [dict(row) for row in connection.execute(\"\"\"
                 SELECT r.title AS recipe, tp.field_name, tp.position, tp.raw_text,
@@ -856,10 +1064,21 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                 FROM text_preparations tp
                 JOIN recipes r ON r.site_recipe_id = tp.recipe_id
                 ORDER BY r.title COLLATE NOCASE, tp.field_name, tp.position
-                LIMIT 40
             \"\"\")]
             connection.close()
-            display(HTML("Amostra da preparação textual já exibida no output."))
+            for item in preparacao:
+                item["tokens"] = ", ".join(json.loads(item.pop("content_tokens_json")))
+            exibir_tabela(
+                preparacao,
+                [
+                    ("recipe", "Receita"), ("field_name", "Campo"), ("position", "Posição"),
+                    ("raw_text", "Texto bruto"), ("clean_text", "Texto limpo"),
+                    ("tokens", "Tokens úteis"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Preparação textual",
+            )
             """,
             [
                 _html_output(
@@ -873,6 +1092,10 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("clean_text", "Texto limpo"),
                             ("tokens", "Tokens úteis"),
                         ],
+                        page_size=DEFAULT_PAGE_SIZE,
+                        total_count=prepared_text_count,
+                        collapsible=True,
+                        title="Amostra da preparação textual",
                     )
                 )
             ],
@@ -881,10 +1104,29 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _markdown_cell("## 6. TF-IDF, clusters e termos principais"),
         _code_cell(
             """
+            pagina = 1
+            itens_por_pagina = 20
             connection = connect_database(DATABASE_PATH)
             analise = latest_text_analysis(connection)
             connection.close()
-            display(HTML("Termos principais por TF-IDF já exibidos no output."))
+            termos_tfidf = []
+            for documento in (analise or {}).get("documents", []):
+                for termo in documento.get("top_terms_data", []):
+                    termos_tfidf.append({
+                        "recipe": documento.get("title"),
+                        "cluster": documento.get("cluster_label"),
+                        **termo,
+                    })
+            exibir_tabela(
+                termos_tfidf,
+                [
+                    ("recipe", "Receita"), ("cluster", "Cluster"), ("term", "Termo"),
+                    ("tf", "TF"), ("idf", "IDF"), ("tfidf", "TF-IDF"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Termos principais por TF-IDF",
+            )
             """,
             [
                 _html_output(
@@ -902,6 +1144,9 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("idf", "IDF"),
                             ("tfidf", "TF-IDF"),
                         ],
+                        page_size=DEFAULT_PAGE_SIZE,
+                        collapsible=True,
+                        title="Termos principais por TF-IDF",
                     )
                 )
             ],
@@ -1018,7 +1263,19 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _code_cell(
             """
             # Similaridade por cosseno entre vetores TF-IDF.
-            display(HTML("Tabela de similaridades TF-IDF já exibida no output."))
+            pagina = 1
+            itens_por_pagina = 20
+            similaridades_tfidf = (analise or {}).get("similarities", [])
+            exibir_tabela(
+                similaridades_tfidf,
+                [
+                    ("recipe_title", "Receita"), ("neighbor_title", "Vizinha"),
+                    ("rank", "Rank"), ("cosine_similarity", "Similaridade"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Similaridades por TF-IDF",
+            )
             """,
             [
                 _html_output(
@@ -1031,6 +1288,9 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("cosine_similarity", "Similaridade"),
                         ],
                         empty_message="Com apenas uma receita, não há vizinhos para comparar.",
+                        page_size=DEFAULT_PAGE_SIZE,
+                        collapsible=True,
+                        title="Similaridades por TF-IDF",
                     )
                 )
             ],
@@ -1042,7 +1302,27 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             connection = connect_database(DATABASE_PATH)
             embeddings = latest_embedding_analysis(connection)
             connection.close()
-            display(HTML("Tokens mais representativos dos embeddings já exibidos no output."))
+            pagina = 1
+            itens_por_pagina = 20
+            tokens_embeddings = []
+            for documento in (embeddings or {}).get("documents", []):
+                for token in documento.get("top_tokens", []):
+                    tokens_embeddings.append({
+                        "recipe": documento.get("title"),
+                        "token": token.get("token"),
+                        "count": token.get("count"),
+                        "norm": documento.get("norm"),
+                    })
+            exibir_tabela(
+                tokens_embeddings,
+                [
+                    ("recipe", "Receita"), ("token", "Token"),
+                    ("count", "Contagem"), ("norm", "Norma do vetor"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Tokens mais representativos",
+            )
             """,
             [
                 _html_output(
@@ -1065,6 +1345,9 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("count", "Contagem"),
                             ("norm", "Norma do vetor"),
                         ],
+                        page_size=DEFAULT_PAGE_SIZE,
+                        collapsible=True,
+                        title="Tokens mais representativos",
                     )
                 )
             ],
@@ -1074,7 +1357,19 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _code_cell(
             """
             # Mostra quais palavras apareceram como contexto de outras palavras.
-            display(HTML("Contextos aprendidos já exibidos no output."))
+            pagina = 1
+            itens_por_pagina = 20
+            contextos_aprendidos = []
+            for palavra in (embeddings or {}).get("words", []):
+                for contexto in palavra.get("top_contexts", []):
+                    contextos_aprendidos.append({"term": palavra.get("term"), **contexto})
+            exibir_tabela(
+                contextos_aprendidos,
+                [("term", "Termo"), ("context", "Contexto"), ("weight", "Peso PPMI")],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Contextos aprendidos",
+            )
             """,
             [
                 _html_output(
@@ -1085,6 +1380,9 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("context", "Contexto"),
                             ("weight", "Peso PPMI"),
                         ],
+                        page_size=DEFAULT_PAGE_SIZE,
+                        collapsible=True,
+                        title="Contextos aprendidos",
                     )
                 )
             ],
@@ -1094,7 +1392,19 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _code_cell(
             """
             # Similaridade por cosseno entre embeddings densos das receitas.
-            display(HTML("Tabela de similaridades por embeddings já exibida no output."))
+            pagina = 1
+            itens_por_pagina = 20
+            similaridades_embeddings = (embeddings or {}).get("similarities", [])
+            exibir_tabela(
+                similaridades_embeddings,
+                [
+                    ("recipe_title", "Receita"), ("neighbor_title", "Vizinha"),
+                    ("rank", "Rank"), ("cosine_similarity", "Similaridade"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Similaridades por embeddings",
+            )
             """,
             [
                 _html_output(
@@ -1107,6 +1417,9 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("cosine_similarity", "Similaridade"),
                         ],
                         empty_message="Com apenas uma receita, não há vizinhos por embeddings para comparar.",
+                        page_size=DEFAULT_PAGE_SIZE,
+                        collapsible=True,
+                        title="Similaridades por embeddings",
                     )
                 )
             ],
@@ -1120,7 +1433,14 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
             modelo_embeddings = load_latest_embedding_model(connection)
             resultados_semanticos = semantic_search(modelo_embeddings, consulta_semantica, limit=5) if modelo_embeddings else []
             connection.close()
-            display(HTML("Resultado da busca semântica já exibido no output."))
+            exibir_tabela(
+                resultados_semanticos,
+                [
+                    ("title", "Receita"), ("cosine_similarity", "Similaridade"),
+                    ("matched_tokens", "Termos reconhecidos"),
+                ],
+                titulo="Resultado da busca semântica",
+            )
             """,
             [
                 _html_output(
@@ -1156,7 +1476,14 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                     for item in ocorrencias[:8]
                 ]
             connection.close()
-            display(HTML("Ocorrências contextualizadas já exibidas no output."))
+            exibir_tabela(
+                exemplos_contextuais,
+                [
+                    ("token", "Token"), ("posição", "Posição"),
+                    ("contexto", "Janela local"), ("dimensões", "Dimensões"),
+                ],
+                titulo="Representação contextual",
+            )
             """,
             [
                 _html_output(
@@ -1207,7 +1534,29 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _code_cell(
             """
             previsoes = (classificacao or {}).get("predictions", [])
-            display(HTML("Previsões já exibidas no output."))
+            pagina = 1
+            itens_por_pagina = 20
+            previsoes_resumidas = []
+            for item in previsoes:
+                probabilidades = item.get("probabilities", {})
+                previsoes_resumidas.append({
+                    "title": item.get("title"),
+                    "split": item.get("split"),
+                    "actual_label": item.get("actual_label"),
+                    "predicted_label": item.get("predicted_label"),
+                    "confidence": max(probabilidades.values()) if probabilidades else None,
+                })
+            exibir_tabela(
+                previsoes_resumidas,
+                [
+                    ("title", "Receita"), ("split", "Conjunto"),
+                    ("actual_label", "Classe real"), ("predicted_label", "Classe prevista"),
+                    ("confidence", "Maior probabilidade"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Previsões da classificação",
+            )
             """,
             [
                 _html_output(
@@ -1221,6 +1570,9 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("confidence", "Maior probabilidade"),
                         ],
                         empty_message="Nenhuma previsão foi gerada.",
+                        page_size=DEFAULT_PAGE_SIZE,
+                        collapsible=True,
+                        title="Previsões da classificação",
                     )
                 )
             ],
@@ -1299,7 +1651,19 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _code_cell(
             """
             dependencias = (linguistica or {}).get("dependencies", [])
-            display(HTML("Dependências sintáticas rasas já exibidas no output."))
+            pagina = 1
+            itens_por_pagina = 20
+            exibir_tabela(
+                dependencias,
+                [
+                    ("title", "Receita"), ("sentence_index", "Sentença"),
+                    ("token_index", "Índice"), ("token", "Token"), ("lemma", "Lema"),
+                    ("head_index", "Núcleo"), ("relation", "Relação"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Dependências sintáticas",
+            )
             """,
             [
                 _html_output(
@@ -1314,6 +1678,10 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("head_index", "Núcleo"),
                             ("relation", "Relação"),
                         ],
+                        page_size=DEFAULT_PAGE_SIZE,
+                        total_count=int(linguistic_run.get("dependency_count") or len(dependency_rows)),
+                        collapsible=True,
+                        title="Dependências sintáticas",
                     )
                 )
             ],
@@ -1323,7 +1691,27 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _code_cell(
             """
             sentimentos = (linguistica or {}).get("sentiments", [])
-            display(HTML("Análises de sentimento já exibidas no output."))
+            pagina = 1
+            itens_por_pagina = 20
+            sentimentos_resumidos = []
+            for item in sentimentos:
+                sentimentos_resumidos.append({
+                    **item,
+                    "evidence": ", ".join(dado.get("token", "") for dado in item.get("evidence", [])) or "—",
+                    "aspects": ", ".join(dado.get("aspect", "") for dado in item.get("aspects", [])) or "—",
+                })
+            exibir_tabela(
+                sentimentos_resumidos,
+                [
+                    ("title", "Receita"), ("field_name", "Campo"), ("position", "Posição"),
+                    ("polarity", "Polaridade"), ("score", "Escore"),
+                    ("subjectivity", "Subjetividade"), ("evidence", "Evidências"),
+                    ("aspects", "Aspectos"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Sentimentos e aspectos",
+            )
             """,
             [
                 _html_output(
@@ -1339,6 +1727,10 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("evidence", "Evidências"),
                             ("aspects", "Aspectos"),
                         ],
+                        page_size=DEFAULT_PAGE_SIZE,
+                        total_count=int(linguistic_run.get("sentiment_count") or len(sentiment_rows)),
+                        collapsible=True,
+                        title="Sentimentos e aspectos",
                     )
                 )
             ],
@@ -1348,7 +1740,20 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _code_cell(
             """
             entidades = (linguistica or {}).get("entities", [])
-            display(HTML("Entidades de domínio já exibidas no output."))
+            pagina = 1
+            itens_por_pagina = 20
+            exibir_tabela(
+                entidades,
+                [
+                    ("title", "Receita"), ("field_name", "Campo"), ("position", "Posição"),
+                    ("entity_text", "Entidade"), ("entity_type", "Tipo"),
+                    ("normalized_value", "Valor normalizado"), ("bio_tag", "BIO"),
+                    ("extraction_method", "Método"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Entidades de domínio",
+            )
             """,
             [
                 _html_output(
@@ -1364,6 +1769,10 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("bio_tag", "BIO"),
                             ("extraction_method", "Método"),
                         ],
+                        page_size=DEFAULT_PAGE_SIZE,
+                        total_count=int(linguistic_run.get("entity_count") or len(entity_rows)),
+                        collapsible=True,
+                        title="Entidades de domínio",
                     )
                 )
             ],
@@ -1373,7 +1782,19 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
         _code_cell(
             """
             relacoes = (linguistica or {}).get("relations", [])
-            display(HTML("Relações semânticas já exibidas no output."))
+            pagina = 1
+            itens_por_pagina = 20
+            exibir_tabela(
+                relacoes,
+                [
+                    ("title", "Receita"), ("subject", "Sujeito"),
+                    ("relation", "Relação"), ("object", "Objeto"),
+                    ("confidence", "Confiança"), ("extraction_method", "Método"),
+                ],
+                pagina=pagina,
+                itens_por_pagina=itens_por_pagina,
+                titulo="Relações extraídas",
+            )
             """,
             [
                 _html_output(
@@ -1387,6 +1808,10 @@ def export_analysis_notebook(database_path: str | Path, output_path: str | Path 
                             ("confidence", "Confiança"),
                             ("extraction_method", "Método"),
                         ],
+                        page_size=DEFAULT_PAGE_SIZE,
+                        total_count=int(linguistic_run.get("relation_count") or len(relation_rows)),
+                        collapsible=True,
+                        title="Relações extraídas",
                     )
                 )
             ],

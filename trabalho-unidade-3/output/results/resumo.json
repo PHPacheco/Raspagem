@@ -1,0 +1,685 @@
+{
+  "generated_on": "2026-10-29",
+  "corpus": {
+    "recipes": 120,
+    "difficulty_labels": 120,
+    "cost_labels": 52,
+    "ratings": 120,
+    "preparation_times": 120,
+    "vocabulary": 2092,
+    "text_units": 2505
+  },
+  "clustering": {
+    "BoW": {
+      "cluster_count": 2,
+      "silhouette": 0.041391,
+      "sizes": {
+        "0": 83,
+        "1": 37
+      },
+      "terms": {
+        "0": [
+          "1",
+          "comprar",
+          "cebola",
+          "2",
+          "sal",
+          "coloque",
+          "panela",
+          "colher"
+        ],
+        "1": [
+          "1",
+          "comprar",
+          "colher",
+          "2",
+          "massa",
+          "minuto",
+          "xicara",
+          "farinha"
+        ]
+      }
+    },
+    "TF-IDF": {
+      "run_id": 5,
+      "cluster_count": 7,
+      "silhouette": 0.022801,
+      "sizes": {
+        "0": 25,
+        "1": 23,
+        "2": 31,
+        "3": 26,
+        "4": 3,
+        "5": 9,
+        "6": 3
+      },
+      "terms": {
+        "0": [
+          "camarao",
+          "peixe",
+          "pimentao",
+          "bacalhau",
+          "azeite",
+          "rodela",
+          "coco",
+          "tomate"
+        ],
+        "1": [
+          "queijo",
+          "mussarela",
+          "batata",
+          "ralado",
+          "requeijao",
+          "frango",
+          "creme",
+          "peru"
+        ],
+        "2": [
+          "frango",
+          "maionese",
+          "bif",
+          "comprar",
+          "farinha",
+          "alho",
+          "frigideira",
+          "oleo"
+        ],
+        "3": [
+          "banana",
+          "fermento",
+          "massa",
+          "aveia",
+          "liquidificador",
+          "farinha",
+          "bolo",
+          "ovos"
+        ],
+        "4": [
+          "salmao",
+          "posta",
+          "grelhe",
+          "limao",
+          "raminho",
+          "grelhado",
+          "aluminio",
+          "coentro"
+        ],
+        "5": [
+          "pressao",
+          "costela",
+          "panela",
+          "carne",
+          "feche",
+          "metade",
+          "caldo",
+          "linguica"
+        ],
+        "6": [
+          "porco",
+          "bisteca",
+          "70",
+          "100",
+          "macarrao",
+          "laranja",
+          "baiano",
+          "couve"
+        ]
+      },
+      "method": "tfidf-l2+kmeans++-silhouette-auto"
+    },
+    "PPMI-32D": {
+      "cluster_count": 4,
+      "silhouette": 0.101907,
+      "sizes": {
+        "0": 40,
+        "1": 24,
+        "2": 22,
+        "3": 34
+      },
+      "terms": {
+        "0": [
+          "1",
+          "panela",
+          "2",
+          "sal",
+          "colher",
+          "comprar",
+          "cebola",
+          "deixar"
+        ],
+        "1": [
+          "1",
+          "comprar",
+          "cebola",
+          "2",
+          "coloque",
+          "forno",
+          "tomate",
+          "sal"
+        ],
+        "2": [
+          "1",
+          "frango",
+          "coloque",
+          "batata",
+          "creme",
+          "comprar",
+          "cebola",
+          "forno"
+        ],
+        "3": [
+          "1",
+          "comprar",
+          "colher",
+          "2",
+          "massa",
+          "minuto",
+          "xicara",
+          "farinha"
+        ]
+      }
+    }
+  },
+  "searches": {
+    "carne com cebola": {
+      "BoW": [
+        {
+          "title": "Carne de panela de pressão",
+          "score": 0.417
+        },
+        {
+          "title": "Rocambole de carne moída maravilhoso",
+          "score": 0.4069
+        },
+        {
+          "title": "Carne louca de festa",
+          "score": 0.3675
+        },
+        {
+          "title": "Costela de boi na panela de pressão cozida na cebola",
+          "score": 0.3482
+        },
+        {
+          "title": "Strogonoff de carne",
+          "score": 0.3162
+        }
+      ],
+      "TF-IDF": [
+        {
+          "title": "Carne louca de festa",
+          "score": 0.2933
+        },
+        {
+          "title": "Carne de panela de pressão",
+          "score": 0.2702
+        },
+        {
+          "title": "Rocambole de carne moída maravilhoso",
+          "score": 0.2196
+        },
+        {
+          "title": "Carne assada na panela de pressão",
+          "score": 0.2111
+        },
+        {
+          "title": "Escondidinho de carne moída",
+          "score": 0.1885
+        }
+      ],
+      "PPMI-32D": [
+        {
+          "title": "Carne de panela de pressão",
+          "score": 0.5166
+        },
+        {
+          "title": "Escondidinho de carne moída",
+          "score": 0.4801
+        },
+        {
+          "title": "Rocambole de carne moída maravilhoso",
+          "score": 0.4495
+        },
+        {
+          "title": "Panqueca de banana fit",
+          "score": 0.4443
+        },
+        {
+          "title": "Estrogonofe de camarão",
+          "score": 0.4337
+        }
+      ]
+    },
+    "sobremesa de banana": {
+      "BoW": [
+        {
+          "title": "Bolo de Banana com Aveia Fitness",
+          "score": 0.2531
+        },
+        {
+          "title": "Panqueca de banana fit",
+          "score": 0.2229
+        },
+        {
+          "title": "Bolo diet de banana, sem farinha e sem açúcar",
+          "score": 0.2041
+        },
+        {
+          "title": "Torta de banana integral",
+          "score": 0.1983
+        },
+        {
+          "title": "Panqueca saudável de aveia e banana",
+          "score": 0.1789
+        }
+      ],
+      "TF-IDF": [
+        {
+          "title": "Bolo de Banana com Aveia Fitness",
+          "score": 0.301
+        },
+        {
+          "title": "Torta de banana integral",
+          "score": 0.268
+        },
+        {
+          "title": "Bolo integral de banana",
+          "score": 0.2439
+        },
+        {
+          "title": "Panqueca de banana fit",
+          "score": 0.2398
+        },
+        {
+          "title": "Bolo diet de banana, sem farinha e sem açúcar",
+          "score": 0.2356
+        }
+      ],
+      "PPMI-32D": [
+        {
+          "title": "Bolo integral de banana",
+          "score": 0.4643
+        },
+        {
+          "title": "Torta de banana integral",
+          "score": 0.424
+        },
+        {
+          "title": "Pão sem glúten",
+          "score": 0.401
+        },
+        {
+          "title": "Panqueca de banana fit",
+          "score": 0.3944
+        },
+        {
+          "title": "Bolo de banana de liquidificador sem glúten e sem lactose",
+          "score": 0.365
+        }
+      ]
+    }
+  },
+  "classification": {
+    "target": "cost_label",
+    "classifier": "centroide mais próximo por similaridade de cosseno",
+    "documents": 52,
+    "train": 39,
+    "test": 13,
+    "class_distribution": {
+      "Custo baixo": 7,
+      "Custo médio": 34,
+      "Custo alto": 11
+    },
+    "representations": {
+      "BoW": {
+        "accuracy": 0.7692,
+        "macro_precision": 0.8148,
+        "macro_recall": 0.6806,
+        "macro_f1": 0.719,
+        "confusion": {
+          "Custo alto": {
+            "Custo alto": 2,
+            "Custo baixo": 0,
+            "Custo médio": 1
+          },
+          "Custo baixo": {
+            "Custo alto": 0,
+            "Custo baixo": 1,
+            "Custo médio": 1
+          },
+          "Custo médio": {
+            "Custo alto": 1,
+            "Custo baixo": 0,
+            "Custo médio": 7
+          }
+        },
+        "metrics": [
+          {
+            "label": "Custo alto",
+            "precision": 0.6667,
+            "recall": 0.6667,
+            "f1": 0.6667,
+            "support": 3
+          },
+          {
+            "label": "Custo baixo",
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6667,
+            "support": 2
+          },
+          {
+            "label": "Custo médio",
+            "precision": 0.7778,
+            "recall": 0.875,
+            "f1": 0.8235,
+            "support": 8
+          }
+        ]
+      },
+      "TF-IDF": {
+        "accuracy": 0.7692,
+        "macro_precision": 0.8148,
+        "macro_recall": 0.6806,
+        "macro_f1": 0.719,
+        "confusion": {
+          "Custo alto": {
+            "Custo alto": 2,
+            "Custo baixo": 0,
+            "Custo médio": 1
+          },
+          "Custo baixo": {
+            "Custo alto": 0,
+            "Custo baixo": 1,
+            "Custo médio": 1
+          },
+          "Custo médio": {
+            "Custo alto": 1,
+            "Custo baixo": 0,
+            "Custo médio": 7
+          }
+        },
+        "metrics": [
+          {
+            "label": "Custo alto",
+            "precision": 0.6667,
+            "recall": 0.6667,
+            "f1": 0.6667,
+            "support": 3
+          },
+          {
+            "label": "Custo baixo",
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6667,
+            "support": 2
+          },
+          {
+            "label": "Custo médio",
+            "precision": 0.7778,
+            "recall": 0.875,
+            "f1": 0.8235,
+            "support": 8
+          }
+        ]
+      },
+      "PPMI-32D": {
+        "accuracy": 0.6154,
+        "macro_precision": 0.5556,
+        "macro_recall": 0.5278,
+        "macro_f1": 0.5353,
+        "confusion": {
+          "Custo alto": {
+            "Custo alto": 1,
+            "Custo baixo": 0,
+            "Custo médio": 2
+          },
+          "Custo baixo": {
+            "Custo alto": 0,
+            "Custo baixo": 1,
+            "Custo médio": 1
+          },
+          "Custo médio": {
+            "Custo alto": 1,
+            "Custo baixo": 1,
+            "Custo médio": 6
+          }
+        },
+        "metrics": [
+          {
+            "label": "Custo alto",
+            "precision": 0.5,
+            "recall": 0.3333,
+            "f1": 0.4,
+            "support": 3
+          },
+          {
+            "label": "Custo baixo",
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "support": 2
+          },
+          {
+            "label": "Custo médio",
+            "precision": 0.6667,
+            "recall": 0.75,
+            "f1": 0.7059,
+            "support": 8
+          }
+        ]
+      }
+    },
+    "difficulty_limitation": {
+      "fácil": 120
+    }
+  },
+  "linguistic": {
+    "run": {
+      "id": 4,
+      "model_version": "pln-aula-9-domain-rules-v1",
+      "document_count": 120,
+      "sentence_count": 780,
+      "dependency_count": 11241,
+      "sentiment_count": 2505,
+      "entity_count": 3427,
+      "relation_count": 2251,
+      "created_at": "2026-10-29T20:44:21.720505+00:00"
+    },
+    "sentiments": [
+      {
+        "polarity": "neutro",
+        "count": 2421,
+        "average_score": 3.671577401441093e-05,
+        "average_subjectivity": 5.1099273112839974e-05
+      },
+      {
+        "polarity": "positivo",
+        "count": 75,
+        "average_score": 0.7255555555555555,
+        "average_subjectivity": 0.2679943173981946
+      },
+      {
+        "polarity": "negativo",
+        "count": 9,
+        "average_score": -0.6148148148148148,
+        "average_subjectivity": 0.5423169423169423
+      }
+    ],
+    "entities": [
+      {
+        "entity_type": "QUANTITY",
+        "count": 1209
+      },
+      {
+        "entity_type": "INGREDIENT",
+        "count": 1040
+      },
+      {
+        "entity_type": "UNIT",
+        "count": 484
+      },
+      {
+        "entity_type": "UTENSIL",
+        "count": 317
+      },
+      {
+        "entity_type": "DURATION",
+        "count": 241
+      },
+      {
+        "entity_type": "CATEGORY",
+        "count": 128
+      },
+      {
+        "entity_type": "TEMPERATURE",
+        "count": 8
+      }
+    ],
+    "relations": [
+      {
+        "relation": "tem_ingrediente",
+        "count": 1040,
+        "average_confidence": 1.0
+      },
+      {
+        "relation": "usa_utensilio",
+        "count": 317,
+        "average_confidence": 1.0
+      },
+      {
+        "relation": "colocar",
+        "count": 144,
+        "average_confidence": 0.65
+      },
+      {
+        "relation": "pertence_categoria",
+        "count": 128,
+        "average_confidence": 1.0
+      },
+      {
+        "relation": "deixar",
+        "count": 67,
+        "average_confidence": 0.65
+      },
+      {
+        "relation": "levar",
+        "count": 49,
+        "average_confidence": 0.65
+      },
+      {
+        "relation": "misturar",
+        "count": 41,
+        "average_confidence": 0.65
+      },
+      {
+        "relation": "bater",
+        "count": 36,
+        "average_confidence": 0.65
+      },
+      {
+        "relation": "temperar",
+        "count": 32,
+        "average_confidence": 0.65
+      },
+      {
+        "relation": "adicionar",
+        "count": 27,
+        "average_confidence": 0.65
+      },
+      {
+        "relation": "servir",
+        "count": 26,
+        "average_confidence": 0.6500000000000001
+      },
+      {
+        "relation": "retirar",
+        "count": 21,
+        "average_confidence": 0.65
+      }
+    ],
+    "relation_examples": [
+      {
+        "title": "Risoto de Camarão",
+        "subject": "Risoto de Camarão",
+        "relation": "deixar",
+        "object": "descansando",
+        "confidence": 0.65
+      },
+      {
+        "title": "Risoto de Camarão",
+        "subject": "Risoto de Camarão",
+        "relation": "refogar",
+        "object": "metade",
+        "confidence": 0.65
+      },
+      {
+        "title": "Risoto de Camarão",
+        "subject": "Risoto de Camarão",
+        "relation": "refogar",
+        "object": "formar",
+        "confidence": 0.65
+      },
+      {
+        "title": "Risoto de Camarão",
+        "subject": "Risoto de Camarão",
+        "relation": "pingue",
+        "object": "agua",
+        "confidence": 0.65
+      },
+      {
+        "title": "Risoto de Camarão",
+        "subject": "Risoto de Camarão",
+        "relation": "temperar",
+        "object": "suavemente",
+        "confidence": 0.65
+      },
+      {
+        "title": "Risoto de Camarão",
+        "subject": "Risoto de Camarão",
+        "relation": "enxague",
+        "object": "camarao",
+        "confidence": 0.65
+      },
+      {
+        "title": "Risoto de Camarão",
+        "subject": "Risoto de Camarão",
+        "relation": "despejar",
+        "object": "molho",
+        "confidence": 0.65
+      },
+      {
+        "title": "Risoto de Camarão",
+        "subject": "Risoto de Camarão",
+        "relation": "colocar",
+        "object": "cerca",
+        "confidence": 0.65
+      }
+    ]
+  },
+  "matrix": {
+    "clustering": {
+      "BoW": "realizado",
+      "TF-IDF": "realizado",
+      "Word2Vec": "não realizado; foi usado PPMI 32D como substituto denso local",
+      "BERT": "não realizado; modelo Transformer não faz parte do ambiente reproduzível"
+    },
+    "search": {
+      "BoW": "realizado",
+      "TF-IDF": "realizado",
+      "Word2Vec": "não realizado; foi usado PPMI 32D como substituto denso local",
+      "BERT": "não realizado; modelo Transformer não faz parte do ambiente reproduzível"
+    },
+    "classification": {
+      "BoW": "realizado",
+      "TF-IDF": "realizado",
+      "Word2Vec": "não realizado; foi usado PPMI 32D como substituto denso local",
+      "BERT": "não realizado; modelo Transformer não faz parte do ambiente reproduzível"
+    }
+  },
+  "ai_disclosure": {
+    "provider": "OpenAI",
+    "model": "Codex (GPT-5)",
+    "prompt": "Analise esse documento preencha ele e coloque na pasta do projeto em uma nova pasta, faça commit.",
+    "use": "Leitura do enunciado, estruturação do relatório, redação inicial, geração dos scripts e validação do PDF. As métricas foram calculadas localmente sobre o banco SQLite do projeto."
+  }
+}

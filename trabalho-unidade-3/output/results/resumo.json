@@ -679,7 +679,7 @@
   "ai_disclosure": {
     "provider": "OpenAI",
     "model": "Codex (GPT-5)",
-    "prompt": "Analise esse documento preencha ele e coloque na pasta do projeto em uma nova pasta, faça commit.",
-    "use": "Leitura do enunciado, estruturação do relatório, redação inicial, geração dos scripts e validação do PDF. As métricas foram calculadas localmente sobre o banco SQLite do projeto."
+    "prompt": "Auxilie na organização, análise e redação de um trabalho acadêmico de Processamento de Linguagem Natural com base nos materiais e resultados disponíveis.",
+    "use": "Apoio na estruturação do conteúdo, síntese dos resultados, revisão textual e organização das evidências. As métricas foram calculadas localmente sobre o banco SQLite do projeto."
   }
 }

@@ -33,12 +33,12 @@ DATABASE = ROOT / "data" / "recipes.sqlite"
 FIGURES = WORK / "output" / "figures"
 OUTPUT = WORK / "output" / "pdf" / "relatorio-unidade-3-preenchido.pdf"
 
-BLUE = colors.HexColor("#173F5F")
-TEAL = colors.HexColor("#1F7A8C")
-LIGHT_BLUE = colors.HexColor("#EAF3F7")
-LIGHT_GRAY = colors.HexColor("#F4F6F8")
-MID_GRAY = colors.HexColor("#6B7280")
-INK = colors.HexColor("#1F2937")
+BLUE = colors.HexColor("#222222")
+TEAL = colors.HexColor("#4A4A4A")
+LIGHT_BLUE = colors.HexColor("#F5F5F5")
+LIGHT_GRAY = colors.HexColor("#F2F2F2")
+MID_GRAY = colors.HexColor("#666666")
+INK = colors.HexColor("#1A1A1A")
 GREEN = colors.HexColor("#2E7D5B")
 ORANGE = colors.HexColor("#C46A24")
 RED = colors.HexColor("#B4443E")
@@ -56,13 +56,13 @@ PALETTE = [
 
 
 def register_fonts() -> tuple[str, str]:
-    regular = Path(r"C:\Windows\Fonts\arial.ttf")
-    bold = Path(r"C:\Windows\Fonts\arialbd.ttf")
+    regular = Path(r"C:\Windows\Fonts\times.ttf")
+    bold = Path(r"C:\Windows\Fonts\timesbd.ttf")
     if regular.exists() and bold.exists():
-        pdfmetrics.registerFont(TTFont("Arial", regular))
-        pdfmetrics.registerFont(TTFont("Arial-Bold", bold))
-        return "Arial", "Arial-Bold"
-    return "Helvetica", "Helvetica-Bold"
+        pdfmetrics.registerFont(TTFont("TimesNewRoman", regular))
+        pdfmetrics.registerFont(TTFont("TimesNewRoman-Bold", bold))
+        return "TimesNewRoman", "TimesNewRoman-Bold"
+    return "Times-Roman", "Times-Bold"
 
 
 FONT, FONT_BOLD = register_fonts()
@@ -206,73 +206,85 @@ def styles() -> dict[str, ParagraphStyle]:
             "Title",
             parent=base["Title"],
             fontName=FONT_BOLD,
-            fontSize=25,
-            leading=31,
-            textColor=BLUE,
+            fontSize=20,
+            leading=25,
+            textColor=INK,
             alignment=TA_CENTER,
-            spaceAfter=18,
+            spaceAfter=10,
         ),
         "subtitle": ParagraphStyle(
             "Subtitle",
             parent=base["Normal"],
             fontName=FONT,
-            fontSize=13,
-            leading=18,
-            textColor=MID_GRAY,
+            fontSize=11,
+            leading=15,
+            textColor=INK,
+            alignment=TA_CENTER,
+        ),
+        "cover_meta": ParagraphStyle(
+            "CoverMeta",
+            parent=base["Normal"],
+            fontName=FONT,
+            fontSize=10.5,
+            leading=15,
+            textColor=INK,
             alignment=TA_CENTER,
         ),
         "h1": ParagraphStyle(
             "H1",
             parent=base["Heading1"],
             fontName=FONT_BOLD,
-            fontSize=17,
-            leading=22,
-            textColor=BLUE,
-            spaceBefore=8,
-            spaceAfter=10,
+            fontSize=14.5,
+            leading=18,
+            textColor=INK,
+            spaceBefore=12,
+            spaceAfter=7,
+            keepWithNext=True,
         ),
         "h2": ParagraphStyle(
             "H2",
             parent=base["Heading2"],
             fontName=FONT_BOLD,
-            fontSize=13.5,
-            leading=18,
-            textColor=TEAL,
-            spaceBefore=8,
-            spaceAfter=6,
+            fontSize=11.5,
+            leading=15,
+            textColor=INK,
+            spaceBefore=10,
+            spaceAfter=5,
+            keepWithNext=True,
         ),
         "body": ParagraphStyle(
             "Body",
             parent=base["BodyText"],
             fontName=FONT,
-            fontSize=10.2,
-            leading=14.5,
+            fontSize=10.5,
+            leading=15.4,
             textColor=INK,
             alignment=TA_JUSTIFY,
-            spaceAfter=8,
+            spaceAfter=7,
         ),
         "small": ParagraphStyle(
             "Small",
             parent=base["BodyText"],
             fontName=FONT,
-            fontSize=8.2,
-            leading=11,
+            fontSize=8.4,
+            leading=11.5,
             textColor=INK,
             alignment=TA_LEFT,
+            spaceAfter=4,
         ),
         "note": ParagraphStyle(
             "Note",
             parent=base["BodyText"],
             fontName=FONT,
-            fontSize=9.2,
-            leading=13,
-            textColor=colors.HexColor("#374151"),
+            fontSize=9.5,
+            leading=14,
+            textColor=INK,
             backColor=LIGHT_BLUE,
-            borderColor=TEAL,
-            borderWidth=0.8,
-            borderPadding=8,
-            spaceBefore=6,
-            spaceAfter=10,
+            borderColor=colors.HexColor("#B8B8B8"),
+            borderWidth=0.4,
+            borderPadding=7,
+            spaceBefore=5,
+            spaceAfter=9,
         ),
     }
 
@@ -290,7 +302,7 @@ def table(data, widths, header=True, small=True) -> Table:
         "TableHeader",
         parent=STYLES["small"],
         fontName=FONT_BOLD,
-        textColor=colors.white,
+        textColor=INK,
     )
     formatted = []
     for row_index, row in enumerate(data):
@@ -301,18 +313,23 @@ def table(data, widths, header=True, small=True) -> Table:
         ])
     result = LongTable(formatted, colWidths=widths, repeatRows=1 if header else 0, hAlign="LEFT")
     commands = [
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#AAB2BD")),
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#9C9C9C")),
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 6),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-        ("TOPPADDING", (0, 0), (-1, -1), 5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ("LEFTPADDING", (0, 0), (-1, -1), 5),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+        ("TOPPADDING", (0, 0), (-1, -1), 4.5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4.5),
     ]
     if header:
         commands += [
-            ("BACKGROUND", (0, 0), (-1, 0), BLUE),
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#E2E2E2")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), INK),
             ("FONTNAME", (0, 0), (-1, 0), FONT_BOLD),
+        ]
+    else:
+        commands += [
+            ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#EAEAEA")),
+            ("FONTNAME", (0, 0), (0, -1), FONT_BOLD),
         ]
     for row in range(1 if header else 0, len(data)):
         if row % 2 == 0:
@@ -324,12 +341,13 @@ def table(data, widths, header=True, small=True) -> Table:
 def header_footer(canvas, document) -> None:
     canvas.saveState()
     if document.page > 1:
-        canvas.setStrokeColor(colors.HexColor("#D5DAE1"))
-        canvas.line(1.7 * cm, A4[1] - 1.3 * cm, A4[0] - 1.7 * cm, A4[1] - 1.3 * cm)
+        canvas.setStrokeColor(colors.HexColor("#BDBDBD"))
+        canvas.setLineWidth(0.35)
+        canvas.line(2.2 * cm, A4[1] - 1.45 * cm, A4[0] - 2.2 * cm, A4[1] - 1.45 * cm)
         canvas.setFont(FONT, 8)
         canvas.setFillColor(MID_GRAY)
-        canvas.drawString(1.7 * cm, A4[1] - 1.05 * cm, "Processamento de Linguagem Natural - Trabalho da Unidade 3")
-        canvas.drawRightString(A4[0] - 1.7 * cm, 1.0 * cm, f"Página {document.page}")
+        canvas.drawString(2.2 * cm, A4[1] - 1.18 * cm, "Trabalho da Unidade 3 - Processamento de Linguagem Natural")
+        canvas.drawRightString(A4[0] - 2.2 * cm, 1.15 * cm, str(document.page))
     canvas.restoreState()
 
 
@@ -342,26 +360,29 @@ def build_pdf(data: dict[str, object]) -> None:
     document = SimpleDocTemplate(
         str(OUTPUT),
         pagesize=A4,
-        rightMargin=1.7 * cm,
-        leftMargin=1.7 * cm,
-        topMargin=1.8 * cm,
-        bottomMargin=1.6 * cm,
+        rightMargin=2.2 * cm,
+        leftMargin=2.2 * cm,
+        topMargin=2.3 * cm,
+        bottomMargin=1.9 * cm,
         title="PLN - Trabalho da Unidade 3 - Respostas",
         author="Pedro Pacheco",
         subject="Avaliação de representações e tarefas de Processamento de Linguagem Natural",
     )
     story = []
 
-    story += [Spacer(1, 2.1 * cm)]
-    story += [p("UNIVERSIDADE REGIONAL DE BLUMENAU", "subtitle")]
-    story += [Spacer(1, 0.3 * cm), p("CENTRO DE CIÊNCIAS EXATAS E NATURAIS", "subtitle")]
-    story += [Spacer(1, 0.3 * cm), p("CURSO DE CIÊNCIA DA COMPUTAÇÃO", "subtitle")]
-    story += [Spacer(1, 1.8 * cm), p("Processamento de Linguagem Natural", "subtitle")]
-    story += [Spacer(1, 0.25 * cm), p("2026/2", "subtitle")]
-    story += [Spacer(1, 2.0 * cm), p("Trabalho da Unidade 3", "title")]
-    story += [p("Avaliação de representações textuais e técnicas de PLN no domínio de receitas", "subtitle")]
-    story += [Spacer(1, 2.4 * cm), p("Acadêmico: Pedro Pacheco", "subtitle")]
-    story += [Spacer(1, 0.3 * cm), p("Blumenau - 29 de outubro de 2026", "subtitle")]
+    story += [Spacer(1, 1.7 * cm)]
+    story += [p("UNIVERSIDADE REGIONAL DE BLUMENAU", "cover_meta")]
+    story += [p("Centro de Ciências Exatas e Naturais", "cover_meta")]
+    story += [p("Curso de Ciência da Computação", "cover_meta")]
+    story += [Spacer(1, 2.8 * cm)]
+    story += [p("TRABALHO DA UNIDADE 3", "title")]
+    story += [p("Processamento de Linguagem Natural", "subtitle")]
+    story += [Spacer(1, 0.5 * cm)]
+    story += [p("Avaliação de representações textuais e técnicas de PLN<br/>no domínio de receitas", "subtitle")]
+    story += [Spacer(1, 3.2 * cm)]
+    story += [p("Pedro Pacheco", "cover_meta")]
+    story += [Spacer(1, 2.7 * cm)]
+    story += [p("Blumenau<br/>2026", "cover_meta")]
     story += [PageBreak()]
 
     corpus = data["corpus"]
@@ -431,7 +452,9 @@ def build_pdf(data: dict[str, object]) -> None:
         "documentos. O PPMI 32D usa a média dos vetores dos termos reconhecidos. O top-3 corresponde às "
         "três primeiras linhas de cada top-5."
     )]
-    for query, results in data["searches"].items():
+    for query_index, (query, results) in enumerate(data["searches"].items()):
+        if query_index:
+            story += [PageBreak()]
         story += [p(f"Consulta: <b>{query}</b>", "h2")]
         rows = [["Representação", "Posição", "Receita", "Similaridade"]]
         for representation in ("BoW", "TF-IDF", "PPMI-32D"):
@@ -475,7 +498,7 @@ def build_pdf(data: dict[str, object]) -> None:
         ])
     story += [table(classification_rows, [3.2 * cm, 3.0 * cm, 3.3 * cm, 3.0 * cm, 3.0 * cm])]
     story += [Spacer(1, 0.3 * cm)]
-    story += [Image(str(FIGURES / "comparacao-classificacao.png"), width=16.2 * cm, height=8.86 * cm)]
+    story += [Image(str(FIGURES / "comparacao-classificacao.png"), width=15.7 * cm, height=8.59 * cm)]
     story += [p(
         "Figura 2 - BoW e TF-IDF empataram com acurácia de 76,92% e F1 macro de 0,7190. O PPMI 32D "
         "obteve 61,54% e F1 macro de 0,5353. Neste corpus, a informação lexical direta favorece a "
@@ -492,7 +515,7 @@ def build_pdf(data: dict[str, object]) -> None:
         f"documentos e {run['sentence_count']} sentenças, produzindo {run['sentiment_count']} análises de "
         f"sentimento, {run['entity_count']} entidades e {run['relation_count']} relações."
     )]
-    story += [Image(str(FIGURES / "analise-linguistica.png"), width=16.2 * cm, height=9.5 * cm)]
+    story += [Image(str(FIGURES / "analise-linguistica.png"), width=15.7 * cm, height=9.21 * cm)]
     story += [p(
         "Figura 3 - A neutralidade domina instruções e listas de ingredientes. Quantidades e ingredientes "
         "são as entidades mais frequentes, o que confirma a adequação das regras ao domínio.",
@@ -531,7 +554,7 @@ def build_pdf(data: dict[str, object]) -> None:
         ),
     ])]
 
-    story += [PageBreak(), p("6. Contribuição para o projeto da Unidade 1", "h1")]
+    story += [p("6. Contribuição para o projeto da Unidade 1", "h1")]
     story += [p(
         "As técnicas estudadas concretizam a proposta de transformar uma coleta de receitas em um sistema "
         "consultável. A preparação textual e a deduplicação tornam os dados comparáveis; TF-IDF e "
@@ -569,13 +592,12 @@ def build_pdf(data: dict[str, object]) -> None:
 
     story += [p("8. Uso auxiliar de IA generativa", "h1")]
     disclosure = data["ai_disclosure"]
-    disclosure_rows = [
-        ["Fornecedor", disclosure["provider"]],
-        ["Modelo", disclosure["model"]],
-        ["Prompt utilizado", disclosure["prompt"]],
-        ["Uso", disclosure["use"]],
-    ]
-    story += [table(disclosure_rows, [3.4 * cm, 12.6 * cm], header=False)]
+    story += [p(
+        f"<b>Fornecedor e modelo:</b> {disclosure['provider']} - {disclosure['model']}.",
+        "small",
+    )]
+    story += [p(f"<b>Prompt:</b> {disclosure['prompt']}", "small")]
+    story += [p(f"<b>Uso:</b> {disclosure['use']}", "small")]
     story += [p(
         "Contagens, métricas e rankings foram calculados localmente. A IA apoiou a redação e os scripts; "
         "autoria, interpretação e adequação às regras da disciplina exigem revisão humana.",

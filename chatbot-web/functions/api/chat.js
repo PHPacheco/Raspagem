@@ -1,28 +1,4 @@
-import catalog from "../data/recipes.json" with { type: "json" };
-
-function normalize(text) {
-  return text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().match(/[a-z0-9]+/g)?.join(" ") ?? "";
-}
-
-function rankRecipes(message) {
-  const query = " " + normalize(message) + " ";
-  return catalog.map((recipe) => {
-    const matched = recipe.ingredients.filter(({ name }) => query.includes(" " + name + " "));
-    return {
-      id: recipe.id,
-      title: recipe.title,
-      sourceUrl: recipe.sourceUrl,
-      prepTimeMinutes: recipe.prepTimeMinutes,
-      servings: recipe.servings,
-      matchedIngredients: matched.map(({ label }) => label),
-      missingIngredients: recipe.ingredients.filter((item) => !matched.includes(item)).map(({ label }) => label),
-      score: Math.round(100 * matched.length / recipe.ingredients.length)
-    };
-  })
-    .filter(({ matchedIngredients }) => matchedIngredients.length > 0)
-    .sort((a, b) => b.score - a.score || a.missingIngredients.length - b.missingIngredients.length)
-    .slice(0, 3);
-}
+import { rankRecipes, readMessage, ruleReply } from "../lib/recommender.js";
 
 function json(payload, status = 200) {
   return Response.json(payload, {
@@ -53,12 +29,7 @@ export async function onRequest({ request }) {
   if (!message) return json({ error: "A mensagem é obrigatória." }, 400);
   if (message.length > 600) return json({ error: "Use no máximo 600 caracteres." }, 400);
 
-  const recipes = rankRecipes(message);
-  return json({
-    reply: recipes.length
-      ? "Encontrei opções no catálogo e ordenei pelo aproveitamento dos ingredientes."
-      : "Ainda não encontrei uma receita com esses ingredientes. O que mais você tem em casa?",
-    recipes,
-    mode: "rules"
-  });
+  const state = readMessage(message, body.state);
+  const results = rankRecipes(state).slice(0, 3);
+  return json({ reply: ruleReply(state, results), recipes: results.map(({ card }) => card), state, mode: "rules" });
 }

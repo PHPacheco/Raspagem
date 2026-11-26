@@ -6,7 +6,9 @@ const clearButton = document.querySelector("#clear-chat");
 const recipeTemplate = document.querySelector("#recipe-template");
 const initialMessage = messages.innerHTML;
 
-let history = [];
+const promptButtons = [...document.querySelectorAll("[data-prompt]")];
+let conversationState = null;
+let pending = null;
 
 function appendUserMessage(text) {
   const article = document.createElement("article");
@@ -62,7 +64,7 @@ function appendBotResponse(data) {
       const card = recipeTemplate.content.firstElementChild.cloneNode(true);
       card.querySelector(".recipe-number").textContent = String(index + 1).padStart(2, "0");
       card.querySelector("h3").textContent = recipe.title;
-      card.querySelector(".match-score").textContent = `${recipe.score ?? 0}% compatível`;
+      card.querySelector(".match-score").textContent = `${recipe.score ?? 0}% dos ingredientes principais`;
       const details = [recipe.prepTimeMinutes && `${recipe.prepTimeMinutes} min`,
         recipe.servings && `${recipe.servings} ${recipe.servings === 1 ? "porção" : "porções"}`];
       card.querySelector(".recipe-summary").textContent = details.filter(Boolean).join(" · ");
@@ -93,11 +95,12 @@ function scrollToLatest() {
   messages.scrollTo({ top: messages.scrollHeight, behavior: "smooth" });
 }
 
-async function requestRecipes(message) {
+async function requestRecipes(message, signal) {
   const response = await fetch("/api/chat", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ message, history: history.slice(-6) })
+    body: JSON.stringify({ message, state: conversationState }),
+    signal
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();
@@ -105,24 +108,35 @@ async function requestRecipes(message) {
 
 async function sendMessage(message) {
   const trimmed = message.trim();
-  if (!trimmed) return;
+  if (!trimmed || pending) return;
+
+  const controller = new AbortController();
+  pending = controller;
+  setSending(true);
 
   appendUserMessage(trimmed);
-  history.push({ role: "user", content: trimmed });
   input.value = "";
-  submitButton.disabled = true;
   appendTyping();
 
   try {
-    const data = await requestRecipes(trimmed);
+    const data = await requestRecipes(trimmed, controller.signal);
+    if (pending !== controller) return;
+    conversationState = data.state;
     appendBotResponse(data);
-    history.push({ role: "assistant", content: data.reply });
   } catch {
-    appendError();
+    if (pending === controller) appendError();
   } finally {
-    submitButton.disabled = false;
-    input.focus();
+    if (pending === controller) {
+      pending = null;
+      setSending(false);
+      input.focus();
+    }
   }
+}
+
+function setSending(sending) {
+  submitButton.disabled = sending;
+  promptButtons.forEach((button) => { button.disabled = sending; });
 }
 
 form.addEventListener("submit", (event) => {
@@ -137,12 +151,15 @@ input.addEventListener("keydown", (event) => {
   }
 });
 
-document.querySelectorAll("[data-prompt]").forEach((button) => {
+promptButtons.forEach((button) => {
   button.addEventListener("click", () => sendMessage(button.dataset.prompt));
 });
 
 clearButton.addEventListener("click", () => {
-  history = [];
+  pending?.abort();
+  pending = null;
+  conversationState = null;
+  setSending(false);
   messages.innerHTML = initialMessage;
   input.value = "";
   input.focus();

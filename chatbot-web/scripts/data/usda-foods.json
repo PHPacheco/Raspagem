@@ -1,0 +1,168 @@
+{
+  "retrievedAt": "2026-11-26",
+  "source": "USDA FoodData Central SR Legacy (arquivo CSV oficial)",
+  "foods": {
+    "168165": {
+      "description": "Raisins, dark, seedless (Includes foods for USDA's Food Distribution Program)",
+      "per100g": {
+        "proteinG": 3.3,
+        "fatG": 0.25,
+        "carbohydratesG": 79.32,
+        "caloriesKcal": 299.0
+      }
+    },
+    "168833": {
+      "description": "Sugars, brown",
+      "per100g": {
+        "fatG": 0.0,
+        "carbohydratesG": 98.09,
+        "caloriesKcal": 380.0,
+        "proteinG": 0.12
+      }
+    },
+    "168872": {
+      "description": "Oat bran, raw",
+      "per100g": {
+        "fatG": 7.03,
+        "carbohydratesG": 66.22,
+        "caloriesKcal": 246.0,
+        "proteinG": 17.3
+      }
+    },
+    "168893": {
+      "description": "Wheat flour, whole-grain (Includes foods for USDA's Food Distribution Program)",
+      "per100g": {
+        "fatG": 2.5,
+        "carbohydratesG": 71.97,
+        "caloriesKcal": 340.0,
+        "proteinG": 13.21
+      }
+    },
+    "169593": {
+      "description": "Cocoa, dry powder, unsweetened",
+      "per100g": {
+        "carbohydratesG": 57.9,
+        "caloriesKcal": 228.0,
+        "proteinG": 19.6,
+        "fatG": 13.7
+      }
+    },
+    "169655": {
+      "description": "Sugars, granulated",
+      "per100g": {
+        "proteinG": 0.0,
+        "fatG": 0.0,
+        "caloriesKcal": 387.0,
+        "carbohydratesG": 99.98
+      }
+    },
+    "169698": {
+      "description": "Cornstarch",
+      "per100g": {
+        "fatG": 0.05,
+        "carbohydratesG": 91.27,
+        "caloriesKcal": 381.0,
+        "proteinG": 0.26
+      }
+    },
+    "169714": {
+      "description": "Rice flour, white, unenriched",
+      "per100g": {
+        "fatG": 1.42,
+        "carbohydratesG": 80.13,
+        "caloriesKcal": 366.0,
+        "proteinG": 5.95
+      }
+    },
+    "171287": {
+      "description": "Egg, whole, raw, fresh",
+      "per100g": {
+        "caloriesKcal": 143.0,
+        "proteinG": 12.56,
+        "fatG": 9.51,
+        "carbohydratesG": 0.72
+      }
+    },
+    "171320": {
+      "description": "Spices, cinnamon, ground",
+      "per100g": {
+        "proteinG": 3.99,
+        "fatG": 1.24,
+        "carbohydratesG": 80.59,
+        "caloriesKcal": 247.0
+      }
+    },
+    "171411": {
+      "description": "Oil, soybean, salad or cooking",
+      "per100g": {
+        "proteinG": 0.0,
+        "fatG": 100.0,
+        "carbohydratesG": 0.0,
+        "caloriesKcal": 884.0
+      }
+    },
+    "172336": {
+      "description": "Oil, canola",
+      "per100g": {
+        "fatG": 100.0,
+        "proteinG": 0.0,
+        "carbohydratesG": 0.0,
+        "caloriesKcal": 884.0
+      }
+    },
+    "172804": {
+      "description": "Leavening agents, baking powder, double-acting, straight phosphate",
+      "per100g": {
+        "fatG": 0.0,
+        "carbohydratesG": 24.1,
+        "caloriesKcal": 51.0,
+        "proteinG": 0.1
+      }
+    },
+    "173432": {
+      "description": "Milk, nonfat, fluid, without added vitamin A and vitamin D (fat free or skim)",
+      "per100g": {
+        "fatG": 0.18,
+        "carbohydratesG": 4.86,
+        "caloriesKcal": 35.0,
+        "proteinG": 3.37
+      }
+    },
+    "173471": {
+      "description": "Vanilla extract",
+      "per100g": {
+        "fatG": 0.06,
+        "carbohydratesG": 12.65,
+        "caloriesKcal": 288.0,
+        "proteinG": 0.06
+      }
+    },
+    "173647": {
+      "description": "Beverages, water, tap, drinking",
+      "per100g": {
+        "fatG": 0.0,
+        "carbohydratesG": 0.0,
+        "caloriesKcal": 0.0,
+        "proteinG": 0.0
+      }
+    },
+    "173904": {
+      "description": "Cereals, oats, regular and quick, not fortified, dry",
+      "per100g": {
+        "fatG": 6.52,
+        "carbohydratesG": 67.7,
+        "caloriesKcal": 379.0,
+        "proteinG": 13.15
+      }
+    },
+    "173944": {
+      "description": "Bananas, raw",
+      "per100g": {
+        "carbohydratesG": 22.84,
+        "caloriesKcal": 89.0,
+        "proteinG": 1.09,
+        "fatG": 0.33
+      }
+    }
+  }
+}

@@ -1,12 +1,13 @@
 """Generate the read-only recipe catalog from the project's local SQLite source."""
 
 import argparse
-import json
 from pathlib import Path
 import re
 import sqlite3
 import unicodedata
 from urllib.parse import urlsplit
+
+from usda_nutrition import MAPPING, SNAPSHOT, estimate, read_json, write_json
 
 PROJECT = Path(__file__).resolve().parents[1]
 DEFAULT_DATABASE = PROJECT.parent / "data" / "recipes.sqlite"
@@ -19,7 +20,7 @@ MEASURE = re.compile(
     r"x[ií]caras?|colheres?|colher|copos?|canecas?|dentes?|cabe[cç]as?|"
     r"latas?|vidros?|caixinhas?|caixas?|pacotes?|pacotinhos?|tabletes?|"
     r"cubos?|potes?|sach[eê]s?|fatias?|pitadas?|ramos?|ma[cç]os?|unidades?)\b"
-    r"(?:\s+(?:rasas?|cheias?|pequenas?|grandes?|m[eé]dias?|de ch[aá]|de sopa|de caf[eé]))?"
+    r"(?:\s+(?:rasas?|cheias?|pequenas?|grandes?|m[eé]dias?|de ch[aá]|de sopa|de caf[eé])\b)?"
     r"(?:\s*\([^)]*\))?)?"
     r"(?:\s+(?:de|do|da)\b)?\s*",
     re.IGNORECASE,
@@ -94,8 +95,10 @@ def main():
     parser.add_argument("--recipe-id", action="append", default=[])
     args = parser.parse_args()
     catalog = build_catalog(args.database, args.recipe_id)
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    mapping, snapshot = read_json(MAPPING), read_json(SNAPSHOT)
+    for recipe in catalog:
+        recipe["nutrition"] = estimate(recipe, mapping, snapshot)
+    write_json(args.output, catalog)
     print(f"{len(catalog)} receitas exportadas para {args.output}")
 
 

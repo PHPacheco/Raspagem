@@ -193,6 +193,7 @@ export function rankRecipes(state) {
         prepTimeMinutes: recipe.prepTimeMinutes,
         servings: recipe.servings,
         cost: recipe.cost,
+        nutrition: recipe.nutrition ?? null,
         matchedIngredients: matched.map(({ label }) => label),
         missingIngredients: missing.map(({ label }) => label),
         score: Math.round(100 * coverage)

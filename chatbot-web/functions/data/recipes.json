@@ -24,8 +24,8 @@
         "original": "1 xícara de vinho branco seco"
       },
       {
-        "name": "mpignon",
-        "label": "mpignon",
+        "name": "champignon",
+        "label": "champignon",
         "original": "100 g de champignon (opcional) cortado em lâminas"
       },
       {
@@ -63,7 +63,8 @@
         "label": "Sal, parmesão, curry, salsinha, folha de louro e azeite",
         "original": "Sal, parmesão, curry, salsinha, folha de louro e azeite a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "10091",
@@ -134,7 +135,8 @@
         "label": "molho de tomate",
         "original": "1/2 xícara de molho de tomate"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "101",
@@ -185,7 +187,8 @@
         "label": "tomates",
         "original": "3 tomates sem pele"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "10228",
@@ -246,7 +249,8 @@
         "label": "gema de ovo",
         "original": "1 gema de ovo para empanar os bifes"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "10283",
@@ -297,7 +301,8 @@
         "label": "Queijo cremoso, mussarela, camarão",
         "original": "Queijo cremoso, mussarela, camarão"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "105248",
@@ -348,7 +353,8 @@
         "label": "fécula de batata",
         "original": "4 xícaras (chá) de fécula de batata (cerca de 650 g)"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "106581",
@@ -409,7 +415,8 @@
         "label": "Sal",
         "original": "Sal a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "109052",
@@ -475,7 +482,8 @@
         "label": "azeite",
         "original": "azeite a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "109885",
@@ -526,7 +534,8 @@
         "label": "pimenta",
         "original": "pimenta a gosto (pimenta-do-reino ou vermelha)"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "1106",
@@ -597,7 +606,8 @@
         "label": "cheiro-verde",
         "original": "cheiro-verde a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "111",
@@ -653,7 +663,8 @@
         "label": "sal e pimenta do reino branca",
         "original": "sal e pimenta do reino branca a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "111643",
@@ -709,7 +720,8 @@
         "label": "fermento em pó",
         "original": "1 colher (chá) de fermento em pó"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "112",
@@ -790,7 +802,8 @@
         "label": "azeite de dendê",
         "original": "2 colheres (sopa) de azeite de dendê"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "11594",
@@ -826,7 +839,8 @@
         "label": "hortelã, pimenta-de-cheiro e sal",
         "original": "hortelã, pimenta-de-cheiro e sal a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "116",
@@ -877,7 +891,8 @@
         "label": "manteiga derretida",
         "original": "100 g de manteiga derretida"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "1278",
@@ -918,7 +933,8 @@
         "label": "batata palha",
         "original": "batata palha para polvilhar"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "128",
@@ -974,7 +990,33 @@
         "label": "fermento em pó",
         "original": "1 colher de sopa de fermento em pó"
       }
-    ]
+    ],
+    "nutrition": {
+      "perServing": {
+        "caloriesKcal": 312.2,
+        "proteinG": 5.3,
+        "carbohydratesG": 49.8,
+        "fatG": 11.6
+      },
+      "estimated": true,
+      "source": "USDA FoodData Central",
+      "sourceUrl": "https://fdc.nal.usda.gov/",
+      "retrievedAt": "2026-11-26",
+      "foodIds": [
+        168833,
+        168893,
+        171287,
+        172336,
+        172804,
+        173432,
+        173904,
+        173944
+      ],
+      "omissions": [
+        "canela para salpicar"
+      ],
+      "choices": []
+    }
   },
   {
     "id": "129",
@@ -1020,7 +1062,8 @@
         "label": "parmesão",
         "original": "100 g de parmesão ralado"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "129926",
@@ -1046,7 +1089,8 @@
         "label": "maionese",
         "original": "300 g maionese"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "13005",
@@ -1127,7 +1171,8 @@
         "label": "fermento em pó",
         "original": "1 colher de sopa de fermento em pó"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "131419",
@@ -1173,7 +1218,8 @@
         "label": "queijo parmesão para gratinar",
         "original": "queijo parmesão para gratinar"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "132009",
@@ -1214,7 +1260,8 @@
         "label": "fermento",
         "original": "1 colher de sopa de fermento"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "133817",
@@ -1305,7 +1352,8 @@
         "label": "pequeno que leite de coco",
         "original": "1 vidro pequeno que leite de coco (200 ml)"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "135541",
@@ -1346,7 +1394,8 @@
         "label": "queijo parmesão",
         "original": "queijo parmesão ralado a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "136364",
@@ -1397,7 +1446,8 @@
         "label": "fermento biológico seco",
         "original": "1 colher (sopa) de fermento biológico seco"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "136723",
@@ -1438,7 +1488,29 @@
         "label": "fermento químico em pó",
         "original": "2 colheres (sopa) de fermento químico em pó"
       }
-    ]
+    ],
+    "nutrition": {
+      "perServing": {
+        "caloriesKcal": 307.9,
+        "proteinG": 4.7,
+        "carbohydratesG": 28.4,
+        "fatG": 20.8
+      },
+      "estimated": true,
+      "source": "USDA FoodData Central",
+      "sourceUrl": "https://fdc.nal.usda.gov/",
+      "retrievedAt": "2026-11-26",
+      "foodIds": [
+        168165,
+        171287,
+        171411,
+        172804,
+        173904,
+        173944
+      ],
+      "omissions": [],
+      "choices": []
+    }
   },
   {
     "id": "1408",
@@ -1460,8 +1532,8 @@
         "original": "3 cebolas médias"
       },
       {
-        "name": "mpignon ou palmito",
-        "label": "mpignon ou palmito",
+        "name": "champignon ou palmito",
+        "label": "champignon ou palmito",
         "original": "1 vidro de champignon ou palmito"
       },
       {
@@ -1499,7 +1571,8 @@
         "label": "caldo de carne dissolvido em 100 ml de água",
         "original": "1 cubo de caldo de carne dissolvido em 100 ml de água"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "14222",
@@ -1525,7 +1598,8 @@
         "label": "cebola",
         "original": "1 cebola grande cortada em rodelas"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "142450",
@@ -1601,7 +1675,8 @@
         "label": "forma",
         "original": "forma grande untada com manteiga ou margarina"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "143411",
@@ -1632,7 +1707,8 @@
         "label": "palitos",
         "original": "palitos"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "1438",
@@ -1658,7 +1734,8 @@
         "label": "caldo de carne",
         "original": "3 ou 4 cubos de caldo de carne"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "146981",
@@ -1699,7 +1776,8 @@
         "label": "água morna",
         "original": "1 e 1/2 copo de água morna"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "147577",
@@ -1760,7 +1838,8 @@
         "label": "sal",
         "original": "1 colher (café) de sal"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "147724",
@@ -1836,7 +1915,8 @@
         "label": "sal e pimenta",
         "original": "sal e pimenta a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "14955",
@@ -1862,7 +1942,8 @@
         "label": "caldo de carne",
         "original": "4 tabletes de caldo de carne"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "1534",
@@ -1913,7 +1994,8 @@
         "label": "mussarela",
         "original": "10 fatias de mussarela"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "15354",
@@ -1959,7 +2041,8 @@
         "label": "sal",
         "original": "sal"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "15665",
@@ -2040,7 +2123,8 @@
         "label": "Água até um pouco mais de a metade da panela de pressão",
         "original": "Água até um pouco mais de a metade da panela de pressão"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "1598",
@@ -2081,7 +2165,8 @@
         "label": "sal",
         "original": "sal a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "166155",
@@ -2147,7 +2232,8 @@
         "label": "água ou leite sem lactose",
         "original": "2 colheres (sopa) de água ou leite sem lactose"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "166355",
@@ -2183,7 +2269,8 @@
         "label": "queijo",
         "original": "queijo a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "168455",
@@ -2219,7 +2306,8 @@
         "label": "sal",
         "original": "1 pitada sal"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "1703",
@@ -2265,7 +2353,8 @@
         "label": "maionese",
         "original": "1/2 pote grande de maionese"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "171259",
@@ -2291,7 +2380,8 @@
         "label": "frango cozido temperado e desfiado",
         "original": "1 xícara de frango cozido temperado e desfiado"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "171469",
@@ -2337,7 +2427,33 @@
         "label": "sal",
         "original": "sal a gosto"
       }
-    ]
+    ],
+    "nutrition": {
+      "perServing": {
+        "caloriesKcal": 71.8,
+        "proteinG": 1.1,
+        "carbohydratesG": 5.5,
+        "fatG": 5.0
+      },
+      "estimated": true,
+      "source": "USDA FoodData Central",
+      "sourceUrl": "https://fdc.nal.usda.gov/",
+      "retrievedAt": "2026-11-26",
+      "foodIds": [
+        169698,
+        169714,
+        171287,
+        171411,
+        172804,
+        173647
+      ],
+      "omissions": [
+        "sal a gosto"
+      ],
+      "choices": [
+        "água"
+      ]
+    }
   },
   {
     "id": "173263",
@@ -2398,7 +2514,8 @@
         "label": "queijo, pimenta e sal",
         "original": "queijo, pimenta e sal a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "173267",
@@ -2444,7 +2561,31 @@
         "label": "canela",
         "original": "canela"
       }
-    ]
+    ],
+    "nutrition": {
+      "perServing": {
+        "caloriesKcal": 155.9,
+        "proteinG": 3.3,
+        "carbohydratesG": 22.7,
+        "fatG": 6.6
+      },
+      "estimated": true,
+      "source": "USDA FoodData Central",
+      "sourceUrl": "https://fdc.nal.usda.gov/",
+      "retrievedAt": "2026-11-26",
+      "foodIds": [
+        168165,
+        171287,
+        171411,
+        172804,
+        173904,
+        173944
+      ],
+      "omissions": [
+        "canela sem medida"
+      ],
+      "choices": []
+    }
   },
   {
     "id": "173520",
@@ -2475,7 +2616,8 @@
         "label": "sal",
         "original": "1 pitada de sal"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "176329",
@@ -2506,7 +2648,29 @@
         "label": "fermento",
         "original": "1 colher de chá fermento"
       }
-    ]
+    ],
+    "nutrition": {
+      "perServing": {
+        "caloriesKcal": 102.8,
+        "proteinG": 8.3,
+        "carbohydratesG": 9.2,
+        "fatG": 5.6
+      },
+      "estimated": true,
+      "source": "USDA FoodData Central",
+      "sourceUrl": "https://fdc.nal.usda.gov/",
+      "retrievedAt": "2026-11-26",
+      "foodIds": [
+        168872,
+        171287,
+        172804,
+        173647
+      ],
+      "omissions": [],
+      "choices": [
+        "água"
+      ]
+    }
   },
   {
     "id": "178347",
@@ -2552,7 +2716,32 @@
         "label": "fermento químico em pó",
         "original": "1 colher (sopa) fermento químico em pó"
       }
-    ]
+    ],
+    "nutrition": {
+      "perServing": {
+        "caloriesKcal": 292.1,
+        "proteinG": 3.3,
+        "carbohydratesG": 51.1,
+        "fatG": 8.9
+      },
+      "estimated": true,
+      "source": "USDA FoodData Central",
+      "sourceUrl": "https://fdc.nal.usda.gov/",
+      "retrievedAt": "2026-11-26",
+      "foodIds": [
+        169655,
+        169714,
+        171287,
+        171320,
+        171411,
+        172804,
+        173944
+      ],
+      "omissions": [],
+      "choices": [
+        "óleo de soja"
+      ]
+    }
   },
   {
     "id": "183579",
@@ -2588,7 +2777,8 @@
         "label": "azeite",
         "original": "azeite (opcional)"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "183587",
@@ -2634,7 +2824,8 @@
         "label": "canela",
         "original": "canela para polvilhar"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "183595",
@@ -2665,7 +2856,8 @@
         "label": "Para crepioca salgada, adicione uma pitada de sal",
         "original": "Para crepioca salgada, adicione uma pitada de sal a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "18440",
@@ -2691,7 +2883,8 @@
         "label": "cebola",
         "original": "1 cebola"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "185813",
@@ -2712,7 +2905,8 @@
         "label": "sal",
         "original": "sal a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "189421",
@@ -2743,7 +2937,27 @@
         "label": "ovos",
         "original": "2 ovos"
       }
-    ]
+    ],
+    "nutrition": {
+      "perServing": {
+        "caloriesKcal": 298.7,
+        "proteinG": 16.2,
+        "carbohydratesG": 37.7,
+        "fatG": 11.3
+      },
+      "estimated": true,
+      "source": "USDA FoodData Central",
+      "sourceUrl": "https://fdc.nal.usda.gov/",
+      "retrievedAt": "2026-11-26",
+      "foodIds": [
+        169593,
+        171287,
+        173904,
+        173944
+      ],
+      "omissions": [],
+      "choices": []
+    }
   },
   {
     "id": "189500",
@@ -2779,7 +2993,30 @@
         "label": "canela",
         "original": "1 colher (sopa) de canela (alternativas: 1 colher de chocolate em pó OU 2 colheres de manteiga de amendoim)"
       }
-    ]
+    ],
+    "nutrition": {
+      "perServing": {
+        "caloriesKcal": 140.8,
+        "proteinG": 5.2,
+        "carbohydratesG": 22.5,
+        "fatG": 3.3
+      },
+      "estimated": true,
+      "source": "USDA FoodData Central",
+      "sourceUrl": "https://fdc.nal.usda.gov/",
+      "retrievedAt": "2026-11-26",
+      "foodIds": [
+        171287,
+        171320,
+        173471,
+        173904,
+        173944
+      ],
+      "omissions": [],
+      "choices": [
+        "canela"
+      ]
+    }
   },
   {
     "id": "194216",
@@ -2830,7 +3067,8 @@
         "label": "1/2 colher",
         "original": "1 1/2 colher (café) de fermento em pó"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "1971",
@@ -2891,7 +3129,8 @@
         "label": "creme de leite",
         "original": "1 caixinha de creme de leite"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "1979",
@@ -2942,7 +3181,8 @@
         "label": "óleo para fritar",
         "original": "óleo para fritar"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "19969",
@@ -3003,7 +3243,8 @@
         "label": "Pimenta-do-reino",
         "original": "Pimenta-do-reino a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "20768",
@@ -3064,7 +3305,8 @@
         "label": "queijo",
         "original": "queijo ralado a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "2085",
@@ -3111,8 +3353,8 @@
         "original": "400 g de carne cortada em tiras"
       },
       {
-        "name": "mpignon",
-        "label": "mpignon",
+        "name": "champignon",
+        "label": "champignon",
         "original": "100 g de champignon"
       },
       {
@@ -3135,7 +3377,8 @@
         "label": "acelga",
         "original": "acelga a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "20882",
@@ -3191,7 +3434,8 @@
         "label": "Sal",
         "original": "Sal a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "21372",
@@ -3247,7 +3491,8 @@
         "label": "farinha de rosca",
         "original": "farinha de rosca"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "24645",
@@ -3333,7 +3578,8 @@
         "label": "leite de coco de 200 ml",
         "original": "1 vidro de leite de coco de 200 ml"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "256",
@@ -3399,7 +3645,8 @@
         "label": "Ervas finas",
         "original": "Ervas finas a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "27",
@@ -3455,7 +3702,8 @@
         "label": "manteiga derretida para injetar",
         "original": "manteiga derretida para injetar"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "27151",
@@ -3511,7 +3759,33 @@
         "label": "fermento em pó",
         "original": "1 colher de sopa de fermento em pó"
       }
-    ]
+    ],
+    "nutrition": {
+      "perServing": {
+        "caloriesKcal": 312.2,
+        "proteinG": 5.3,
+        "carbohydratesG": 49.8,
+        "fatG": 11.6
+      },
+      "estimated": true,
+      "source": "USDA FoodData Central",
+      "sourceUrl": "https://fdc.nal.usda.gov/",
+      "retrievedAt": "2026-11-26",
+      "foodIds": [
+        168833,
+        168893,
+        171287,
+        172336,
+        172804,
+        173432,
+        173904,
+        173944
+      ],
+      "omissions": [
+        "canela para salpicar"
+      ],
+      "choices": []
+    }
   },
   {
     "id": "2744",
@@ -3568,11 +3842,12 @@
         "original": "1 colher (sopa) de óleo"
       },
       {
-        "name": "mpignon",
-        "label": "mpignon",
+        "name": "champignon",
+        "label": "champignon",
         "original": "100 g de champignon"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "27483",
@@ -3643,7 +3918,8 @@
         "label": "mussarela",
         "original": "300 g de mussarela"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "27688",
@@ -3674,7 +3950,8 @@
         "label": "queijo",
         "original": "1 colher de sopa de queijo ralado"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "2831",
@@ -3735,7 +4012,8 @@
         "label": "caldo de camarão",
         "original": "2 tabletes de caldo de camarão"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "29247",
@@ -3766,7 +4044,8 @@
         "label": "requeijão",
         "original": "1 copo de requeijão"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "297284",
@@ -3802,7 +4081,29 @@
         "label": "Canela em pó",
         "original": "Canela em pó a gosto"
       }
-    ]
+    ],
+    "nutrition": {
+      "perServing": {
+        "caloriesKcal": 146.2,
+        "proteinG": 4.7,
+        "carbohydratesG": 27.8,
+        "fatG": 2.7
+      },
+      "estimated": true,
+      "source": "USDA FoodData Central",
+      "sourceUrl": "https://fdc.nal.usda.gov/",
+      "retrievedAt": "2026-11-26",
+      "foodIds": [
+        171287,
+        172804,
+        173904,
+        173944
+      ],
+      "omissions": [
+        "canela a gosto"
+      ],
+      "choices": []
+    }
   },
   {
     "id": "2998",
@@ -3898,7 +4199,8 @@
         "label": "Sal se precisar",
         "original": "Sal se precisar"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "30",
@@ -4014,7 +4316,8 @@
         "label": "sal",
         "original": "sal"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "301",
@@ -4090,7 +4393,8 @@
         "label": "cheiro-verde",
         "original": "cheiro-verde picado"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "31",
@@ -4131,7 +4435,8 @@
         "label": "leite de coco",
         "original": "leite de coco"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "31016",
@@ -4192,7 +4497,8 @@
         "label": "orégano",
         "original": "orégano a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "3163",
@@ -4253,7 +4559,8 @@
         "label": "Óleo de soja",
         "original": "Óleo de soja"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "32494",
@@ -4314,7 +4621,8 @@
         "label": "Sal, cebola, orégano",
         "original": "Sal, cebola, orégano a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "3279",
@@ -4400,7 +4708,8 @@
         "label": "água",
         "original": "250 ml de água"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "3407",
@@ -4456,7 +4765,8 @@
         "label": "Sal",
         "original": "Sal"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "39314",
@@ -4522,7 +4832,8 @@
         "label": "Gema para pincelar",
         "original": "Gema para pincelar"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "41721",
@@ -4563,7 +4874,8 @@
         "label": "mussarela",
         "original": "100 g de mussarela (pode ser ralada ou em fatias)"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "41954",
@@ -4619,7 +4931,8 @@
         "label": "sal",
         "original": "sal a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "43297",
@@ -4670,7 +4983,8 @@
         "label": "raminho de coentro",
         "original": "1 raminho de coentro"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "437",
@@ -4691,7 +5005,8 @@
         "label": "caldo de carne",
         "original": "1 tablete de caldo de carne"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "454",
@@ -4717,7 +5032,8 @@
         "label": "pequeno de leite de coco",
         "original": "1 vidro pequeno de leite de coco"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "47884",
@@ -4818,7 +5134,8 @@
         "label": "Gergelim torrado ou preto para salpicar depois que pincelar",
         "original": "Gergelim torrado ou preto para salpicar depois que pincelar"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "4907",
@@ -4884,7 +5201,8 @@
         "label": "caldo knor",
         "original": "1 tablete de caldo knor (do sabor que preferir)"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "4947",
@@ -4940,7 +5258,8 @@
         "label": "cheiro verde",
         "original": "cheiro verde a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "547",
@@ -4981,7 +5300,8 @@
         "label": "mussarela",
         "original": "200 g de mussarela"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "55",
@@ -5027,7 +5347,8 @@
         "label": "pimenta-do-reino",
         "original": "pimenta-do-reino a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "5552",
@@ -5068,7 +5389,8 @@
         "label": "sal",
         "original": "sal a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "57",
@@ -5119,7 +5441,8 @@
         "label": "azeite de oliva",
         "original": "2 colheres de azeite de oliva"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "57798",
@@ -5175,7 +5498,8 @@
         "label": "azeite ou óleo",
         "original": "1 colher de azeite ou óleo"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "58",
@@ -5246,7 +5570,8 @@
         "label": "salsa",
         "original": "salsa picada"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "60592",
@@ -5307,7 +5632,8 @@
         "label": "pimenta",
         "original": "pimenta (malagueta ou murupi) a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "61494",
@@ -5373,7 +5699,8 @@
         "label": "Sal",
         "original": "Sal"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "61518",
@@ -5439,7 +5766,8 @@
         "label": "Azeitona preta",
         "original": "Azeitona preta"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "6303",
@@ -5480,7 +5808,8 @@
         "label": "Limão",
         "original": "Limão"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "64879",
@@ -5531,7 +5860,8 @@
         "label": "molho de tomate",
         "original": "395 g de molho de tomate"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "66547",
@@ -5597,7 +5927,8 @@
         "label": "Manteiga",
         "original": "Manteiga para untar"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "66573",
@@ -5663,7 +5994,8 @@
         "label": "óleo",
         "original": "1 colher (sopa) de óleo"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "71309",
@@ -5714,7 +6046,8 @@
         "label": "molho de tomate pronto",
         "original": "2 latas de molho de tomate pronto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "72",
@@ -5765,7 +6098,8 @@
         "label": "manjericão",
         "original": "manjericão"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "80799",
@@ -5856,7 +6190,8 @@
         "label": "salsinha",
         "original": "salsinha a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "838",
@@ -5947,7 +6282,8 @@
         "label": "azeitonas sem caroço",
         "original": "azeitonas sem caroço"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "8576",
@@ -5988,7 +6324,8 @@
         "label": "óleo",
         "original": "4 colheres de sopa de óleo"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "8743",
@@ -6044,7 +6381,8 @@
         "label": "pimenta-do-reino",
         "original": "pimenta-do-reino a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "87779",
@@ -6095,7 +6433,8 @@
         "label": "cebola",
         "original": "1/2 cebola fatiada"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "8836",
@@ -6176,7 +6515,8 @@
         "label": "Orégano",
         "original": "Orégano a gosto"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "88371",
@@ -6227,7 +6567,8 @@
         "label": "Azeite",
         "original": "Azeite para untar"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "8847",
@@ -6268,7 +6609,8 @@
         "label": "carne moída",
         "original": "300 g de carne moída"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "89261",
@@ -6329,7 +6671,8 @@
         "label": "Farinha de trigo",
         "original": "Farinha de trigo"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "9125",
@@ -6415,7 +6758,8 @@
         "label": "orégano",
         "original": "orégano"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "9400",
@@ -6476,7 +6820,8 @@
         "label": "leite de coco",
         "original": "1 vidro de leite de coco"
       }
-    ]
+    ],
+    "nutrition": null
   },
   {
     "id": "97221",
@@ -6517,6 +6862,7 @@
         "label": "água",
         "original": "1/2 xícara de água"
       }
-    ]
+    ],
+    "nutrition": null
   }
 ]

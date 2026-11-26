@@ -42,6 +42,41 @@ function appendTyping() {
   scrollToLatest();
 }
 
+const nutritionNumber = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
+
+function renderNutrition(card, nutrition) {
+  const caption = card.querySelector(".recipe-nutrition");
+  if (!nutrition) {
+    caption.textContent = "Estimativa nutricional indisponível.";
+    return;
+  }
+
+  const values = [
+    ["caloriesKcal", "kcal", "calorias"],
+    ["proteinG", "g de proteínas", "proteínas"],
+    ["carbohydratesG", "g de carboidratos", "carboidratos"],
+    ["fatG", "g de gorduras", "gorduras"]
+  ].map(([key, unit, label]) => {
+    const value = nutrition.perServing[key];
+    return Number.isFinite(value)
+      ? nutritionNumber.format(value) + " " + unit
+      : label + " indisponíveis";
+  });
+  caption.textContent = "Estimativa por porção · " + values.join(" · ") + ". ";
+  if (nutrition.omissions.length) {
+    caption.append("O cálculo exclui " + nutrition.omissions.join(", ") + ". ");
+  }
+  if (nutrition.choices.length) {
+    caption.append("Versão calculada com " + nutrition.choices.join(", ") + ". ");
+  }
+  const source = document.createElement("a");
+  source.href = nutrition.sourceUrl;
+  source.textContent = nutrition.source;
+  source.target = "_blank";
+  source.rel = "noopener noreferrer";
+  caption.append(source);
+}
+
 function appendBotResponse(data) {
   messages.querySelector("[data-typing='true']")?.remove();
 
@@ -73,6 +108,7 @@ function appendBotResponse(data) {
         recipe.matchedIngredients?.join(", ") || "nenhum item reconhecido";
       card.querySelector("[data-field='missing']").textContent =
         recipe.missingIngredients?.join(", ") || "nada essencial";
+      renderNutrition(card, recipe.nutrition);
       list.append(card);
     });
     body.append(list);

@@ -1,0 +1,394 @@
+{
+  "136723": [
+    {
+      "original": "4 bananas nanicas (maduras)",
+      "fdcId": 173944,
+      "grams": 472,
+      "measureAssumption": "4 bananas médias como referência para a banana nanica"
+    },
+    {
+      "original": "4 ovos",
+      "fdcId": 171287,
+      "grams": 200,
+      "measureAssumption": "4 ovos grandes sem casca"
+    },
+    {
+      "original": "1 xícara de uva passa",
+      "fdcId": 168165,
+      "grams": 145,
+      "measureAssumption": "1 xícara sem compactar de uva-passa sem sementes"
+    },
+    {
+      "original": "1 xícara de óleo",
+      "fdcId": 171411,
+      "grams": 218,
+      "measureAssumption": "1 xícara de óleo de soja como referência para o óleo genérico"
+    },
+    {
+      "original": "2 xícaras de aveia em flocos finos",
+      "fdcId": 173904,
+      "grams": 162,
+      "measureAssumption": "2 xícaras de aveia de 81 g"
+    },
+    {
+      "original": "2 colheres (sopa) de fermento químico em pó",
+      "fdcId": 172804,
+      "grams": 27.6,
+      "measureAssumption": "6 colheres de chá de 4,6 g"
+    }
+  ],
+  "189421": [
+    {
+      "original": "1 banana",
+      "fdcId": 173944,
+      "grams": 118,
+      "measureAssumption": "1 banana média"
+    },
+    {
+      "original": "2 colheres de aveia",
+      "fdcId": 173904,
+      "grams": 10.125,
+      "measureAssumption": "2 de 16 colheres de sopa em uma xícara de 81 g"
+    },
+    {
+      "original": "1 colher de cacau em pó 100%",
+      "fdcId": 169593,
+      "grams": 5.4,
+      "measureAssumption": "1 colher de sopa"
+    },
+    {
+      "original": "2 ovos",
+      "fdcId": 171287,
+      "grams": 100,
+      "measureAssumption": "2 ovos grandes sem casca"
+    }
+  ],
+  "189500": [
+    {
+      "original": "2 bananas",
+      "fdcId": 173944,
+      "grams": 236,
+      "measureAssumption": "2 bananas médias"
+    },
+    {
+      "original": "2 ovos",
+      "fdcId": 171287,
+      "grams": 100,
+      "measureAssumption": "2 ovos grandes sem casca"
+    },
+    {
+      "original": "½ xícara de aveia em flocos",
+      "fdcId": 173904,
+      "grams": 40.5,
+      "measureAssumption": "meia xícara de aveia"
+    },
+    {
+      "original": "1 colher (sopa) de extrato de baunilha",
+      "fdcId": 173471,
+      "grams": 13,
+      "measureAssumption": "1 colher de sopa"
+    },
+    {
+      "original": "1 colher (sopa) de canela (alternativas: 1 colher de chocolate em pó OU 2 colheres de manteiga de amendoim)",
+      "fdcId": 171320,
+      "grams": 7.8,
+      "measureAssumption": "1 colher de sopa de canela, a primeira opção da receita",
+      "choice": "canela"
+    }
+  ],
+  "176329": [
+    {
+      "original": "1 ovo",
+      "fdcId": 171287,
+      "grams": 50,
+      "measureAssumption": "1 ovo grande sem casca"
+    },
+    {
+      "original": "2 colheres de farelo de aveia",
+      "fdcId": 168872,
+      "grams": 11.75,
+      "measureAssumption": "2 de 16 colheres de sopa em uma xícara de 94 g"
+    },
+    {
+      "original": "2 colheres de iogurte desnatado ou água",
+      "fdcId": 173647,
+      "grams": 30,
+      "measureAssumption": "2 colheres de sopa de água, opção indicada na receita",
+      "choice": "água"
+    },
+    {
+      "original": "1 colher de chá fermento",
+      "fdcId": 172804,
+      "grams": 4.6,
+      "measureAssumption": "1 colher de chá de fermento químico"
+    }
+  ],
+  "297284": [
+    {
+      "original": "4 bananas bem maduras (de preferência nanina, mas pode ser a banana prata também)",
+      "fdcId": 173944,
+      "grams": 472,
+      "measureAssumption": "4 bananas médias"
+    },
+    {
+      "original": "2 ovos",
+      "fdcId": 171287,
+      "grams": 100,
+      "measureAssumption": "2 ovos grandes sem casca"
+    },
+    {
+      "original": "1 xícara de Aveia em flocos finos",
+      "fdcId": 173904,
+      "grams": 81,
+      "measureAssumption": "1 xícara de aveia"
+    },
+    {
+      "original": "1 colher (sopa) de fermento",
+      "fdcId": 172804,
+      "grams": 13.8,
+      "measureAssumption": "3 colheres de chá de 4,6 g"
+    },
+    {
+      "original": "Canela em pó a gosto",
+      "omitted": "canela a gosto"
+    }
+  ],
+  "178347": [
+    {
+      "original": "4 ovos",
+      "fdcId": 171287,
+      "grams": 200,
+      "measureAssumption": "4 ovos grandes sem casca"
+    },
+    {
+      "original": "1/2 xícara (chá) de óleo vegetal ou óleo de coco",
+      "fdcId": 171411,
+      "grams": 109,
+      "measureAssumption": "meia xícara de óleo de soja, um óleo vegetal",
+      "choice": "óleo de soja"
+    },
+    {
+      "original": "2 xícaras (chá) de açúcar",
+      "fdcId": 169655,
+      "grams": 400,
+      "measureAssumption": "2 xícaras de açúcar de 200 g"
+    },
+    {
+      "original": "1 colher (sopa) de canela em pó",
+      "fdcId": 171320,
+      "grams": 7.8,
+      "measureAssumption": "1 colher de sopa de canela"
+    },
+    {
+      "original": "2 xícaras (chá) de farinha de arroz",
+      "fdcId": 169714,
+      "grams": 316,
+      "measureAssumption": "2 xícaras de farinha de arroz de 158 g"
+    },
+    {
+      "original": "2 xícaras (chá) de bananas amassadas",
+      "fdcId": 173944,
+      "grams": 450,
+      "measureAssumption": "2 xícaras de banana amassada de 225 g"
+    },
+    {
+      "original": "1 colher (sopa) fermento químico em pó",
+      "fdcId": 172804,
+      "grams": 13.8,
+      "measureAssumption": "3 colheres de chá de 4,6 g"
+    }
+  ],
+  "173267": [
+    {
+      "original": "4 bananas",
+      "fdcId": 173944,
+      "grams": 472,
+      "measureAssumption": "4 bananas médias"
+    },
+    {
+      "original": "1 xícara de uvas passas",
+      "fdcId": 168165,
+      "grams": 145,
+      "measureAssumption": "1 xícara sem compactar de uva-passa sem sementes"
+    },
+    {
+      "original": "3 ovos",
+      "fdcId": 171287,
+      "grams": 150,
+      "measureAssumption": "3 ovos grandes sem casca"
+    },
+    {
+      "original": "1/3 xícara de óleo",
+      "fdcId": 171411,
+      "grams": 72.66666666666667,
+      "measureAssumption": "um terço de xícara de óleo de soja, um óleo vegetal"
+    },
+    {
+      "original": "2 xícaras de aveia",
+      "fdcId": 173904,
+      "grams": 162,
+      "measureAssumption": "2 xícaras de aveia de 81 g"
+    },
+    {
+      "original": "2 colheres de fermento",
+      "fdcId": 172804,
+      "grams": 27.6,
+      "measureAssumption": "2 colheres de sopa, equivalentes a 6 colheres de chá de 4,6 g"
+    },
+    {
+      "original": "canela",
+      "omitted": "canela sem medida"
+    }
+  ],
+  "171469": [
+    {
+      "original": "3 ovos inteiros",
+      "fdcId": 171287,
+      "grams": 150,
+      "measureAssumption": "3 ovos grandes sem casca"
+    },
+    {
+      "original": "1 xícara (chá) de farinha de arroz",
+      "fdcId": 169714,
+      "grams": 158,
+      "measureAssumption": "1 xícara de farinha de arroz"
+    },
+    {
+      "original": "1 xícara (chá) de água (ou leite, se puder consumir)",
+      "fdcId": 173647,
+      "grams": 237,
+      "measureAssumption": "1 xícara de água, opção indicada na receita",
+      "choice": "água"
+    },
+    {
+      "original": "1/2 xícara (chá) de óleo (de sua preferência)",
+      "fdcId": 171411,
+      "grams": 109,
+      "measureAssumption": "meia xícara de óleo de soja, um óleo vegetal"
+    },
+    {
+      "original": "1 colher de amido de milho",
+      "fdcId": 169698,
+      "grams": 8,
+      "measureAssumption": "1 de 16 colheres de sopa em uma xícara de 128 g"
+    },
+    {
+      "original": "1 colher (sopa) de fermento químico",
+      "fdcId": 172804,
+      "grams": 13.8,
+      "measureAssumption": "3 colheres de chá de 4,6 g"
+    },
+    {
+      "original": "sal a gosto",
+      "omitted": "sal a gosto"
+    }
+  ],
+  "128": [
+    {
+      "original": "4 ovos inteiros",
+      "fdcId": 171287,
+      "grams": 200,
+      "measureAssumption": "4 ovos grandes sem casca"
+    },
+    {
+      "original": "6 bananas caturra cortadas em rodelas",
+      "fdcId": 173944,
+      "grams": 708,
+      "measureAssumption": "6 bananas médias como referência de tamanho"
+    },
+    {
+      "original": "1/2 xícara de chá de óleo de canola",
+      "fdcId": 172336,
+      "grams": 109,
+      "measureAssumption": "meia xícara de óleo de canola"
+    },
+    {
+      "original": "1/2 xícara de leite desnatado",
+      "fdcId": 173432,
+      "grams": 122.5,
+      "measureAssumption": "meia xícara de leite desnatado"
+    },
+    {
+      "original": "1 xícara de chá de farinha de trigo integral",
+      "fdcId": 168893,
+      "grams": 120,
+      "measureAssumption": "1 xícara de farinha de trigo integral"
+    },
+    {
+      "original": "1 xícara de chá de aveia",
+      "fdcId": 173904,
+      "grams": 81,
+      "measureAssumption": "1 xícara de aveia"
+    },
+    {
+      "original": "2 xícaras de chá, não muito cheias, de açúcar mascavo.",
+      "fdcId": 168833,
+      "grams": 290,
+      "measureAssumption": "2 xícaras de açúcar mascavo sem compactar, aproximação para xícaras não cheias"
+    },
+    {
+      "original": "canela para salpicar",
+      "omitted": "canela para salpicar"
+    },
+    {
+      "original": "1 colher de sopa de fermento em pó",
+      "fdcId": 172804,
+      "grams": 13.8,
+      "measureAssumption": "3 colheres de chá de 4,6 g"
+    }
+  ],
+  "27151": [
+    {
+      "original": "4 ovos inteiros",
+      "fdcId": 171287,
+      "grams": 200,
+      "measureAssumption": "4 ovos grandes sem casca"
+    },
+    {
+      "original": "6 bananas prata cortadas em tiras",
+      "fdcId": 173944,
+      "grams": 708,
+      "measureAssumption": "6 bananas médias como referência de tamanho"
+    },
+    {
+      "original": "1/2 xícara de chá de óleo de canola",
+      "fdcId": 172336,
+      "grams": 109,
+      "measureAssumption": "meia xícara de óleo de canola"
+    },
+    {
+      "original": "1/2 xícara de leite desnatado",
+      "fdcId": 173432,
+      "grams": 122.5,
+      "measureAssumption": "meia xícara de leite desnatado"
+    },
+    {
+      "original": "1 xícara de chá de farinha de trigo integral",
+      "fdcId": 168893,
+      "grams": 120,
+      "measureAssumption": "1 xícara de farinha de trigo integral"
+    },
+    {
+      "original": "1 xícara de chá de aveia integral grossa",
+      "fdcId": 173904,
+      "grams": 81,
+      "measureAssumption": "1 xícara de aveia"
+    },
+    {
+      "original": "2 xícaras de chá, não muito cheias, de açúcar mascavo",
+      "fdcId": 168833,
+      "grams": 290,
+      "measureAssumption": "2 xícaras de açúcar mascavo sem compactar, aproximação para xícaras não cheias"
+    },
+    {
+      "original": "Canela para salpicar",
+      "omitted": "canela para salpicar"
+    },
+    {
+      "original": "1 colher de sopa de fermento em pó",
+      "fdcId": 172804,
+      "grams": 13.8,
+      "measureAssumption": "3 colheres de chá de 4,6 g"
+    }
+  ]
+}

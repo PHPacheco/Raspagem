@@ -4,7 +4,9 @@ Panela Aberta é a aplicação web da Unidade 4 de Processamento de Linguagem Na
 
 ## Executar e validar no computador
 
-Use Node.js 22 ou superior. Na raiz deste repositório, abra um terminal e execute:
+No Windows, com Node.js 22 ou superior instalado, dê dois cliques em [abrir_panela_aberta.bat](abrir_panela_aberta.bat). O atalho instala as dependências se necessário, inicia o Wrangler e abre a página quando ela estiver pronta. Mantenha a janela do atalho aberta durante o uso e pressione Ctrl+C para parar o servidor.
+
+Para executar pelo terminal, comece pela raiz do repositório:
 
 ```powershell
 cd chatbot-web

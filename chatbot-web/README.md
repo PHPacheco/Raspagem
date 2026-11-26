@@ -4,7 +4,7 @@ Panela Aberta é a aplicação web da Unidade 4 de Processamento de Linguagem Na
 
 ## Executar e validar no computador
 
-No Windows, com Node.js 22 ou superior instalado, dê dois cliques em [abrir_panela_aberta.bat](abrir_panela_aberta.bat). O atalho instala as dependências se necessário, inicia o Wrangler e abre a página quando ela estiver pronta. Mantenha a janela do atalho aberta durante o uso e pressione Ctrl+C para parar o servidor.
+No Windows, dê dois cliques em [abrir_panela_aberta.bat](abrir_panela_aberta.bat). Se o site já estiver rodando, o atalho abre a página no navegador. Para iniciar o servidor, ele usa Node.js 22 ou superior, instala as dependências se necessário e abre a página quando estiver pronta. Mantenha a janela do servidor aberta durante o uso e pressione Ctrl+C para pará-lo.
 
 Para executar pelo terminal, comece pela raiz do repositório:
 

@@ -4,6 +4,14 @@ title Panela Aberta
 
 pushd "%~dp0" || exit /b 1
 
+set "PANELA_ABERTA_URL=http://127.0.0.1:8788"
+rem Reabra a pagina se o Panela Aberta ja estiver rodando.
+powershell.exe -NoProfile -NonInteractive -Command "$ProgressPreference = 'SilentlyContinue'; $url = $env:PANELA_ABERTA_URL; try { $page = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 2; if ($page.Content -like '*<title>Panela Aberta*') { Start-Process -FilePath $url -ErrorAction Stop; exit 0 } } catch {}; exit 1"
+if not errorlevel 1 (
+    popd
+    exit /b 0
+)
+
 where npm.cmd >nul 2>&1
 if errorlevel 1 goto :no_node
 node -e "if (Number(process.versions.node.split('.')[0]) < 22) process.exit(1)" >nul 2>&1
@@ -24,7 +32,6 @@ if not exist "node_modules\.bin\wrangler.cmd" (
     )
 )
 
-set "PANELA_ABERTA_URL=http://127.0.0.1:8788"
 echo Panela Aberta em %PANELA_ABERTA_URL%
 echo Deixe esta janela aberta. Use Ctrl+C para parar o servidor.
 echo.

@@ -25,85 +25,26 @@
 
     <main id="inicio">
       <section class="intro" aria-labelledby="intro-title">
-        <div>
-          <h1 id="intro-title">Receitas com o que você tem</h1>
-          <p class="intro-copy">
-            Conte o que você tem em casa. O assistente cruza seus ingredientes com
-            120 receitas do projeto para sugerir o que preparar.
-          </p>
-        </div>
-        <div class="ingredient-cloud" aria-label="Exemplos de ingredientes">
-          <span>arroz</span>
-          <span>tomate</span>
-          <span>aveia</span>
-          <span>frango</span>
-          <span>banana</span>
-          <span>ovos</span>
-        </div>
+        <h1 id="intro-title">Receitas com o que você tem</h1>
+        <p class="intro-copy">
+          Conte o que você tem em casa e encontre opções entre 120 receitas do projeto.
+        </p>
       </section>
 
-      <section class="workspace" id="chat" aria-label="Área do assistente de receitas">
-        <aside class="guide" id="como-funciona">
-          <h2>Como usar</h2>
-          <ol class="steps">
-            <li>
-              <div>
-                <strong>Liste o que tem</strong>
-                <p>Vale escrever livremente e incluir preferências.</p>
-              </div>
-            </li>
-            <li>
-              <div>
-                <strong>Compare as opções</strong>
-                <p>Veja o que já está disponível e o que ainda falta.</p>
-              </div>
-            </li>
-            <li>
-              <div>
-                <strong>Escolha a receita</strong>
-                <p>Consulte a origem antes de começar o preparo.</p>
-              </div>
-            </li>
-          </ol>
-          <div class="note">
-            <strong>Sobre nutrição</strong>
-            <p>
-              As estimativas por porção usam dados da USDA FoodData Central. Confira os
-              rótulos e a receita de origem se precisar evitar algum ingrediente.
-            </p>
-          </div>
-        </aside>
-
-        <section class="chat-panel" aria-labelledby="chat-title">
+      <div class="workspace">
+        <section class="chat-panel" id="chat" aria-labelledby="chat-title">
           <div class="chat-heading">
-            <div>
-              <h2 id="chat-title">O que tem na sua cozinha?</h2>
-            </div>
+            <h2 id="chat-title">O que tem na sua cozinha?</h2>
             <button class="text-button" id="clear-chat" type="button">Nova conversa</button>
           </div>
 
-          <div class="messages" id="messages" aria-live="polite" aria-label="Mensagens da conversa">
-            <article class="message message-bot">
+          <div class="messages" id="messages" role="log" aria-label="Mensagens da conversa" tabindex="0">
+            <article class="message message-bot" aria-label="Panela Aberta">
               <div class="avatar" aria-hidden="true">PA</div>
               <div class="message-body">
-                <p>
-                  Olá! Escreva os ingredientes que você tem e, se quiser, diga se
-                  procura algo rápido, leve ou vegetariano.
-                </p>
+                <p>Liste seus ingredientes ou use um dos exemplos.</p>
               </div>
             </article>
-          </div>
-
-          <div class="suggestions" aria-label="Sugestões de mensagens">
-            <button type="button" data-prompt="Tenho frango, tomate, cebola e arroz">
-              frango + tomate + arroz
-            </button>
-            <button type="button" data-prompt="Tenho banana, aveia, cacau e ovos">
-              banana + aveia + cacau + ovos
-            </button>
-            <button type="button" data-prompt="Tenho batata, queijo e leite. Prefiro algo vegetariano">
-              batata + queijo + leite
-            </button>
           </div>
 
           <form class="composer" id="chat-form">
@@ -115,20 +56,54 @@
                 rows="2"
                 maxlength="600"
                 aria-describedby="composer-help"
-                placeholder="Ex.: tenho abobrinha, arroz e dois ovos..."
+                placeholder="Tenho abobrinha, arroz e dois ovos…"
                 required
               ></textarea>
-              <button class="send-button" type="submit">
-                <span>Enviar</span>
-                <span aria-hidden="true">↗</span>
-              </button>
+              <button class="send-button" type="submit">Enviar</button>
             </div>
             <p class="composer-help" id="composer-help">
-              Inclua uma restrição ou aponte quanto tempo você tem para cozinhar.
+              Se quiser, diga quanto tempo tem ou quais ingredientes prefere evitar.
             </p>
           </form>
+
+          <div class="suggestions" role="group" aria-label="Exemplos de mensagens">
+            <button type="button" data-prompt="Tenho frango, tomate e arroz">
+              Frango, tomate e arroz
+            </button>
+            <button type="button" data-prompt="Tenho banana, aveia, cacau e ovos">
+              Banana, aveia, cacau e ovos
+            </button>
+            <button type="button" data-prompt="Tenho batata, queijo e leite">
+              Batata, queijo e leite
+            </button>
+          </div>
         </section>
-      </section>
+
+        <aside class="guide" id="como-funciona" aria-labelledby="guide-title">
+          <h2 id="guide-title">Como usar</h2>
+          <ol class="steps">
+            <li>
+              <strong>Liste o que tem</strong>
+              <p>Escreva livremente e inclua suas preferências.</p>
+            </li>
+            <li>
+              <strong>Compare as opções</strong>
+              <p>Veja quais ingredientes você já tem e quais faltam.</p>
+            </li>
+            <li>
+              <strong>Consulte o preparo</strong>
+              <p>Abra a receita de origem para ver o modo de preparo.</p>
+            </li>
+          </ol>
+          <div class="note">
+            <strong>Sobre nutrição</strong>
+            <p>
+              As estimativas por porção usam dados da USDA FoodData Central. Confira os
+              rótulos e a receita de origem se precisar evitar algum ingrediente.
+            </p>
+          </div>
+        </aside>
+      </div>
 
       <section class="project-info" aria-labelledby="project-title">
         <h2 id="project-title">Sobre o projeto</h2>
@@ -153,19 +128,16 @@
 
     <template id="recipe-template">
       <article class="recipe-card">
-        <div class="recipe-content">
-          <div class="recipe-title-row">
-            <h3></h3>
-            <span class="match-score"></span>
-          </div>
+        <header class="recipe-heading">
+          <h3></h3>
           <p class="recipe-summary"></p>
-          <div class="recipe-meta">
-            <p><strong>Você já tem:</strong> <span data-field="matched"></span></p>
-            <p><strong>Pode faltar:</strong> <span data-field="missing"></span></p>
-          </div>
-          <a class="recipe-source" target="_blank" rel="noopener noreferrer">Ver receita e preparo na fonte</a>
-          <p class="recipe-nutrition"></p>
-        </div>
+        </header>
+        <dl class="recipe-meta">
+          <div><dt>Você já tem</dt><dd data-field="matched"></dd></div>
+          <div><dt>O que falta</dt><dd data-field="missing"></dd></div>
+        </dl>
+        <div class="recipe-nutrition"></div>
+        <a class="recipe-source" target="_blank" rel="noopener noreferrer">Ver preparo na fonte</a>
       </article>
     </template>
 

@@ -186,7 +186,7 @@ Os métodos são baselines determinísticos e interpretáveis, não substitutos 
 .\.venv\bin\python.exe -m scraper export-notebook
 ```
 
-Esse comando gera `notebooks\Trabalho PLN.ipynb` com outputs prontos. O fluxo oficial de visualização não usa mais página web/Streamlit.
+Esse comando gera `notebooks\Trabalho PLN.ipynb` com outputs prontos para visualizar as análises.
 
 Para atualizar tudo antes de gerar o notebook:
 
@@ -200,16 +200,6 @@ Para atualizar tudo antes de gerar o notebook:
 
 O notebook mantém os filtros em forma de variáveis editáveis, além das tabelas, detalhes das receitas, preparação textual, gráfico 3D, TF-IDF, embeddings, classificação e extração de informação.
 O resumo informa a cobertura dos metadados. Valores ausentes, como custo não publicado pela fonte, permanecem nulos e aparecem como `Não informado`, sem dados inventados.
-
-## Relatório web separado
-
-O relatório estático fica isolado em `relatorio-web\`. Essa pasta não importa módulos Python, não executa análises e contém apenas HTML, CSS, documentação e um atalho próprio. O notebook continua sendo a interface executável da análise.
-
-No Windows, abra o relatório com:
-
-```text
-relatorio-web\abrir_relatorio.bat
-```
 
 ## Testes
 

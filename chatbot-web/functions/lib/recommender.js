@@ -8,7 +8,7 @@ const ALIASES = {
   arroz: ["arrozes"],
   aveia: ["aveia em flocos", "aveia em flocos finos", "flocos de aveia"],
   azeite: ["azeite de oliva", "azeite extra virgem"],
-  banana: ["bananas", "banana nanica", "bananas nanicas", "banana prata", "banana nanina"],
+  banana: ["bananas", "banana nanica", "bananas nanicas", "banana prata", "bananas prata", "banana nanina", "bananas caturra", "banana caturra"],
   batata: ["batatas", "batata inglesa"],
   "batata doce": ["batatas doces"],
   cacau: ["cacau em po", "cacau em po 100"],
@@ -90,7 +90,7 @@ for (const [name, key] of Object.entries(EXCLUSION_ALIASES)) {
 }
 const phrase = [...vocabulary.keys()].sort((a, b) => b.length - a.length).join("|");
 const ingredientPattern = new RegExp("\\b(?:" + phrase + ")\\b", "g");
-const markerPattern = /\b(?:(?<absent>nao (?:tenho|possuo|temos)|falta|acabou)|(?<excluded>sem|evito|evite|nao (?:quero|como|posso comer)|alergi[ac][ao]?s? (?:a|ao))|(?<available>tenho|possuo|temos|sobrou|tambem|mais))\b/g;
+const markerPattern = /\b(?:(?<absent>nao (?:tenho|possuo|temos)|falta|acabou)|(?<excluded>sem|exceto|tirando|evito|evite|nao (?:quero|como|posso comer|posso usar)|alergi[ac][ao]?s? (?:a|ao))|(?<available>tenho|possuo|temos|sobrou|tambem))\b/g;
 const restrictions = new Set([...ingredientKeys, ...vocabulary.values(), ...Object.keys(GROUPS)]);
 
 function listed(values, allowed) {

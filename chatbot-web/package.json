@@ -1,0 +1,14 @@
+{
+  "name": "panela-aberta-chatbot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev public",
+    "deploy": "wrangler pages deploy public",
+    "check": "node --check public/app.js && node --check functions/api/chat.js"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

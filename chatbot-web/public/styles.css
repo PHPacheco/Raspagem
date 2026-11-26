@@ -107,15 +107,6 @@ main {
   gap: 70px;
 }
 
-.eyebrow {
-  margin: 0 0 12px;
-  color: var(--coral-dark);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-}
-
 h1,
 h2,
 h3,
@@ -193,10 +184,6 @@ h1 {
   color: var(--white);
 }
 
-.guide .eyebrow {
-  color: #f3ae9b;
-}
-
 .guide h2,
 .chat-heading h2 {
   margin: 0;
@@ -218,17 +205,8 @@ h1 {
 }
 
 .steps li {
-  display: grid;
-  grid-template-columns: 38px 1fr;
-  gap: 14px;
   padding: 22px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.22);
-}
-
-.steps li > span {
-  color: #f3ae9b;
-  font-family: Georgia, "Times New Roman", serif;
-  font-style: italic;
 }
 
 .steps strong {
@@ -354,23 +332,18 @@ h1 {
 }
 
 .recipe-card {
-  display: grid;
-  grid-template-columns: 38px 1fr;
-  gap: 12px;
   padding: 17px;
   border-left: 3px solid var(--coral);
   background: var(--white);
 }
 
-.recipe-number {
-  color: var(--coral-dark);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 28px;
-  font-style: italic;
+.recipe-card:first-child {
+  border-left-color: var(--green);
 }
 
 .recipe-title-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 14px;
@@ -403,16 +376,36 @@ h1 {
   font-size: 13px;
 }
 
-.recipe-meta p,
-.recipe-nutrition {
+.recipe-meta p {
   margin: 0;
 }
 
-.nutrition-pending {
+.recipe-source {
+  display: inline-block;
   margin-top: 10px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.recipe-nutrition {
+  margin: 8px 0 0;
   color: var(--muted);
   font-size: 12px;
-  font-style: italic;
+}
+
+.project-info {
+  max-width: 740px;
+  margin: 0 0 48px;
+  color: var(--muted);
+}
+
+.project-info h2 {
+  color: var(--green);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 32px;
+  font-weight: 500;
+  margin: 0 0 12px;
 }
 
 .suggestions {
@@ -574,10 +567,6 @@ footer p {
     margin-top: 28px;
   }
 
-  .steps li {
-    grid-template-columns: 1fr;
-  }
-
   .note {
     max-width: 680px;
   }
@@ -632,10 +621,6 @@ footer p {
     gap: 0;
   }
 
-  .steps li {
-    grid-template-columns: 38px 1fr;
-  }
-
   .chat-heading {
     align-items: flex-end;
   }
@@ -658,7 +643,6 @@ footer p {
   }
 
   .recipe-card {
-    grid-template-columns: 28px 1fr;
     padding: 14px 12px;
   }
 

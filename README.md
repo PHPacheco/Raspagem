@@ -2,6 +2,10 @@
 
 Projeto didático para estudar raspagem de HTML, normalização de dados, SQLite e análise textual em um notebook Jupyter com outputs prontos.
 
+## Panela Aberta
+
+A aplicação web da Unidade 4 recomenda receitas a partir dos ingredientes disponíveis. Usa o catálogo da disciplina, estimativas nutricionais da USDA e Qwen pelo Workers AI. Consulte o [roteiro de execução, avaliação e publicação no Cloudflare](chatbot-web/README.md).
+
 ## Aviso de conformidade
 
 O coletor se identifica como:

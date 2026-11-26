@@ -7,11 +7,12 @@ import sqlite3
 import unicodedata
 from urllib.parse import urlsplit
 
-from usda_nutrition import MAPPING, SNAPSHOT, estimate, read_json, write_json
+from usda_nutrition import DATA, MAPPING, SNAPSHOT, estimate, read_json, write_json
 
 PROJECT = Path(__file__).resolve().parents[1]
 DEFAULT_DATABASE = PROJECT.parent / "data" / "recipes.sqlite"
 DEFAULT_CATALOG = PROJECT / "functions" / "data" / "recipes.json"
+DEFAULT_SOURCES = DATA / "recipe-sources.json"
 
 QUANTITY = r"(?:\d+(?:[,.]\d+)?(?:\s*/\s*\d+)?(?:\s*[¼½¾⅓⅔⅛])?|[¼½¾⅓⅔⅛])"
 MEASURE = re.compile(
@@ -46,7 +47,7 @@ def ingredient(raw):
     return {"name": normalize(name), "label": name, "original": raw}
 
 
-def build_catalog(database, selected_ids=()):
+def build_catalog(database, sources, selected_ids=()):
     uri = database.resolve().as_uri() + "?mode=ro"
     with sqlite3.connect(uri, uri=True) as connection:
         connection.row_factory = sqlite3.Row
@@ -59,8 +60,9 @@ def build_catalog(database, selected_ids=()):
             recipe_id = row["site_recipe_id"]
             if selected_ids and recipe_id not in selected_ids:
                 continue
-            source = urlsplit(row["url"])
-            if source.scheme != "https" or not source.hostname:
+            source_url = sources.get(recipe_id, row["url"])
+            source = urlsplit(source_url)
+            if source.scheme != "https" or not source.hostname or source.path.endswith("-html-salvo.html"):
                 continue
             ingredients = [
                 ingredient(item["raw_text"])
@@ -75,7 +77,7 @@ def build_catalog(database, selected_ids=()):
             catalog.append({
                 "id": recipe_id,
                 "title": row["title"],
-                "sourceUrl": row["url"],
+                "sourceUrl": source_url,
                 "prepTimeMinutes": row["prep_time_minutes"],
                 "servings": row["servings"],
                 "cost": row["cost_label"],
@@ -92,9 +94,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE)
     parser.add_argument("--output", type=Path, default=DEFAULT_CATALOG)
+    parser.add_argument("--sources", type=Path, default=DEFAULT_SOURCES)
     parser.add_argument("--recipe-id", action="append", default=[])
     args = parser.parse_args()
-    catalog = build_catalog(args.database, args.recipe_id)
+    catalog = build_catalog(args.database, read_json(args.sources), args.recipe_id)
     mapping, snapshot = read_json(MAPPING), read_json(SNAPSHOT)
     for recipe in catalog:
         recipe["nutrition"] = estimate(recipe, mapping, snapshot)

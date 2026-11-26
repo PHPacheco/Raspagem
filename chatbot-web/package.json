@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "wrangler pages dev public",
     "deploy": "wrangler pages deploy public",
-    "check": "node --check public/app.js && node --check functions/api/chat.js"
+    "check": "node --check public/app.js && node --check functions/api/chat.js && node --check functions/lib/recommender.js && node --check functions/lib/workers-ai.js",
+    "test": "node --test tests/*.test.mjs",
+    "verify": "node scripts/verify.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"

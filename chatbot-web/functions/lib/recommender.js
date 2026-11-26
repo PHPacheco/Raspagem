@@ -5,7 +5,7 @@ const ALIASES = {
   acucar: ["acucares"],
   alho: ["alhos"],
   "alho poro": ["alho frances"],
-  arroz: ["arrozes"],
+  arroz: ["arrozes", "arroz branco", "arroz branco cozido"],
   aveia: ["aveia em flocos", "aveia em flocos finos", "flocos de aveia"],
   azeite: ["azeite de oliva", "azeite extra virgem"],
   banana: ["bananas", "banana nanica", "bananas nanicas", "banana prata", "bananas prata", "banana nanina", "bananas caturra", "banana caturra"],
@@ -19,9 +19,9 @@ const ALIASES = {
   ovo: ["ovos", "ovo inteiro", "ovos inteiros", "clara de ovo", "claras de ovo", "gema de ovo", "gemas de ovo"],
   "farinha de trigo": ["trigo", "farinha de trigo peneirada"],
   feijao: ["feijoes"],
-  frango: ["peito de frango", "file de peito de frango", "file de frango", "files de frango", "frango desfiado"],
+  frango: ["peito de frango", "file de peito de frango", "file de frango", "files de frango", "frango desfiado", "coxa e sobrecoxa de frango"],
   iogurte: ["iogurte natural", "iogurte desnatado"],
-  leite: ["leite integral", "leite desnatado", "leite semidesnatado"],
+  leite: ["leite integral", "leite desnatado", "leite semidesnatado", "leite sem lactose"],
   limao: ["limoes"],
   macarrao: ["massa de macarrao"],
   milho: ["milho verde", "milho verde escorrido"],
@@ -116,8 +116,10 @@ export function readMessage(message, previousInput) {
   const text = fold(message);
   const updates = { available: new Set(), unavailable: new Set(), excluded: new Set() };
   for (const segment of message.split(/[.!?;\n]+/).map(fold)) {
-    const markers = [...segment.matchAll(markerPattern)];
-    for (const item of segment.matchAll(ingredientPattern)) {
+    const items = [...segment.matchAll(ingredientPattern)];
+    const markers = [...segment.matchAll(markerPattern)].filter((entry) =>
+      !items.some((item) => item.index < entry.index && entry.index < item.index + item[0].length));
+    for (const item of items) {
       const key = vocabulary.get(item[0]);
       const marker = markers.findLast((entry) => entry.index < item.index);
       const kind = marker ? Object.keys(marker.groups).find((group) => marker.groups[group]) : "available";

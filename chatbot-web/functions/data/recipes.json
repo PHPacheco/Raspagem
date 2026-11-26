@@ -2,7 +2,7 @@
   {
     "id": "100303",
     "title": "Risoto de Camarão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/100303-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/100303-risoto-de-camarao.html",
     "prepTimeMinutes": 60,
     "servings": 4,
     "cost": null,
@@ -69,7 +69,7 @@
   {
     "id": "10091",
     "title": "Filé de peixe ao forno",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/10091-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/10091-file-de-peixe-ao-forno.html",
     "prepTimeMinutes": 60,
     "servings": 6,
     "cost": null,
@@ -141,7 +141,7 @@
   {
     "id": "101",
     "title": "Arroz de forno à parmegiana",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/101-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/101-arroz-de-forno-a-parmegiana.html",
     "prepTimeMinutes": 30,
     "servings": 6,
     "cost": null,
@@ -193,7 +193,7 @@
   {
     "id": "10228",
     "title": "Bife à parmegiana",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/10228-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/10228-bife-a-parmegiana.html",
     "prepTimeMinutes": 10,
     "servings": 10,
     "cost": "Custo baixo",
@@ -255,7 +255,7 @@
   {
     "id": "10283",
     "title": "Batata suíça",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/10283-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/10283-batata-suica.html",
     "prepTimeMinutes": 15,
     "servings": 4,
     "cost": null,
@@ -307,7 +307,7 @@
   {
     "id": "105248",
     "title": "Pão sem glúten",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/105248-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/105248-pao-sem-gluten.html",
     "prepTimeMinutes": 120,
     "servings": 2,
     "cost": "Custo médio",
@@ -359,7 +359,7 @@
   {
     "id": "106581",
     "title": "Bacalhau 7 mares",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/106581-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/106581-bacalhau-7-mares.html",
     "prepTimeMinutes": 45,
     "servings": 4,
     "cost": null,
@@ -421,7 +421,7 @@
   {
     "id": "109052",
     "title": "Filé de peixe assado",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/109052-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/109052-file-de-peixe-assado.html",
     "prepTimeMinutes": 40,
     "servings": 4,
     "cost": null,
@@ -488,7 +488,7 @@
   {
     "id": "109885",
     "title": "Filé de frango gratinado",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/109885-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/109885-file-de-frango-gratinado.html",
     "prepTimeMinutes": 40,
     "servings": 8,
     "cost": null,
@@ -540,7 +540,7 @@
   {
     "id": "1106",
     "title": "Camarão na moranga",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/1106-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/1106-camarao-na-moranga.html",
     "prepTimeMinutes": 90,
     "servings": 6,
     "cost": "Custo alto",
@@ -612,7 +612,7 @@
   {
     "id": "111",
     "title": "Salmão ao champignon",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/111-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/111-salmao-ao-champignon.html",
     "prepTimeMinutes": 60,
     "servings": 4,
     "cost": null,
@@ -669,7 +669,7 @@
   {
     "id": "111643",
     "title": "Frango à passarinho super crocante",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/111643-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/111643-frango-a-passarinho-super-crocante.html",
     "prepTimeMinutes": 30,
     "servings": 12,
     "cost": null,
@@ -726,7 +726,7 @@
   {
     "id": "112",
     "title": "Bobó de camarão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/112-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/112-bobo-de-camarao.html",
     "prepTimeMinutes": 60,
     "servings": 6,
     "cost": "Custo alto",
@@ -808,7 +808,7 @@
   {
     "id": "11594",
     "title": "Quibe fácil",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/11594-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/11594-quibe-facil.html",
     "prepTimeMinutes": 60,
     "servings": 40,
     "cost": null,
@@ -845,7 +845,7 @@
   {
     "id": "116",
     "title": "Gratinado de frango simples",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/116-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/116-gratinado-de-frango.html",
     "prepTimeMinutes": 60,
     "servings": 6,
     "cost": "Custo médio",
@@ -897,7 +897,7 @@
   {
     "id": "1278",
     "title": "Frango cremoso",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/1278-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/1278-frango-cremoso.html",
     "prepTimeMinutes": 40,
     "servings": 4,
     "cost": null,
@@ -939,7 +939,7 @@
   {
     "id": "128",
     "title": "Bolo integral de banana",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/128-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/128-bolo-integral-de-banana.html",
     "prepTimeMinutes": 60,
     "servings": 12,
     "cost": null,
@@ -1021,7 +1021,7 @@
   {
     "id": "129",
     "title": "Frango com Catupiri e batata palha da tia Gracia",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/129-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/129-frango-com-catupiri-e-batata-palha-da-tia-gracia.html",
     "prepTimeMinutes": 60,
     "servings": 6,
     "cost": null,
@@ -1068,7 +1068,7 @@
   {
     "id": "129926",
     "title": "Frango assado com creme de cebola e maionese",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/129926-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/129926-frango-assado-com-creme-de-cebola-e-maionese.html",
     "prepTimeMinutes": 30,
     "servings": 8,
     "cost": null,
@@ -1095,7 +1095,7 @@
   {
     "id": "13005",
     "title": "Torta de frango com catupiry da Lilian",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/13005-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/13005-torta-de-frango-com-catupiry-da-lilian.html",
     "prepTimeMinutes": 30,
     "servings": 9,
     "cost": null,
@@ -1177,7 +1177,7 @@
   {
     "id": "131419",
     "title": "Frango gratinado com creme de milho",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/131419-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/131419-frango-gratinado-com-creme-de-milho.html",
     "prepTimeMinutes": 30,
     "servings": 8,
     "cost": null,
@@ -1224,7 +1224,7 @@
   {
     "id": "132009",
     "title": "Bolo fácil de laranja sem glúten",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/132009-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/132009-bolo-facil-de-laranja-sem-gluten.html",
     "prepTimeMinutes": 30,
     "servings": 10,
     "cost": null,
@@ -1266,7 +1266,7 @@
   {
     "id": "133817",
     "title": "Moqueca de peixe fácil",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/133817-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/133817-moqueca-de-peixe-facil.html",
     "prepTimeMinutes": 30,
     "servings": 4,
     "cost": "Custo médio",
@@ -1358,7 +1358,7 @@
   {
     "id": "135541",
     "title": "Frango com maionese",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/135541-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/135541-frango-com-maionese.html",
     "prepTimeMinutes": 45,
     "servings": 6,
     "cost": null,
@@ -1400,7 +1400,7 @@
   {
     "id": "136364",
     "title": "Pão sem glúten e sem lactose prático",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/136364-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/136364-pao-sem-gluten-e-sem-lactose-pratico.html",
     "prepTimeMinutes": 35,
     "servings": 10,
     "cost": "Custo médio",
@@ -1452,7 +1452,7 @@
   {
     "id": "136723",
     "title": "Bolo saudável de banana",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/136723-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/136723-bolo-saudavel-de-banana.html",
     "prepTimeMinutes": 30,
     "servings": 12,
     "cost": null,
@@ -1515,7 +1515,7 @@
   {
     "id": "1408",
     "title": "Strogonoff de carne",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/1408-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/1408-strogonoff-de-carne.html",
     "prepTimeMinutes": 30,
     "servings": 8,
     "cost": "Custo médio",
@@ -1577,7 +1577,7 @@
   {
     "id": "14222",
     "title": "Costela na pressão com lingüiça",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/14222-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/14222-costela-na-pressao-com-linguica.html",
     "prepTimeMinutes": 60,
     "servings": 8,
     "cost": null,
@@ -1604,7 +1604,7 @@
   {
     "id": "142450",
     "title": "Frango assado na cerveja - chef Vitor Monteiro",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/142450-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/142450-frango-assado-na-cerveja-chef-vitor-monteiro.html",
     "prepTimeMinutes": 65,
     "servings": 6,
     "cost": null,
@@ -1681,7 +1681,7 @@
   {
     "id": "143411",
     "title": "Picolé salada de frutas",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/143411-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/143411-picole-salada-de-frutas.html",
     "prepTimeMinutes": 3,
     "servings": 20,
     "cost": null,
@@ -1740,7 +1740,7 @@
   {
     "id": "146981",
     "title": "Pão sem glúten",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/146981-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/146981-pao-sem-gluten.html",
     "prepTimeMinutes": 70,
     "servings": 1,
     "cost": "Custo médio",
@@ -1782,7 +1782,7 @@
   {
     "id": "147577",
     "title": "Pão sem glúten de liquidificador",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/147577-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/147577-pao-sem-gluten-de-liquidificador.html",
     "prepTimeMinutes": 60,
     "servings": 2,
     "cost": "Custo médio",
@@ -1844,7 +1844,7 @@
   {
     "id": "147724",
     "title": "Torta integral de atum",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/147724-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/147724-torta-integral-de-atum.html",
     "prepTimeMinutes": 45,
     "servings": 12,
     "cost": null,
@@ -1921,7 +1921,7 @@
   {
     "id": "14955",
     "title": "Costela de boi na panela de pressão cozida na cebola",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/14955-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/14955-costela-de-boi-na-panela-de-pressao-cozida-na-cebola.html",
     "prepTimeMinutes": 50,
     "servings": 12,
     "cost": null,
@@ -1948,7 +1948,7 @@
   {
     "id": "1534",
     "title": "Filé à parmegiana",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/1534-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/1534-file-a-parmegiana.html",
     "prepTimeMinutes": 60,
     "servings": 5,
     "cost": null,
@@ -2000,7 +2000,7 @@
   {
     "id": "15354",
     "title": "Frango assado com batatas",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/15354-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/15354-frango-assado-com-batatas.html",
     "prepTimeMinutes": 60,
     "servings": 5,
     "cost": "Custo médio",
@@ -2047,7 +2047,7 @@
   {
     "id": "15665",
     "title": "Sopa de legumes com macarrão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/15665-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/15665-sopa-de-legumes-com-macarrao.html",
     "prepTimeMinutes": 50,
     "servings": 6,
     "cost": "Custo médio",
@@ -2129,7 +2129,7 @@
   {
     "id": "1598",
     "title": "Rocambole de carne moída maravilhoso",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/1598-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/1598-rocambole-de-carne-moida-maravilhoso.html",
     "prepTimeMinutes": 15,
     "servings": 8,
     "cost": "Custo médio",
@@ -2171,7 +2171,7 @@
   {
     "id": "166155",
     "title": "Bolo de cenoura sem glúten e sem lactose",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/166155-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/166155-bolo-de-cenoura-sem-gluten-e-sem-lactose.html",
     "prepTimeMinutes": 50,
     "servings": 15,
     "cost": "Custo médio",
@@ -2238,7 +2238,7 @@
   {
     "id": "166355",
     "title": "Panqueca sem glúten",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/166355-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/166355-panqueca-sem-gluten.html",
     "prepTimeMinutes": 30,
     "servings": 12,
     "cost": null,
@@ -2275,7 +2275,7 @@
   {
     "id": "168455",
     "title": "Crepe de tapioca (crepioca)",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/168455-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/168455-crepe-de-tapioca-crepioca.html",
     "prepTimeMinutes": 20,
     "servings": 1,
     "cost": null,
@@ -2312,7 +2312,7 @@
   {
     "id": "1703",
     "title": "Salpicão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/1703-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/1703-salpicao.html",
     "prepTimeMinutes": 30,
     "servings": 10,
     "cost": null,
@@ -2359,7 +2359,7 @@
   {
     "id": "171259",
     "title": "Coxinha fit (pré-treino)",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/171259-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/171259-coxinha-fit-pre-treino.html",
     "prepTimeMinutes": 45,
     "servings": 5,
     "cost": null,
@@ -2386,7 +2386,7 @@
   {
     "id": "171469",
     "title": "Torta salgada sem glúten",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/171469-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/171469-torta-salgada-sem-gluten.html",
     "prepTimeMinutes": 30,
     "servings": 25,
     "cost": "Custo médio",
@@ -2458,7 +2458,7 @@
   {
     "id": "173263",
     "title": "Fricassê de frango",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/173263-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/173263-fricasse-de-frango.html",
     "prepTimeMinutes": 30,
     "servings": 10,
     "cost": null,
@@ -2520,7 +2520,7 @@
   {
     "id": "173267",
     "title": "Bolo diet de banana, sem farinha e sem açúcar",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/173267-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/173267-bolo-diet-de-banana-sem-farinha-e-sem-acucar.html",
     "prepTimeMinutes": 30,
     "servings": 15,
     "cost": null,
@@ -2590,7 +2590,7 @@
   {
     "id": "173520",
     "title": "Crepioca - Pão de queijo de frigideira",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/173520-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/173520-crepioca-pao-de-queijo-de-frigideira.html",
     "prepTimeMinutes": 6,
     "servings": 1,
     "cost": null,
@@ -2622,7 +2622,7 @@
   {
     "id": "176329",
     "title": "Pão de micro-ondas",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/176329-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/176329-pao-de-micro-ondas.html",
     "prepTimeMinutes": 3,
     "servings": 1,
     "cost": null,
@@ -2675,7 +2675,7 @@
   {
     "id": "178347",
     "title": "Bolo de banana de liquidificador sem glúten e sem lactose",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/178347-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/178347-bolo-de-banana-de-liquidificador-sem-gluten-e-sem-lactose.html",
     "prepTimeMinutes": 45,
     "servings": 15,
     "cost": null,
@@ -2746,7 +2746,7 @@
   {
     "id": "183579",
     "title": "Omelete fit",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/183579-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/183579-omelete-fit.html",
     "prepTimeMinutes": 5,
     "servings": 1,
     "cost": null,
@@ -2783,7 +2783,7 @@
   {
     "id": "183587",
     "title": "Bolinho de aveia fit",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/183587-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/183587-bolinho-de-aveia-fit.html",
     "prepTimeMinutes": 25,
     "servings": 4,
     "cost": null,
@@ -2830,7 +2830,7 @@
   {
     "id": "183595",
     "title": "Crepioca fit",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/183595-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/183595-crepioca-fit.html",
     "prepTimeMinutes": 5,
     "servings": 1,
     "cost": "Custo baixo",
@@ -2862,7 +2862,7 @@
   {
     "id": "18440",
     "title": "Costela no bafo na panela de pressão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/18440-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/18440-costela-no-bafo-na-panela-de-pressao.html",
     "prepTimeMinutes": 30,
     "servings": 5,
     "cost": null,
@@ -2889,7 +2889,7 @@
   {
     "id": "185813",
     "title": "Pipoca fit sem óleo",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/185813-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/185813-pipoca-fit-sem-oleo.html",
     "prepTimeMinutes": 3,
     "servings": 2,
     "cost": "Custo baixo",
@@ -2911,7 +2911,7 @@
   {
     "id": "189421",
     "title": "Panqueca de banana fit",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/189421-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/189421-panqueca-de-banana-fit.html",
     "prepTimeMinutes": 15,
     "servings": 1,
     "cost": "Custo baixo",
@@ -2962,7 +2962,7 @@
   {
     "id": "189500",
     "title": "Panqueca saudável de aveia e banana",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/189500-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/189500-panqueca-saudavel-de-aveia-e-banana.html",
     "prepTimeMinutes": 15,
     "servings": 4,
     "cost": "Custo baixo",
@@ -3021,7 +3021,7 @@
   {
     "id": "194216",
     "title": "Torta de frango para quem faz dieta low carb",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/194216-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/194216-torta-de-frango-para-quem-faz-dieta-low-carb.html",
     "prepTimeMinutes": 40,
     "servings": 10,
     "cost": null,
@@ -3073,7 +3073,7 @@
   {
     "id": "1971",
     "title": "Estrogonofe de camarão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/1971-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/1971-estrogonofe-de-camarao.html",
     "prepTimeMinutes": 40,
     "servings": 5,
     "cost": "Custo médio",
@@ -3135,7 +3135,7 @@
   {
     "id": "1979",
     "title": "Bolinho de bacalhau",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/1979-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/1979-bolinho-de-bacalhau.html",
     "prepTimeMinutes": 50,
     "servings": 40,
     "cost": "Custo alto",
@@ -3187,7 +3187,7 @@
   {
     "id": "19969",
     "title": "Estrogonofe de camarão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/19969-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/19969-estrogonofe-de-camarao.html",
     "prepTimeMinutes": 60,
     "servings": 6,
     "cost": "Custo médio",
@@ -3249,7 +3249,7 @@
   {
     "id": "20768",
     "title": "Escondidinho de carne-seca",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/20768-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/20768-escondidinho-de-carne-seca.html",
     "prepTimeMinutes": 60,
     "servings": 6,
     "cost": "Custo médio",
@@ -3311,7 +3311,7 @@
   {
     "id": "2085",
     "title": "Yakissoba da casa",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/2085-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/2085-yakissoba-da-casa.html",
     "prepTimeMinutes": 40,
     "servings": 4,
     "cost": "Custo médio",
@@ -3383,7 +3383,7 @@
   {
     "id": "20882",
     "title": "Bisteca de porco ao forno",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/20882-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/20882-bisteca-de-porco-ao-forno.html",
     "prepTimeMinutes": 60,
     "servings": 8,
     "cost": null,
@@ -3440,7 +3440,7 @@
   {
     "id": "21372",
     "title": "Filé de frango à milanesa",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/21372-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/21372-file-de-frango-a-milanesa.html",
     "prepTimeMinutes": 60,
     "servings": 8,
     "cost": null,
@@ -3497,7 +3497,7 @@
   {
     "id": "24645",
     "title": "Bacalhau divino e delicioso",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/24645-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/24645-bacalhau-divino.html",
     "prepTimeMinutes": 25,
     "servings": 5,
     "cost": "Custo alto",
@@ -3584,7 +3584,7 @@
   {
     "id": "256",
     "title": "Camarão com requeijão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/256-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/256-camarao-com-requeijao.html",
     "prepTimeMinutes": 30,
     "servings": 4,
     "cost": null,
@@ -3651,7 +3651,7 @@
   {
     "id": "27",
     "title": "Peru assado simples",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/27-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/27-peru-assado-simples.html",
     "prepTimeMinutes": 210,
     "servings": 6,
     "cost": "Custo alto",
@@ -3708,7 +3708,7 @@
   {
     "id": "27151",
     "title": "Torta de banana integral",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/27151-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/27151-torta-de-banana-integral.html",
     "prepTimeMinutes": 50,
     "servings": 12,
     "cost": null,
@@ -3790,7 +3790,7 @@
   {
     "id": "2744",
     "title": "Estrogonofe da casa",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/2744-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/2744-estrogonofe-da-casa.html",
     "prepTimeMinutes": 30,
     "servings": 4,
     "cost": null,
@@ -3852,7 +3852,7 @@
   {
     "id": "27483",
     "title": "Escondidinho de carne moída",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/27483-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/27483-escondidinho-de-carne-moida.html",
     "prepTimeMinutes": 40,
     "servings": 10,
     "cost": "Custo médio",
@@ -3924,7 +3924,7 @@
   {
     "id": "27688",
     "title": "Almoço rápido",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/27688-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/27688-almoco-rapido.html",
     "prepTimeMinutes": 30,
     "servings": 4,
     "cost": null,
@@ -3956,7 +3956,7 @@
   {
     "id": "2831",
     "title": "Moqueca de peixe",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/2831-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/2831-moqueca-de-peixe.html",
     "prepTimeMinutes": 70,
     "servings": 4,
     "cost": "Custo médio",
@@ -4018,7 +4018,7 @@
   {
     "id": "29247",
     "title": "Filé de frango ao forno",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/29247-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/29247-file-de-frango-ao-forno.html",
     "prepTimeMinutes": 50,
     "servings": 10,
     "cost": null,
@@ -4050,7 +4050,7 @@
   {
     "id": "297284",
     "title": "Bolo de Banana com Aveia Fitness",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/297284-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/297284-bolo-de-banana-com-aveia-fitness.html",
     "prepTimeMinutes": 40,
     "servings": 6,
     "cost": null,
@@ -4108,7 +4108,7 @@
   {
     "id": "2998",
     "title": "Feijoada",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/2998-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/2998-feijoada.html",
     "prepTimeMinutes": 140,
     "servings": 20,
     "cost": "Custo médio",
@@ -4205,7 +4205,7 @@
   {
     "id": "30",
     "title": "Bacalhau ao Forno",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/30-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/30-bacalhau-ao-forno.html",
     "prepTimeMinutes": 150,
     "servings": 6,
     "cost": null,
@@ -4322,7 +4322,7 @@
   {
     "id": "301",
     "title": "Bacalhoada",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/301-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/301-bacalhoada.html",
     "prepTimeMinutes": 90,
     "servings": 6,
     "cost": "Custo alto",
@@ -4399,7 +4399,7 @@
   {
     "id": "31",
     "title": "Camarão à Moda Baiana",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/31-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/31-camarao-a-moda-baiana.html",
     "prepTimeMinutes": 60,
     "servings": 4,
     "cost": null,
@@ -4441,7 +4441,7 @@
   {
     "id": "31016",
     "title": "Filé de frango à parmegiana",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/31016-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/31016-file-de-frango-a-parmegiana.html",
     "prepTimeMinutes": 50,
     "servings": 8,
     "cost": "Custo médio",
@@ -4503,7 +4503,7 @@
   {
     "id": "3163",
     "title": "Moqueca capixaba - a legítima",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/3163-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/3163-moqueca-capixaba-a-legitima.html",
     "prepTimeMinutes": 45,
     "servings": 6,
     "cost": null,
@@ -4565,7 +4565,7 @@
   {
     "id": "32494",
     "title": "Torta de frango",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/32494-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/32494-torta-de-frango.html",
     "prepTimeMinutes": 40,
     "servings": 20,
     "cost": null,
@@ -4627,7 +4627,7 @@
   {
     "id": "3279",
     "title": "Macarrão de verão Tudo Gostoso",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/3279-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/3279-macarrao-de-verao-tudo-gostoso.html",
     "prepTimeMinutes": 45,
     "servings": 4,
     "cost": null,
@@ -4714,7 +4714,7 @@
   {
     "id": "3407",
     "title": "Sardinha na panela de pressão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/3407-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/3407-sardinha-na-panela-de-pressao.html",
     "prepTimeMinutes": 30,
     "servings": 8,
     "cost": null,
@@ -4771,7 +4771,7 @@
   {
     "id": "39314",
     "title": "Hambúrguer assado",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/39314-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/39314-hamburguer-assado.html",
     "prepTimeMinutes": 80,
     "servings": 12,
     "cost": null,
@@ -4838,7 +4838,7 @@
   {
     "id": "41721",
     "title": "Frango cremoso rapidinho",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/41721-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/41721-frango-cremoso-rapidinho.html",
     "prepTimeMinutes": 25,
     "servings": 8,
     "cost": null,
@@ -4880,7 +4880,7 @@
   {
     "id": "41954",
     "title": "Estrogonofe de frango simples",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/41954-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/41954-estrogonofe-de-frango-simples.html",
     "prepTimeMinutes": 30,
     "servings": 5,
     "cost": null,
@@ -4937,7 +4937,7 @@
   {
     "id": "43297",
     "title": "Salmão grelhado",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/43297-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/43297-salmao-grelhado.html",
     "prepTimeMinutes": 20,
     "servings": 2,
     "cost": null,
@@ -4989,7 +4989,7 @@
   {
     "id": "437",
     "title": "Costela na panela de pressão sem água",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/437-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/437-costela-na-panela-de-pressao-sem-agua.html",
     "prepTimeMinutes": 35,
     "servings": 5,
     "cost": null,
@@ -5011,7 +5011,7 @@
   {
     "id": "454",
     "title": "Peixe ao leite de coco",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/454-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/454-peixe-ao-leite-de-coco.html",
     "prepTimeMinutes": 25,
     "servings": 5,
     "cost": "Custo médio",
@@ -5038,7 +5038,7 @@
   {
     "id": "47884",
     "title": "Esfiha de carne adaptada (receita turca)",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/47884-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/47884-esfiha-de-carne-adaptada-receita-turca.html",
     "prepTimeMinutes": 90,
     "servings": 30,
     "cost": null,
@@ -5140,7 +5140,7 @@
   {
     "id": "4907",
     "title": "Filé de Peixe ao Molho Branco",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/4907-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/4907-file-de-peixe-ao-molho-branco.html",
     "prepTimeMinutes": 30,
     "servings": 8,
     "cost": null,
@@ -5207,7 +5207,7 @@
   {
     "id": "4947",
     "title": "Frango com quiabo mineiro",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/4947-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/4947-frango-com-quiabo-mineiro.html",
     "prepTimeMinutes": 60,
     "servings": 6,
     "cost": null,
@@ -5264,7 +5264,7 @@
   {
     "id": "547",
     "title": "Filé de peixe da mamãe",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/547-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/547-file-de-peixe-da-mamae.html",
     "prepTimeMinutes": 25,
     "servings": 8,
     "cost": null,
@@ -5306,7 +5306,7 @@
   {
     "id": "55",
     "title": "Bife à milanesa",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/55-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/55-bife-a-milanesa.html",
     "prepTimeMinutes": 40,
     "servings": 6,
     "cost": "Custo médio",
@@ -5353,7 +5353,7 @@
   {
     "id": "5552",
     "title": "Estrogonofe de frango básico",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/5552-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/5552-estrogonofe-de-frango-basico.html",
     "prepTimeMinutes": 40,
     "servings": 7,
     "cost": null,
@@ -5395,7 +5395,7 @@
   {
     "id": "57",
     "title": "Quibe assado",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/57-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/57-quibe-assado.html",
     "prepTimeMinutes": 20,
     "servings": 6,
     "cost": "Custo médio",
@@ -5447,7 +5447,7 @@
   {
     "id": "57798",
     "title": "Peito de frango rápido e econômico",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/57798-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/57798-peito-de-frango-rapido-e-economico.html",
     "prepTimeMinutes": 30,
     "servings": 4,
     "cost": "Custo médio",
@@ -5504,7 +5504,7 @@
   {
     "id": "58",
     "title": "Tabule",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/58-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/58-tabule.html",
     "prepTimeMinutes": 480,
     "servings": 4,
     "cost": "Custo baixo",
@@ -5576,7 +5576,7 @@
   {
     "id": "60592",
     "title": "Vatapá de camarão rápido",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/60592-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/60592-vatapa-de-camarao-rapido.html",
     "prepTimeMinutes": 90,
     "servings": 15,
     "cost": "Custo médio",
@@ -5638,7 +5638,7 @@
   {
     "id": "61494",
     "title": "Filé de tilápia assado",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/61494-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/61494-file-de-tilapia-assado.html",
     "prepTimeMinutes": 30,
     "servings": 6,
     "cost": "Custo médio",
@@ -5705,7 +5705,7 @@
   {
     "id": "61518",
     "title": "Bacalhau com natas da Drika - direto de Portugal",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/61518-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/61518-bacalhau-com-natas-da-drika-direto-de-portugal.html",
     "prepTimeMinutes": 30,
     "servings": 6,
     "cost": "Custo alto",
@@ -5772,7 +5772,7 @@
   {
     "id": "6303",
     "title": "Frango assado inteiro e descomplicado",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/6303-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/6303-frango-assado-inteiro-e-descomplicado.html",
     "prepTimeMinutes": 120,
     "servings": 6,
     "cost": "Custo médio",
@@ -5814,7 +5814,7 @@
   {
     "id": "64879",
     "title": "Almôndegas",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/64879-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/64879-almondegas.html",
     "prepTimeMinutes": 60,
     "servings": 4,
     "cost": "Custo baixo",
@@ -5866,7 +5866,7 @@
   {
     "id": "66547",
     "title": "Pão integral com farinha integral, linhaça e aveia",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/66547-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/66547-pao-integral-com-farinha-integral-linhaca-e-aveia.html",
     "prepTimeMinutes": 120,
     "servings": 2,
     "cost": null,
@@ -5933,7 +5933,7 @@
   {
     "id": "66573",
     "title": "Carne assada na panela de pressão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/66573-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/66573-carne-assada-na-panela-de-pressao.html",
     "prepTimeMinutes": 90,
     "servings": 6,
     "cost": "Custo médio",
@@ -6000,7 +6000,7 @@
   {
     "id": "71309",
     "title": "Carne louca de festa",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/71309-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/71309-carne-louca-de-festa.html",
     "prepTimeMinutes": 60,
     "servings": 8,
     "cost": "Custo médio",
@@ -6052,7 +6052,7 @@
   {
     "id": "72",
     "title": "Salpicão de frango",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/72-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/72-salpicao-de-frango.html",
     "prepTimeMinutes": 10,
     "servings": null,
     "cost": null,
@@ -6104,7 +6104,7 @@
   {
     "id": "80799",
     "title": "Almôndega ao molho de tomate - rápida, prática e gostosa",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/80799-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/80799-almondega-ao-molho-de-tomate-rapida-pratica-e-gostosa.html",
     "prepTimeMinutes": 20,
     "servings": 4,
     "cost": "Custo médio",
@@ -6196,7 +6196,7 @@
   {
     "id": "838",
     "title": "Torta de bacalhau",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/838-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/838-torta-de-bacalhau.html",
     "prepTimeMinutes": 60,
     "servings": 10,
     "cost": null,
@@ -6288,7 +6288,7 @@
   {
     "id": "8576",
     "title": "Peru de Natal",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/8576-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/8576-peru-de-natal.html",
     "prepTimeMinutes": 40,
     "servings": 20,
     "cost": "Custo alto",
@@ -6330,7 +6330,7 @@
   {
     "id": "8743",
     "title": "Chester assado",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/8743-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/8743-chester-assado.html",
     "prepTimeMinutes": 40,
     "servings": 8,
     "cost": "Custo alto",
@@ -6387,7 +6387,7 @@
   {
     "id": "87779",
     "title": "Filé de salmão ao forno facílimo",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/87779-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/87779-file-de-salmao-ao-forno-facilimo.html",
     "prepTimeMinutes": 50,
     "servings": 2,
     "cost": "Custo alto",
@@ -6439,7 +6439,7 @@
   {
     "id": "8836",
     "title": "Carne de panela",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/8836-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/8836-carne-de-panela.html",
     "prepTimeMinutes": 50,
     "servings": 5,
     "cost": "Custo médio",
@@ -6521,7 +6521,7 @@
   {
     "id": "88371",
     "title": "Filé de merluza com batata ao forno",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/88371-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/88371-file-de-merluza-com-batata-ao-forno.html",
     "prepTimeMinutes": 30,
     "servings": 6,
     "cost": "Custo médio",
@@ -6573,7 +6573,7 @@
   {
     "id": "8847",
     "title": "Almôndegas",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/8847-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/8847-almondegas.html",
     "prepTimeMinutes": 40,
     "servings": 4,
     "cost": null,
@@ -6615,7 +6615,7 @@
   {
     "id": "89261",
     "title": "Frango frito americano",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/89261-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/89261-frango-frito-americano.html",
     "prepTimeMinutes": 90,
     "servings": 6,
     "cost": null,
@@ -6677,7 +6677,7 @@
   {
     "id": "9125",
     "title": "Bife à parmegiana",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/9125-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/9125-bife-a-parmegiana.html",
     "prepTimeMinutes": 90,
     "servings": 6,
     "cost": "Custo médio",
@@ -6764,7 +6764,7 @@
   {
     "id": "9400",
     "title": "Moqueca de camarão",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/9400-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/9400-moqueca-de-camarao.html",
     "prepTimeMinutes": 20,
     "servings": 2,
     "cost": "Custo alto",
@@ -6826,7 +6826,7 @@
   {
     "id": "97221",
     "title": "Bife acebolado com molho de maionese",
-    "sourceUrl": "https://www.tudogostoso.com.br/receita/97221-html-salvo.html",
+    "sourceUrl": "https://www.tudogostoso.com.br/receita/97221-bife-acebolado-com-molho-de-maionese.html",
     "prepTimeMinutes": 20,
     "servings": 2,
     "cost": null,

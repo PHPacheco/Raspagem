@@ -26,11 +26,10 @@
     <main id="inicio">
       <section class="intro" aria-labelledby="intro-title">
         <div>
-          <p class="eyebrow">Assistente culinário experimental</p>
-          <h1 id="intro-title">Sua despensa já sabe o que vai ter no jantar.</h1>
+          <h1 id="intro-title">Receitas com o que você tem</h1>
           <p class="intro-copy">
             Conte o que você tem em casa. O assistente cruza seus ingredientes com
-            o catálogo do projeto e mostra as opções que exigem menos compras.
+            120 receitas do projeto para sugerir o que preparar.
           </p>
         </div>
         <div class="ingredient-cloud" aria-label="Exemplos de ingredientes">
@@ -45,25 +44,21 @@
 
       <section class="workspace" id="chat" aria-label="Área do assistente de receitas">
         <aside class="guide" id="como-funciona">
-          <p class="eyebrow">Do ingrediente à receita</p>
-          <h2>Três passos simples</h2>
+          <h2>Como usar</h2>
           <ol class="steps">
             <li>
-              <span>01</span>
               <div>
                 <strong>Liste o que tem</strong>
                 <p>Vale escrever livremente e incluir preferências.</p>
               </div>
             </li>
             <li>
-              <span>02</span>
               <div>
                 <strong>Compare as opções</strong>
                 <p>Veja o que já está disponível e o que ainda falta.</p>
               </div>
             </li>
             <li>
-              <span>03</span>
               <div>
                 <strong>Escolha a receita</strong>
                 <p>Consulte a origem antes de começar o preparo.</p>
@@ -73,8 +68,8 @@
           <div class="note">
             <strong>Sobre nutrição</strong>
             <p>
-              Calorias e macronutrientes só serão exibidos quando houver dados e
-              quantidades suficientes. Estimativas não substituem orientação profissional.
+              As estimativas por porção usam dados da USDA FoodData Central. Confira os
+              rótulos e a receita de origem se precisar evitar algum ingrediente.
             </p>
           </div>
         </aside>
@@ -82,7 +77,6 @@
         <section class="chat-panel" aria-labelledby="chat-title">
           <div class="chat-heading">
             <div>
-              <p class="status"><span aria-hidden="true"></span> catálogo do projeto</p>
               <h2 id="chat-title">O que tem na sua cozinha?</h2>
             </div>
             <button class="text-button" id="clear-chat" type="button">Nova conversa</button>
@@ -104,8 +98,8 @@
             <button type="button" data-prompt="Tenho frango, tomate, cebola e arroz">
               frango + tomate + arroz
             </button>
-            <button type="button" data-prompt="Tenho banana, aveia e ovos. Quero um lanche">
-              banana + aveia + ovos
+            <button type="button" data-prompt="Tenho banana, aveia, cacau e ovos">
+              banana + aveia + cacau + ovos
             </button>
             <button type="button" data-prompt="Tenho batata, queijo e leite. Prefiro algo vegetariano">
               batata + queijo + leite
@@ -120,6 +114,7 @@
                 name="message"
                 rows="2"
                 maxlength="600"
+                aria-describedby="composer-help"
                 placeholder="Ex.: tenho abobrinha, arroz e dois ovos..."
                 required
               ></textarea>
@@ -134,16 +129,30 @@
           </form>
         </section>
       </section>
+
+      <section class="project-info" aria-labelledby="project-title">
+        <h2 id="project-title">Sobre o projeto</h2>
+        <p>Pedro Pacheco · Processamento de Linguagem Natural · FURB</p>
+        <p>
+          A aplicação transforma a lista de ingredientes em termos de busca, recupera receitas do
+          catálogo e considera cobertura, ingredientes faltantes e preferências. Com o Qwen
+          habilitado, a IA ajuda a interpretar a mensagem e escolher entre receitas compatíveis.
+        </p>
+        <p>
+          O catálogo reúne receitas de aves, carnes, peixes e alimentação saudável. A cobertura
+          nutricional inicial é de 10 receitas com quantidades revisadas. O tempo e o custo
+          dependem dos dados informados na fonte.
+        </p>
+        <a href="https://github.com/PHPacheco/Raspagem/tree/codex/panela-aberta/chatbot-web">Código, metodologia e avaliação</a>
+      </section>
     </main>
 
     <footer>
-      <p>Projeto acadêmico de Processamento de Linguagem Natural.</p>
-      <p>Receitas com fonte, recomendações explicáveis.</p>
+      <p>Panela Aberta · Unidade 4 de PLN</p>
     </footer>
 
     <template id="recipe-template">
       <article class="recipe-card">
-        <div class="recipe-number" aria-hidden="true"></div>
         <div class="recipe-content">
           <div class="recipe-title-row">
             <h3></h3>

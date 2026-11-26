@@ -95,9 +95,8 @@ function appendBotResponse(data) {
   if (Array.isArray(data.recipes) && data.recipes.length) {
     const list = document.createElement("div");
     list.className = "recipe-list";
-    data.recipes.forEach((recipe, index) => {
+    data.recipes.forEach((recipe) => {
       const card = recipeTemplate.content.firstElementChild.cloneNode(true);
-      card.querySelector(".recipe-number").textContent = String(index + 1).padStart(2, "0");
       card.querySelector("h3").textContent = recipe.title;
       card.querySelector(".match-score").textContent = `${recipe.score ?? 0}% dos ingredientes principais`;
       const details = [recipe.prepTimeMinutes && `${recipe.prepTimeMinutes} min`,
